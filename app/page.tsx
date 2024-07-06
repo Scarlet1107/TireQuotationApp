@@ -1,9 +1,13 @@
-import Image from "next/image";
+"use client";
+import React from "react";
+import Header from "../components/Header";
+import InfomationInputPanel from "./infomationInputPanel";
 
 export default function Home() {
   return (
-    <main className="p-24">
-      <div>Welcome to my App!</div>
+    <main>
+      <Header />
+      <InfomationInputPanel />
     </main>
   );
 }
