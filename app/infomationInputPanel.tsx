@@ -11,8 +11,13 @@ const InfomationInputPanel = () => {
   const [CustomerTypePriceRate, setCustomerTypePriceRate] = useState<
     null | any[]
   >(null);
-  const [tireSize, setTireSize] = useState<any>([]);
+  const [tireSizeOptions, setTireSizeOptions] = useState<any>([]);
   const [customerType, setCustomerType] = useState<string>("");
+
+  // Selected option
+  const [priceRate, setPriceRate] = useState<number>(0);
+  const [tireSize, setTireSize] = useState<string>("");
+  const [theNumberOfTires, setTheNumberOfTires] = useState<number>(0);
 
   useEffect(() => {
     const getRate = async () => {
@@ -32,35 +37,47 @@ const InfomationInputPanel = () => {
         uniqueSizesSet.add(item.size);
       });
       const uniqueSizes = Array.from(uniqueSizesSet);
-      setTireSize(uniqueSizes);
+      setTireSizeOptions(uniqueSizes);
       console.log("tireInfo = ", uniqueSizes);
     };
     getTireSize();
   }, []);
 
+  // プロップスの受け取り方に問題あり。
   const handleCustomerChange = (e: any) => {
-    console.log("customerType = ", e.target.value);
-    setCustomerType(e.target.value);
+    console.log("CustomerType = ", e);
+    setCustomerType(e);
+
+    setPriceRate(e / 100); // ここでパーセントから割合に変更
+    console.log("CustomerTypePriceRate = ", CustomerTypePriceRate);
   };
 
-  const handleClick = () => {
-    priceRate = CustomerTypePriceRate.percent;
-    console.log("clicked");
+  const handleTireSizeChange = (e: any) => {
+    console.log("TireSize = ", e.target.value);
+    setTireSize(e.target.value);
   };
+
+  // const handleClick = () => {
+  //   priceRate = CustomerTypePriceRate.percent;
+  //   console.log("clicked");
+  // };
 
   return (
     <div className="w-1/2 flex flex-col justify-center space-x-8 space-y-8 place-items-center mt-4">
       <div className="space-x-4">
         <label className="text-xl">お客さんを選択</label>
-        <select onChange={(e) => handleCustomerChange(e)} className="place-self-center mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <select
+          onChange={(e) => handleCustomerChange(e.target.value)}
+          value={customerType}
+          className="place-self-center mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
           {CustomerTypePriceRate &&
-            CustomerTypePriceRate.map((item) => (
+            CustomerTypePriceRate.map((rate) => (
               <option
-                key={item.target}
-                value={item.target}
-                
+                key={rate.target}
+                value={rate.target}
               >
-                {item.target}
+                {rate.target}
               </option>
             ))}
         </select>
@@ -69,8 +86,12 @@ const InfomationInputPanel = () => {
         <label htmlFor="tireSize" className="text-xl">
           タイヤサイズを選択
         </label>
-        <select className="place-self-center mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          {tireSize.map((size: string) => (
+        <select
+          className="place-self-center mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          value={tireSize}
+          onChange={(e) => handleTireSizeChange(e)}
+        >
+          {tireSizeOptions.map((size: string) => (
             <option key={uuidv4()} value={String(size)}>
               {size}
             </option>
