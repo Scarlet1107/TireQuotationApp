@@ -56,6 +56,7 @@ export const deleteAllData = async () => {
   if (error) {
     console.error(error);
   } else {
+    alert("テーブルのデータをすべて削除しました");
     console.log("All data deleted:", data);
   }
 };
