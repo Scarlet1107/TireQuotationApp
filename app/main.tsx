@@ -79,6 +79,10 @@ const Main = () => {
 
   const handleButtonClick = async () => {
     console.log("button clicked");
+    if(selectedData.tireSize === "" || selectedData.priceRate === 0 || selectedData.theNumberOfTire === 0) {
+      console.log("必要な情報が入力されていません。")
+      return;
+    }
     const res = await getAllTiresBySize(selectedData.tireSize);
     if (res.data === null) {
       alert("タイヤの情報が見つかりませんでした。");
