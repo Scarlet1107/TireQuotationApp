@@ -47,3 +47,15 @@ export const getAllTiresBySize = async (size: string) => {
   return TiresBySize;
 };
 
+export const deleteAllData = async () => {
+  const { data, error } = await supabase
+    .from("tirePrice")
+    .delete()
+    .neq("id", "0");
+
+  if (error) {
+    console.error(error);
+  } else {
+    console.log("All data deleted:", data);
+  }
+};

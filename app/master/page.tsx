@@ -1,18 +1,27 @@
-import React from 'react'
-import Header from '@/components/Header'
+"use client";
+import React from "react";
+import Header from "@/components/Header";
+import { deleteAllData } from "@/utils/supabaseFunctions";
 
 const page = () => {
-    const handleClick = async () => {
-        const res = await fetch('/api/deleteAll')
-        const data = await res.json()
-        console.log(data)
+  const handleClick = async () => {
+    try {
+      await deleteAllData();
+    } catch (error) {
+      console.error(error);
     }
+  };
   return (
     <div>
       <Header />
-      <button onClick={() => handleClick()}>テーブルのデータをすべて削除する</button>
+      <button
+        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+        onClick={() => handleClick()}
+      >
+        テーブルのデータをすべて削除する
+      </button>
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default page;
