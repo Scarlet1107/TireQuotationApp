@@ -38,3 +38,12 @@ export const getAllTireSize = async () => {
   const TireSize = await supabase.from("tirePrice").select("size");
   return TireSize;
 };
+
+export const getAllTiresBySize = async (size: string) => {
+  const TiresBySize = await supabase
+    .from("tirePrice")
+    .select("*")
+    .eq("size", size);
+  return TiresBySize;
+};
+
