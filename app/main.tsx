@@ -131,6 +131,9 @@ const Main = () => {
                 </option>
               ))}
           </select>
+
+          
+          
         </div>
         <div className="space-x-4">
           <label htmlFor="tireSize" className="text-xl">
@@ -148,7 +151,9 @@ const Main = () => {
               </option>
             ))}
           </select>
+          
         </div>
+
         <div className="space-x-4">
           <label className="text-xl">数量</label>
           <input
@@ -164,6 +169,9 @@ const Main = () => {
         >
           この内容で見積もる！
         </button>
+
+
+        <button className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded" onClick={() => window.print()}>印刷する</button>
       </div>
       {/* 右側部分 */}
       <div className="w-1/2 flex flex-col justify-center space-x-8 space-y-8 place-items-center">
