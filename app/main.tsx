@@ -8,6 +8,19 @@ import {
 } from "@/utils/supabaseFunctions";
 import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 const Main = () => {
   const [CustomerTypePriceRate, setCustomerTypePriceRate] = useState<
@@ -79,8 +92,12 @@ const Main = () => {
 
   const handleButtonClick = async () => {
     console.log("button clicked");
-    if(selectedData.tireSize === "" || selectedData.priceRate === 0 || selectedData.theNumberOfTire === 0) {
-      console.log("必要な情報が入力されていません。")
+    if (
+      selectedData.tireSize === "" ||
+      selectedData.priceRate === 0 ||
+      selectedData.theNumberOfTire === 0
+    ) {
+      console.log("必要な情報が入力されていません。");
       return;
     }
     const res = await getAllTiresBySize(selectedData.tireSize);
@@ -114,7 +131,7 @@ const Main = () => {
   return (
     <div className="mt-8 flex">
       {/* 左側の部分 */}
-      <div className="w-1/2 flex flex-col justify-center space-x-8 space-y-8 place-items-center">
+      <div className="w-1/2 flex flex-col space-y-8 ml-12">
         <div className="space-x-4">
           <label className="text-xl">お客さんを選択</label>
           <select
@@ -131,9 +148,6 @@ const Main = () => {
                 </option>
               ))}
           </select>
-
-          
-          
         </div>
         <div className="space-x-4">
           <label htmlFor="tireSize" className="text-xl">
@@ -151,27 +165,80 @@ const Main = () => {
               </option>
             ))}
           </select>
-          
         </div>
 
         <div className="space-x-4">
-          <label className="text-xl">数量</label>
-          <input
-            type="text"
+          <label htmlFor="options" className="text-xl">
+            会社名を選択
+          </label>
+          <select className="place-self-center mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value=""></option>
+            <option value="1">会社名１</option>
+            <option value="2">会社名２</option>
+            <option value="3">会社名３</option>
+          </select>
+        </div>
+
+        <div className="space-x-4">
+          <Label className="text-xl">数量</Label>
+          <Input
             onChange={(e) => handleTheNumberOfTiresChange(e)}
             defaultValue={selectedData.theNumberOfTire}
-            className="p-2 w-1/3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-1/5"
           />
         </div>
-        <button
-          className=" bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+
+        <div className="flex justify-around">
+          <div className="items-top flex space-x-2">
+            <Checkbox id="terms1" className="" />
+            <div className="grid gap-1.5 leading-none">
+              <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                工賃
+              </Label>
+            </div>
+          </div>
+          <div className="items-top flex space-x-2">
+            <Checkbox id="terms1" />
+            <div className="grid gap-1.5 leading-none">
+              <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                脱着工賃
+              </Label>
+            </div>
+          </div>
+          <div className="items-top flex space-x-2">
+            <Checkbox id="terms1" />
+            <div className="grid gap-1.5 leading-none">
+              <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                タイヤ処分料
+              </Label>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-x-4">
+          <Label>その他のオプション</Label>
+          <Button>+</Button>
+            <div className="flex space-x-4 mt-4">
+              <Label>項目</Label>
+              <Input />
+              <Label>金額</Label>
+              <Input />
+              <Label>数量</Label>
+              <Input />
+            </div>
+        </div>
+
+        <div className="space-x-4">
+          <Label className="text-xl">値引き額</Label>
+          <Input className="w-1/5" />
+        </div>
+
+        <Button
+          className=" bg-green-500 hover:bg-green-600 w-1/5"
           onClick={() => handleButtonClick()}
         >
           この内容で見積もる！
-        </button>
-
-
-        <button className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded" onClick={() => window.print()}>印刷する</button>
+        </Button>
       </div>
       {/* 右側部分 */}
       <div className="w-1/2 flex flex-col justify-center space-x-8 space-y-8 place-items-center">
@@ -187,6 +254,12 @@ const Main = () => {
             <span className="font-medium">金額 : {result.price}円</span>
           </div>
         ))}
+        <Button
+          className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded"
+          onClick={() => window.print()}
+        >
+          印刷する
+        </Button>
       </div>
     </div>
   );
