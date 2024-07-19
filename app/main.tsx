@@ -132,9 +132,7 @@ const Main = () => {
   return (
     <div className="mt-8 flex">
       <div className="w-1/2 flex flex-col space-y-8 ml-12">
-        <Select
-          onValueChange={(value: string) => handleCustomerTypeChange(value)}
-        >
+        <Select onValueChange={(Value) => handleCustomerTypeChange(Value)}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="お客さんを選択" />
           </SelectTrigger>
@@ -148,7 +146,7 @@ const Main = () => {
           </SelectContent>
         </Select>
 
-        <Select onValueChange={(value: string) => handleTireSizeChange(value)}>
+        <Select onValueChange={(Value) => handleTireSizeChange(Value)}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="タイヤサイズを選択" />
           </SelectTrigger>
