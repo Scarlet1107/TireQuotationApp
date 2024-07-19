@@ -36,6 +36,8 @@ const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
   const [tireSizes, setTireSizes] = useState<string[]>([]);
   const [brandNames, setBrandNames] = useState<string[]>([]);
+
+  // 改名が必要。検索条件をまとめたものだから、もっと適当な名前があるはず。
   const [selectedData, setSelectedData] = useState<TireData>({
     priceRate: 0,
     numberOfTires: 1,
@@ -65,7 +67,7 @@ const Main = () => {
         new Set(names.data.map((item) => item.brandName))
       );
       setBrandNames(uniqueBrandNames);
-      console.log("uniqueBrandNames", uniqueBrandNames);
+      console.log("uniqueBrandNames", uniqueBrandNames); //Delete later
     }
   };
 
@@ -170,6 +172,7 @@ const Main = () => {
             ))}
           </SelectContent>
         </Select>
+
 
         <select className="mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option value=""></option>
