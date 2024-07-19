@@ -1,9 +1,8 @@
-"use Client";
-import { extraOption, Result, TireData } from "@/utils/interface";
+"use client";
+import { ExtraOption, Result, TireData } from "@/utils/interface";
 import {
-  getAllTireInformation,
-  getAllTireSize,
-  getCustomerTypePriceRate,
+  getAllTireSizes,
+  getCustomerTypePriceRates,
   getAllTiresBySize,
 } from "@/utils/supabaseFunctions";
 import React, { useEffect, useState } from "react";
@@ -32,173 +31,140 @@ import {
 } from "@/components/ui/card";
 
 const Main = () => {
-  const [CustomerTypePriceRate, setCustomerTypePriceRate] = useState<
-    null | any[]
-  >(null);
-  const [tireSizeOptions, setTireSizeOptions] = useState<any>([]);
+  const [priceRates, setPriceRates] = useState<any[]>([]);
+  const [tireSizes, setTireSizes] = useState<string[]>([]);
   const [customerType, setCustomerType] = useState<string>("");
   const [selectedData, setSelectedData] = useState<TireData>({
     priceRate: 0,
-    theNumberOfTire: 1,
+    numberOfTires: 1,
     tireSize: "",
   });
-  const [extraOptions, setExtraOptions] = useState<extraOption[]>([]);
+  const [extraOptions, setExtraOptions] = useState<ExtraOption[]>([]);
   const [results, setResults] = useState<Result[]>([]);
 
-  // お客さんのタイプのよる価格の掛け率を取得
   useEffect(() => {
-    const getRate = async () => {
-      const rates = await getCustomerTypePriceRate();
-      setCustomerTypePriceRate(rates.data);
-      console.log("rates.data = ", rates.data);
+    const fetchPriceRates = async () => {
+      const rates = await getCustomerTypePriceRates();
+      setPriceRates(rates.data as any[]);
     };
-    getRate();
+    fetchPriceRates();
   }, []);
 
-  // タイヤサイズの情報を取得
   useEffect(() => {
-    const getTireSize = async () => {
-      const size = await getAllTireSize();
-      const uniqueSizesSet = new Set();
-      if (size.data === null) return;
-      size.data.forEach((item) => {
-        uniqueSizesSet.add(item.size);
-      });
-      const uniqueSizes = Array.from(uniqueSizesSet);
-      setTireSizeOptions(uniqueSizes);
+    const fetchTireSizes = async () => {
+      const sizes = await getAllTireSizes();
+      if (sizes.data) {
+        const uniqueSizes = Array.from(
+          new Set(sizes.data.map((item) => item.size))
+        );
+        setTireSizes(uniqueSizes);
+      }
     };
-    getTireSize();
+    fetchTireSizes();
   }, []);
 
-  // プロップスの受け取り方に問題あり。
-  const handleCustomerChange = (e: any) => {
-    console.log("CustomerType = ", e);
-    setCustomerType(e);
-    selectedData.priceRate = e / 100;
-    console.log("selectedData = ", selectedData);
+  const handleCustomerTypeChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const value = e.target.value;
+    setCustomerType(value);
+    setSelectedData((prev) => ({ ...prev, priceRate: Number(value) / 100 }));
   };
 
   const handleTireSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedData({
-      ...selectedData,
-      tireSize: e.target.value,
-    });
+    const value = e.target.value;
+    setSelectedData((prev) => ({ ...prev, tireSize: value }));
   };
 
-  const handleTheNumberOfTiresChange = (e: any) => {
-    setSelectedData({
-      ...selectedData,
-      theNumberOfTire: e.target.value,
-    });
+  const handleNumberOfTiresChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = Number(e.target.value);
+    setSelectedData((prev) => ({ ...prev, numberOfTires: value }));
   };
 
-  const handleButtonClick = async () => {
-    console.log("button clicked");
-    if (
-      selectedData.tireSize === "" ||
-      selectedData.priceRate === 0 ||
-      selectedData.theNumberOfTire === 0
-    ) {
+  const handleEstimate = async () => {
+    const { tireSize, priceRate, numberOfTires } = selectedData;
+    if (!tireSize || priceRate === 0 || numberOfTires === 0) {
       console.log("必要な情報が入力されていません。");
       return;
     }
-    const res = await getAllTiresBySize(selectedData.tireSize);
+
+    const res = await getAllTiresBySize(tireSize);
     if (res.data === null) {
       alert("タイヤの情報が見つかりませんでした。");
       return;
-    } else {
-      console.log("res.data = ", res.data);
-      // const tirePrice = res.data[0].price;
-      // const totalPrice =
-      //   tirePrice * selectedData.theNumberOfTire * selectedData.priceRate;
-      // console.log("totalPrice = ", totalPrice);
-      setResults([]);
-      res.data.forEach((tire: any, index) => {
-        const tirePrice = res.data[index].price;
-        const totalPrice =
-          Math.ceil(
-            (tirePrice *
-              selectedData.theNumberOfTire *
-              selectedData.priceRate) /
-              10
-          ) * 10;
-
-        setResults((results) => [
-          ...results,
-          {
-            brandName: tire.brandName,
-            modelName: tire.modelName,
-            intermediateCalculation: `${tirePrice} × ${selectedData.theNumberOfTire} × ${selectedData.priceRate}`,
-            price: totalPrice,
-          },
-        ]);
-      });
     }
+
+    const newResults = res.data.map((tire: any) => {
+      const tirePrice = tire.price;
+      const totalPrice =
+        Math.ceil((tirePrice * numberOfTires * priceRate) / 10) * 10;
+      return {
+        brandName: tire.brandName,
+        modelName: tire.modelName,
+        intermediateCalculation: `${tirePrice} × ${numberOfTires} × ${priceRate}`,
+        price: totalPrice,
+      };
+    });
+    setResults(newResults);
   };
 
   const addExtraOption = () => {
     if (extraOptions.length >= 5) return;
-
     setExtraOptions([
       ...extraOptions,
-      {
-        id: uuidv4(),
-        option: "",
-        price: 0,
-        quantity: 4,
-      },
+      { id: uuidv4(), option: "", price: 100, quantity: 4 },
     ]);
   };
 
   const deleteExtraOption = (id: string) => {
-    const newOptions = extraOptions.filter((option) => option.id !== id);
-    setExtraOptions(newOptions);
+    setExtraOptions(extraOptions.filter((option) => option.id !== id));
   };
 
-  const handleExtraOptionChange = (id: string, field: keyof extraOption) => {
-    return (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleExtraOptionChange =
+    (id: string, field: keyof ExtraOption) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
-      setExtraOptions((prevOptions) =>
-        prevOptions.map((option) =>
+      setExtraOptions(
+        extraOptions.map((option) =>
           option.id === id ? { ...option, [field]: newValue } : option
         )
       );
     };
-  };
 
   return (
     <div className="mt-8 flex">
-      {/* 左側の部分 */}
       <div className="w-1/2 flex flex-col space-y-8 ml-12">
         <div className="space-x-4">
-          <label className="text-xl">お客さんを選択</label>
+          <Label className="text-xl">お客さんを選択</Label>
           <select
-            onChange={(e) => handleCustomerChange(e.target.value)}
+            onChange={handleCustomerTypeChange}
             value={customerType}
-            className="place-self-center mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value=""></option>
-            {/* ここで表示する文字列とvalue値が異なるので注意 */}
-            {CustomerTypePriceRate &&
-              CustomerTypePriceRate.map((rate) => (
-                <option key={uuidv4()} value={rate.percent}>
+            {priceRates &&
+              priceRates.map((rate) => (
+                <option key={rate.target} value={rate.percent}>
                   {rate.target}
                 </option>
               ))}
           </select>
         </div>
+
         <div className="space-x-4">
           <label htmlFor="tireSize" className="text-xl">
             タイヤサイズを選択
           </label>
           <select
-            className="place-self-center mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            onChange={handleTireSizeChange}
             value={selectedData.tireSize}
-            onChange={(e) => handleTireSizeChange(e)}
+            className="mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value=""></option>
-            {tireSizeOptions.map((size: string) => (
-              <option key={uuidv4()} value={String(size)}>
+            {tireSizes.map((size) => (
+              <option key={size} value={size}>
                 {size}
               </option>
             ))}
@@ -209,7 +175,7 @@ const Main = () => {
           <label htmlFor="options" className="text-xl">
             メーカーを選択
           </label>
-          <select className="place-self-center mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <select className="mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <option value=""></option>
             <option value="1">メーカー１</option>
             <option value="2">メーカー２</option>
@@ -220,63 +186,56 @@ const Main = () => {
         <div className="space-x-4">
           <Label className="text-xl">数量</Label>
           <Input
-            onChange={(e) => handleTheNumberOfTiresChange(e)}
-            defaultValue={selectedData.theNumberOfTire}
+            type="number"
+            onChange={handleNumberOfTiresChange}
+            value={selectedData.numberOfTires}
             className="w-1/5"
           />
         </div>
 
         <div className="flex justify-around">
-          <div className="items-top flex space-x-2">
-            <Checkbox id="terms1" className="" />
-            <div className="grid gap-1.5 leading-none">
-              <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                工賃
-              </Label>
-            </div>
-          </div>
-          <div className="items-top flex space-x-2">
+          <div className="flex items-top space-x-2">
             <Checkbox id="terms1" />
-            <div className="grid gap-1.5 leading-none">
-              <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                脱着工賃
-              </Label>
-            </div>
+            <Label className="text-sm font-medium">工賃</Label>
           </div>
-          <div className="items-top flex space-x-2">
-            <Checkbox id="terms1" />
-            <div className="grid gap-1.5 leading-none">
-              <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                タイヤ処分料
-              </Label>
-            </div>
+          <div className="flex items-top space-x-2">
+            <Checkbox id="terms2" />
+            <Label className="text-sm font-medium">脱着工賃</Label>
+          </div>
+          <div className="flex items-top space-x-2">
+            <Checkbox id="terms3" />
+            <Label className="text-sm font-medium">タイヤ処分料</Label>
           </div>
         </div>
 
         <div className="space-x-4">
           <Label>その他のオプション</Label>
-          <Button onClick={() => addExtraOption()}>+</Button>
+          <Button onClick={addExtraOption}>+</Button>
           {extraOptions.map((extraOption, index) => (
             <div key={extraOption.id} className="flex space-x-4 mt-4">
               <p className="px-4">{index + 1}</p>
               <Label>項目</Label>
               <Input
                 name="option"
-                onChange={handleExtraOptionChange(extraOption.id, `option`)}
+                type="text"
+                onChange={handleExtraOptionChange(extraOption.id, "option")}
                 value={extraOption.option}
                 placeholder="オプション名"
               />
               <Label>金額</Label>
               <Input
                 name="price"
-                onChange={handleExtraOptionChange(extraOption.id, `price`)}
+                type="number"
+                step={100}
+                onChange={handleExtraOptionChange(extraOption.id, "price")}
                 value={extraOption.price}
                 placeholder="金額"
               />
               <Label>数量</Label>
               <Input
                 name="quantity"
-                onChange={handleExtraOptionChange(extraOption.id, `quantity`)}
+                type="number"
+                onChange={handleExtraOptionChange(extraOption.id, "quantity")}
                 value={extraOption.quantity}
                 placeholder="数量"
               />
@@ -296,13 +255,12 @@ const Main = () => {
         </div>
 
         <Button
-          className=" bg-green-500 hover:bg-green-600 w-1/5"
-          onClick={() => handleButtonClick()}
+          className="bg-green-500 hover:bg-green-600 w-1/5"
+          onClick={handleEstimate}
         >
           この内容で見積もる！
         </Button>
       </div>
-      {/* 右側部分 */}
       <div className="w-1/2 flex flex-col space-x-8 space-y-8">
         <p className="flex justify-center text-3xl font-bold">見積もり結果</p>
         <div className="grid grid-cols-2 gap-4">
@@ -319,13 +277,6 @@ const Main = () => {
             </Card>
           ))}
         </div>
-
-        {/* <Button
-          className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded"
-          onClick={() => window.print()}
-        >
-          印刷する
-        </Button> */}
       </div>
     </div>
   );

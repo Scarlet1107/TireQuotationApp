@@ -1,6 +1,6 @@
 import { supabase } from "../utils/supabase";
 
-export const getCustomerTypePriceRate = async () => {
+export const getCustomerTypePriceRates = async () => {
   const CustomerTypePriceRate = await supabase
     .from("CustomerTypePriceRate")
     .select("*");
@@ -12,7 +12,7 @@ export const getAllTireInformation = async () => {
   return TireInformation;
 };
 
-export const getAllTireSize = async () => {
+export const getAllTireSizes = async () => {
   const TireSize = await supabase.from("tirePrice").select("size");
   return TireSize;
 };

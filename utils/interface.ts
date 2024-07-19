@@ -2,7 +2,7 @@ import { UUID } from "crypto";
 
 export interface TireData {
   priceRate: number;
-  theNumberOfTire: number;
+  numberOfTires: number;
   tireSize: string;
 }
 
@@ -13,7 +13,7 @@ export interface Result {
   price: number;
 }
 
-export interface extraOption{
+export interface ExtraOption{
   id: string;
   option: string;
   price: number;
