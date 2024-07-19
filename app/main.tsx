@@ -29,11 +29,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Value } from "@radix-ui/react-select";
 
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
   const [tireSizes, setTireSizes] = useState<string[]>([]);
-  const [customerType, setCustomerType] = useState<string>("");
   const [selectedData, setSelectedData] = useState<TireData>({
     priceRate: 0,
     numberOfTires: 1,
@@ -63,17 +63,13 @@ const Main = () => {
     fetchTireSizes();
   }, []);
 
-  const handleCustomerTypeChange = (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const value = e.target.value;
-    setCustomerType(value);
+  const handleCustomerTypeChange = (value: string) => {
     setSelectedData((prev) => ({ ...prev, priceRate: Number(value) / 100 }));
   };
 
-  const handleTireSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    setSelectedData((prev) => ({ ...prev, tireSize: value }));
+  const handleTireSizeChange = (size: string) => {
+    console.log("handleTireSizeChange", size);
+    setSelectedData((prev) => ({ ...prev, tireSize: size }));
   };
 
   const handleNumberOfTiresChange = (
@@ -136,46 +132,43 @@ const Main = () => {
   return (
     <div className="mt-8 flex">
       <div className="w-1/2 flex flex-col space-y-8 ml-12">
-        <div className="space-x-4">
-          <Label className="text-xl">お客さんを選択</Label>
-          <select
-            onChange={handleCustomerTypeChange}
-            value={customerType}
-            className="mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value=""></option>
+        <Select
+          onValueChange={(value: string) => handleCustomerTypeChange(value)}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="お客さんを選択" />
+          </SelectTrigger>
+          <SelectContent>
             {priceRates &&
-              priceRates.map((rate) => (
-                <option key={rate.target} value={rate.percent}>
+              priceRates.map((rate: any) => (
+                <SelectItem key={rate.target} value={rate.percent}>
                   {rate.target}
-                </option>
+                </SelectItem>
               ))}
-          </select>
-        </div>
+          </SelectContent>
+        </Select>
 
-        <div className="space-x-4">
-          <label htmlFor="tireSize" className="text-xl">
-            タイヤサイズを選択
-          </label>
-          <select
-            onChange={handleTireSizeChange}
-            value={selectedData.tireSize}
-            className="mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value=""></option>
+        <Select onValueChange={(value: string) => handleTireSizeChange(value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="タイヤサイズを選択" />
+          </SelectTrigger>
+          <SelectContent>
             {tireSizes.map((size) => (
-              <option key={size} value={size}>
+              <SelectItem key={size} value={size}>
                 {size}
-              </option>
+              </SelectItem>
             ))}
-          </select>
-        </div>
+          </SelectContent>
+        </Select>
 
         <div className="space-x-4">
-          <label htmlFor="options" className="text-xl">
+          <label htmlFor="selectMaker" className="text-xl">
             メーカーを選択
           </label>
-          <select className="mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <select
+            id="selectMaker"
+            className="mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
             <option value=""></option>
             <option value="1">メーカー１</option>
             <option value="2">メーカー２</option>
@@ -183,28 +176,32 @@ const Main = () => {
           </select>
         </div>
 
-        <div className="space-x-4">
-          <Label className="text-xl">数量</Label>
-          <Input
-            type="number"
-            onChange={handleNumberOfTiresChange}
-            value={selectedData.numberOfTires}
-            className="w-1/5"
-          />
-        </div>
-
-        <div className="flex justify-around">
-          <div className="flex items-top space-x-2">
-            <Checkbox id="terms1" />
-            <Label className="text-sm font-medium">工賃</Label>
+        <div className="flex">
+          <div className="space-x-4">
+            <Label htmlFor="number" className="text-xl">
+              数量
+            </Label>
+            <Input
+              id="number"
+              type="number"
+              onChange={handleNumberOfTiresChange}
+              value={selectedData.numberOfTires}
+              className="w-1/2"
+            />
           </div>
-          <div className="flex items-top space-x-2">
-            <Checkbox id="terms2" />
-            <Label className="text-sm font-medium">脱着工賃</Label>
-          </div>
-          <div className="flex items-top space-x-2">
-            <Checkbox id="terms3" />
-            <Label className="text-sm font-medium">タイヤ処分料</Label>
+          <div className="flex flex-col space-y-2">
+            <div className="flex items-top space-x-2">
+              <Checkbox id="terms1" />
+              <Label className="text-sm font-medium">工賃</Label>
+            </div>
+            <div className="flex items-top space-x-2">
+              <Checkbox id="terms2" />
+              <Label className="text-sm font-medium">脱着工賃</Label>
+            </div>
+            <div className="flex items-top space-x-2">
+              <Checkbox id="terms3" />
+              <Label className="text-sm font-medium">タイヤ処分料</Label>
+            </div>
           </div>
         </div>
 
