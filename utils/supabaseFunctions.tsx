@@ -17,6 +17,11 @@ export const getAllTireSizes = async () => {
   return TireSize;
 };
 
+export const getAllBrandNames = async () => {
+  const BrandNames = await supabase.from("tirePrice").select("brandName");
+  return BrandNames;
+};
+
 export const getAllTiresBySize = async (size: string) => {
   const TiresBySize = await supabase
     .from("tirePrice")
@@ -24,6 +29,8 @@ export const getAllTiresBySize = async (size: string) => {
     .eq("size", size);
   return TiresBySize;
 };
+
+// For master page
 
 export const deleteAllData = async () => {
   const { data, error } = await supabase

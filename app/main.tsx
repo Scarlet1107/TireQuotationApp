@@ -4,6 +4,7 @@ import {
   getAllTireSizes,
   getCustomerTypePriceRates,
   getAllTiresBySize,
+  getAllBrandNames,
 } from "@/utils/supabaseFunctions";
 import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -34,6 +35,7 @@ import { Value } from "@radix-ui/react-select";
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
   const [tireSizes, setTireSizes] = useState<string[]>([]);
+  const [brandNames, setBrandNames] = useState<string[]>([]);
   const [selectedData, setSelectedData] = useState<TireData>({
     priceRate: 0,
     numberOfTires: 1,
@@ -42,25 +44,35 @@ const Main = () => {
   const [extraOptions, setExtraOptions] = useState<ExtraOption[]>([]);
   const [results, setResults] = useState<Result[]>([]);
 
-  useEffect(() => {
-    const fetchPriceRates = async () => {
-      const rates = await getCustomerTypePriceRates();
-      setPriceRates(rates.data as any[]);
-    };
-    fetchPriceRates();
-  }, []);
+  const fetchPriceRates = async () => {
+    const rates = await getCustomerTypePriceRates();
+    setPriceRates(rates.data as any[]);
+  };
+  const fetchTireSizes = async () => {
+    const sizes = await getAllTireSizes();
+    if (sizes.data) {
+      const uniqueSizes = Array.from(
+        new Set(sizes.data.map((item) => item.size))
+      );
+      setTireSizes(uniqueSizes);
+    }
+  };
+
+  const fetchAllBrandNames = async () => {
+    const names = await getAllBrandNames();
+    if (names.data) {
+      const uniqueBrandNames = Array.from(
+        new Set(names.data.map((item) => item.brandName))
+      );
+      setBrandNames(uniqueBrandNames);
+      console.log("uniqueBrandNames", uniqueBrandNames);
+    }
+  };
 
   useEffect(() => {
-    const fetchTireSizes = async () => {
-      const sizes = await getAllTireSizes();
-      if (sizes.data) {
-        const uniqueSizes = Array.from(
-          new Set(sizes.data.map((item) => item.size))
-        );
-        setTireSizes(uniqueSizes);
-      }
-    };
+    fetchPriceRates();
     fetchTireSizes();
+    fetchAllBrandNames();
   }, []);
 
   const handleCustomerTypeChange = (value: string) => {
@@ -159,20 +171,12 @@ const Main = () => {
           </SelectContent>
         </Select>
 
-        <div className="space-x-4">
-          <label htmlFor="selectMaker" className="text-xl">
-            メーカーを選択
-          </label>
-          <select
-            id="selectMaker"
-            className="mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value=""></option>
-            <option value="1">メーカー１</option>
-            <option value="2">メーカー２</option>
-            <option value="3">メーカー３</option>
-          </select>
-        </div>
+        <select className="mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option value=""></option>
+          <option value="1">メーカー１</option>
+          <option value="2">メーカー２</option>
+          <option value="3">メーカー３</option>
+        </select>
 
         <div className="flex">
           <div className="space-x-4">
