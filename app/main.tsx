@@ -212,7 +212,7 @@ const Main = () => {
           </Select>
         </div>
 
-        <div className="flex flex-col md:flex-row md:space-x-8 space-y-4">
+        <div className="flex flex-col lg:flex-row md:space-x-8 space-y-4">
           <div className="space-x-4">
             <Label htmlFor="number">数量</Label>
             <Input
