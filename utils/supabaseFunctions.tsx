@@ -22,11 +22,12 @@ export const getAllBrandNames = async () => {
   return BrandNames;
 };
 
-export const getAllTiresBySize = async (size: string) => {
-  const TiresBySize = await supabase
-    .from("tirePrice")
-    .select("*")
-    .eq("size", size);
+export const searchTires = async (size: string, brandName: string) => {
+  let query = supabase.from("tirePrice").select("*").eq("size", size);
+  if ((brandName != "all")) {
+    query = query.eq("brandName", brandName);
+  }
+  const TiresBySize = await query;
   return TiresBySize;
 };
 

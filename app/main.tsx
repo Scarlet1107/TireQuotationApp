@@ -3,7 +3,7 @@ import { ExtraOption, Result, TireData } from "@/utils/interface";
 import {
   getAllTireSizes,
   getCustomerTypePriceRates,
-  getAllTiresBySize,
+  searchTires,
   getAllBrandNames,
 } from "@/utils/supabaseFunctions";
 import React, { useEffect, useState } from "react";
@@ -41,7 +41,7 @@ const Main = () => {
   const [selectedData, setSelectedData] = useState<TireData>({
     priceRate: 0,
     numberOfTires: 1,
-    brandName: "",
+    brandName: "all",
     tireSize: "",
   });
   const [extraOptions, setExtraOptions] = useState<ExtraOption[]>([]);
@@ -87,8 +87,8 @@ const Main = () => {
   };
 
   const handleBrandNameChange = (brandName: string) => {
-    setSelectedData((prev) => ({...prev, brandName: brandName}))
-  }
+    setSelectedData((prev) => ({ ...prev, brandName: brandName }));
+  };
 
   const handleNumberOfTiresChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -98,13 +98,14 @@ const Main = () => {
   };
 
   const handleEstimate = async () => {
-    const { tireSize, priceRate, numberOfTires } = selectedData;
+    const { tireSize, priceRate, brandName, numberOfTires } = selectedData;
+    console.log("selectedData", selectedData); //Delete later
     if (!tireSize || priceRate === 0 || numberOfTires === 0) {
       console.log("必要な情報が入力されていません。");
       return;
     }
 
-    const res = await getAllTiresBySize(tireSize);
+    const res = await searchTires(tireSize, brandName);
     if (res.data === null) {
       alert("タイヤの情報が見つかりませんでした。");
       return;
@@ -121,6 +122,7 @@ const Main = () => {
         price: totalPrice,
       };
     });
+    console.log("newResults", newResults); //Delete later
     setResults(newResults);
   };
 
@@ -177,25 +179,21 @@ const Main = () => {
           </SelectContent>
         </Select>
 
-        {/* <Select onValueChange={(Value) => handleBrandNameChange(Value)}>
+        <Select onValueChange={(Value) => handleBrandNameChange(Value)}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="メーカーを選択" />
           </SelectTrigger>
           <SelectContent>
-            {brandNames.map(() => (
-              <SelectItem key={size} value={size}>
-                {size}
+            <SelectItem key="All" value="all">
+              すべて
+            </SelectItem>
+            {brandNames.map((brandName) => (
+              <SelectItem key={brandName} value={brandName}>
+                {brandName}
               </SelectItem>
             ))}
           </SelectContent>
-        </Select> */}
-
-        <select className="mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <option value=""></option>
-          <option value="1">メーカー１</option>
-          <option value="2">メーカー２</option>
-          <option value="3">メーカー３</option>
-        </select>
+        </Select>
 
         <div className="flex">
           <div className="space-x-4">
@@ -212,16 +210,16 @@ const Main = () => {
           </div>
           <div className="flex flex-col space-y-2">
             <div className="flex items-top space-x-2">
-              <Checkbox id="terms1" />
-              <Label className="text-sm font-medium">工賃</Label>
+              <Checkbox id="terms1" defaultChecked />
+              <Label className="text-sm font-medium">作業工賃</Label>
             </div>
             <div className="flex items-top space-x-2">
-              <Checkbox id="terms2" />
-              <Label className="text-sm font-medium">脱着工賃</Label>
+              <Checkbox id="terms2" defaultChecked />
+              <Label className="text-sm font-medium">脱着料</Label>
             </div>
             <div className="flex items-top space-x-2">
-              <Checkbox id="terms3" />
-              <Label className="text-sm font-medium">タイヤ処分料</Label>
+              <Checkbox id="terms3" defaultChecked />
+              <Label className="text-sm font-medium">廃タイヤ処分</Label>
             </div>
           </div>
         </div>
