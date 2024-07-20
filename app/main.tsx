@@ -30,7 +30,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Value } from "@radix-ui/react-select";
 
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
@@ -40,7 +39,7 @@ const Main = () => {
   // 改名が必要。検索条件をまとめたものだから、もっと適当な名前があるはず。
   const [selectedData, setSelectedData] = useState<TireData>({
     priceRate: 0,
-    numberOfTires: 1,
+    numberOfTires: 4,
     brandName: "all",
     tireSize: "",
   });
@@ -101,12 +100,13 @@ const Main = () => {
     const { tireSize, priceRate, brandName, numberOfTires } = selectedData;
     console.log("selectedData", selectedData); //Delete later
     if (!tireSize || priceRate === 0 || numberOfTires === 0) {
-      console.log("必要な情報が入力されていません。");
+      alert("必要な情報が入力されていません。");
       return;
     }
 
     const res = await searchTires(tireSize, brandName);
-    if (res.data === null) {
+    console.log("res.data = ", res.data); //Delete later
+    if (!res.data || (Array.isArray(res.data) && res.data.length === 0)) {
       alert("タイヤの情報が見つかりませんでした。");
       return;
     }
@@ -203,6 +203,7 @@ const Main = () => {
             <Input
               id="number"
               type="number"
+              min={1}
               onChange={handleNumberOfTiresChange}
               value={selectedData.numberOfTires}
               className="w-1/2"
@@ -251,6 +252,7 @@ const Main = () => {
               <Input
                 name="quantity"
                 type="number"
+                min={1}
                 onChange={handleExtraOptionChange(extraOption.id, "quantity")}
                 value={extraOption.quantity}
                 placeholder="数量"
