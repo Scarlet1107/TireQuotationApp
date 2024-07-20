@@ -212,7 +212,7 @@ const Main = () => {
           </Select>
         </div>
 
-        <div className="flex flex-col md:flex-col space-y-4 md:space-y-0">
+        <div className="flex flex-col md:flex-row md:space-x-8 space-y-4">
           <div className="space-x-4">
             <Label htmlFor="number">数量</Label>
             <Input
@@ -224,7 +224,7 @@ const Main = () => {
               className="w-min"
             />
           </div>
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col space-y-4">
             <div className="flex items-top space-x-2">
               <Checkbox id="terms1" defaultChecked />
               <Label className="text-sm font-medium">作業工賃</Label>
@@ -240,51 +240,71 @@ const Main = () => {
           </div>
         </div>
 
-        <div className="space-x-4">
-          <Label>その他のオプション</Label>
+        <div>
+          <Label className="mr-2 text-lg">その他のオプション</Label>
           <Button onClick={addExtraOption}>+</Button>
-          {extraOptions.map((extraOption, index) => (
-            <div key={extraOption.id} className="flex space-x-4 mt-4">
-              <p className="px-4">{index + 1}</p>
-              <Label>項目</Label>
-              <Input
-                name="option"
-                type="text"
-                onChange={handleExtraOptionChange(extraOption.id, "option")}
-                value={extraOption.option}
-                placeholder="オプション名"
-              />
-              <Label>金額</Label>
-              <Input
-                name="price"
-                type="number"
-                step={100}
-                onChange={handleExtraOptionChange(extraOption.id, "price")}
-                value={extraOption.price}
-                placeholder="金額"
-              />
-              <Label>数量</Label>
-              <Input
-                name="quantity"
-                type="number"
-                min={1}
-                onChange={handleExtraOptionChange(extraOption.id, "quantity")}
-                value={extraOption.quantity}
-                placeholder="数量"
-              />
-              <Button
-                className={buttonVariants({ variant: "destructive" })}
-                onClick={() => deleteExtraOption(extraOption.id)}
-              >
-                消
-              </Button>
-            </div>
-          ))}
+          <div className="mt-4">
+            {extraOptions.map((extraOption, index) => (
+              <div key={extraOption.id}>
+                <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4 mt-6">
+                  <div>
+                    <Label>項目<span className="font-bold">{index+1}</span></Label>
+                    <Input
+                      name="option"
+                      type="text"
+                      onChange={handleExtraOptionChange(
+                        extraOption.id,
+                        "option"
+                      )}
+                      value={extraOption.option}
+                      placeholder="オプション名"
+                    />
+                  </div>
+                  <div>
+                    <Label>金額</Label>
+                    <Input
+                      name="price"
+                      type="number"
+                      step={100}
+                      onChange={handleExtraOptionChange(
+                        extraOption.id,
+                        "price"
+                      )}
+                      value={extraOption.price}
+                      placeholder="金額"
+                    />
+                  </div>
+                  <div>
+                    <Label>数量</Label>
+                    <Input
+                      name="quantity"
+                      type="number"
+                      min={1}
+                      onChange={handleExtraOptionChange(
+                        extraOption.id,
+                        "quantity"
+                      )}
+                      value={extraOption.quantity}
+                      placeholder="数量"
+                    />
+                  </div>
+
+                  <Button
+                    className="w-min place-self-end"
+                    variant={"destructive"}
+                    onClick={() => deleteExtraOption(extraOption.id)}
+                  >
+                    消
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="space-x-4">
           <Label className="text-xl">値引き額</Label>
-          <Input className="w-1/5" />
+          <Input className="w-min" />
         </div>
 
         <Button
@@ -295,7 +315,9 @@ const Main = () => {
         </Button>
       </div>
       <div className="w-full flex flex-col space-x-8 space-y-8">
-        <p className="flex justify-center text-3xl font-bold mt-12 md:mt-0">見積もり結果</p>
+        <p className="flex justify-center text-3xl font-bold mt-12 md:mt-0">
+          見積もり結果
+        </p>
         <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
           {results.map((result, index) => (
             <Card key={index}>
