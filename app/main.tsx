@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Toaster } from "@/components/ui/toaster";
 
 import {
   Card,
@@ -30,11 +31,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
+
+import { Bold, Italic, Underline } from "lucide-react";
+
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
   const [tireSizes, setTireSizes] = useState<string[]>([]);
   const [brandNames, setBrandNames] = useState<string[]>([]);
+  const { toast } = useToast();
 
   // 改名が必要。検索条件をまとめたものだから、もっと適当な名前があるはず。
   const [selectedData, setSelectedData] = useState<TireData>({
@@ -107,8 +114,18 @@ const Main = () => {
     const res = await searchTires(tireSize, brandName);
     console.log("res.data = ", res.data); //Delete later
     if (!res.data || (Array.isArray(res.data) && res.data.length === 0)) {
-      alert("タイヤの情報が見つかりませんでした。");
+      // alert("タイヤの情報が見つかりませんでした。");
+      toast({
+        variant: "destructive",
+        title: "タイヤ情報が見つかりませんでした。",
+      });
       return;
+    }
+
+    if (brandName === "all") {
+      toast({
+        title: "すべてのメーカーで検索しました",
+      });
     }
 
     const newResults = res.data.map((tire: any) => {
@@ -150,63 +167,61 @@ const Main = () => {
     };
 
   return (
-    <div className="mt-8 flex">
-      <div className="w-1/2 flex flex-col space-y-8 ml-12">
-        <Select onValueChange={(Value) => handleCustomerTypeChange(Value)}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="お客さんを選択" />
-          </SelectTrigger>
-          <SelectContent>
-            {priceRates &&
-              priceRates.map((rate: any) => (
-                <SelectItem key={rate.target} value={rate.percent}>
-                  {rate.target}
+    <div className="w-full mt-8 flex flex-col md:flex-row">
+      <div className="w-max md:w-full flex flex-col space-y-8 ml-12 ">
+        <div className="flex xl:space-x-4 flex-col xl:flex-row space-y-3 xl:space-y-0">
+          <Select onValueChange={(Value) => handleCustomerTypeChange(Value)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="お客さんを選択" />
+            </SelectTrigger>
+            <SelectContent>
+              {priceRates &&
+                priceRates.map((rate: any) => (
+                  <SelectItem key={rate.target} value={rate.percent}>
+                    {rate.target}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+          <Select onValueChange={(Value) => handleTireSizeChange(Value)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="タイヤサイズを選択" />
+            </SelectTrigger>
+            <SelectContent>
+              {tireSizes.map((size) => (
+                <SelectItem key={size} value={size}>
+                  {size}
                 </SelectItem>
               ))}
-          </SelectContent>
-        </Select>
-
-        <Select onValueChange={(Value) => handleTireSizeChange(Value)}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="タイヤサイズを選択" />
-          </SelectTrigger>
-          <SelectContent>
-            {tireSizes.map((size) => (
-              <SelectItem key={size} value={size}>
-                {size}
+            </SelectContent>
+          </Select>
+          <Select onValueChange={(Value) => handleBrandNameChange(Value)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="メーカーを選択" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem key="All" value="all">
+                すべて
               </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+              {brandNames.map((brandName) => (
+                <SelectItem key={brandName} value={brandName}>
+                  {brandName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-        <Select onValueChange={(Value) => handleBrandNameChange(Value)}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="メーカーを選択" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem key="All" value="all">
-              すべて
-            </SelectItem>
-            {brandNames.map((brandName) => (
-              <SelectItem key={brandName} value={brandName}>
-                {brandName}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <div className="flex">
+        <div className="flex flex-col md:flex-col space-y-4 md:space-y-0">
           <div className="space-x-4">
-            <Label htmlFor="number" className="text-xl">
-              数量
-            </Label>
+            <Label htmlFor="number">数量</Label>
             <Input
               id="number"
               type="number"
               min={1}
               onChange={handleNumberOfTiresChange}
               value={selectedData.numberOfTires}
-              className="w-1/2"
+              className="w-min"
             />
           </div>
           <div className="flex flex-col space-y-2">
@@ -273,15 +288,15 @@ const Main = () => {
         </div>
 
         <Button
-          className="bg-green-500 hover:bg-green-600 w-1/5"
+          className="bg-green-500 hover:bg-green-600 w-min"
           onClick={handleEstimate}
         >
           この内容で見積もる！
         </Button>
       </div>
-      <div className="w-1/2 flex flex-col space-x-8 space-y-8">
-        <p className="flex justify-center text-3xl font-bold">見積もり結果</p>
-        <div className="grid grid-cols-2 gap-4">
+      <div className="w-full flex flex-col space-x-8 space-y-8">
+        <p className="flex justify-center text-3xl font-bold mt-12 md:mt-0">見積もり結果</p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
           {results.map((result, index) => (
             <Card key={index}>
               <CardHeader>
@@ -290,12 +305,17 @@ const Main = () => {
               </CardHeader>
               <CardContent>
                 <p>途中計算式 : {result.intermediateCalculation}</p>
-                <p>金額 : {result.price}円</p>
               </CardContent>
+              <CardFooter>
+                <p>
+                  金額 : <span className="font-medium">{result.price}</span>円
+                </p>
+              </CardFooter>
             </Card>
           ))}
         </div>
       </div>
+      <Toaster />
     </div>
   );
 };
