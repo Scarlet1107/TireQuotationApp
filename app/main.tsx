@@ -41,6 +41,7 @@ const Main = () => {
   const [selectedData, setSelectedData] = useState<TireData>({
     priceRate: 0,
     numberOfTires: 1,
+    brandName: "",
     tireSize: "",
   });
   const [extraOptions, setExtraOptions] = useState<ExtraOption[]>([]);
@@ -82,9 +83,12 @@ const Main = () => {
   };
 
   const handleTireSizeChange = (size: string) => {
-    console.log("handleTireSizeChange", size);
     setSelectedData((prev) => ({ ...prev, tireSize: size }));
   };
+
+  const handleBrandNameChange = (brandName: string) => {
+    setSelectedData((prev) => ({...prev, brandName: brandName}))
+  }
 
   const handleNumberOfTiresChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -173,6 +177,18 @@ const Main = () => {
           </SelectContent>
         </Select>
 
+        {/* <Select onValueChange={(Value) => handleBrandNameChange(Value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="メーカーを選択" />
+          </SelectTrigger>
+          <SelectContent>
+            {brandNames.map(() => (
+              <SelectItem key={size} value={size}>
+                {size}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select> */}
 
         <select className="mt-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option value=""></option>
