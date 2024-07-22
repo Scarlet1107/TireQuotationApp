@@ -325,7 +325,7 @@ const Main = () => {
         </div>
 
         <Button
-          className="w-min bg-green-500 hover:bg-green-600"
+          className="w-min transform bg-green-500 transition-all duration-100 hover:scale-95 hover:bg-green-600"
           onClick={handleEstimate}
         >
           この内容で見積もる！
@@ -337,7 +337,10 @@ const Main = () => {
         </p>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
           {results.map((result, index) => (
-            <Card key={index}>
+            <Card
+              key={index}
+              className="transform transition-all duration-100 hover:scale-105"
+            >
               <CardHeader>
                 <CardTitle>会社名 : {result.brandName}</CardTitle>
                 <CardDescription>モデル名 : {result.modelName}</CardDescription>
