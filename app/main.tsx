@@ -6,11 +6,11 @@ import {
   searchTires,
   getAllBrandNames,
 } from "@/utils/supabaseFunctions";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -32,15 +32,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import ReactToPrint from "react-to-print";
+import PrintContent from "./printContent";
 
-
-const Main = () => {
+const Main = (props: any) => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
   const [tireSizes, setTireSizes] = useState<string[]>([]);
   const [brandNames, setBrandNames] = useState<string[]>([]);
   const { toast } = useToast();
 
-  // 改名が必要。検索条件をまとめたものだから、もっと適当な名前があるはず。
   const [selectedData, setSelectedData] = useState<TireData>({
     priceRate: 0,
     numberOfTires: 4,
@@ -99,6 +99,10 @@ const Main = () => {
     setSelectedData((prev) => ({ ...prev, numberOfTires: value }));
   };
 
+  const [componentRefs, setComponentRefs] = useState<
+    React.RefObject<HTMLDivElement>[]
+  >([]);
+
   const handleEstimate = async () => {
     const { tireSize, priceRate, brandName, numberOfTires } = selectedData;
 
@@ -153,6 +157,7 @@ const Main = () => {
       };
     });
     setResults(newResults);
+    setComponentRefs(newResults.map(() => React.createRef<HTMLDivElement>()));
   };
 
   const addExtraOption = () => {
@@ -180,7 +185,7 @@ const Main = () => {
 
   return (
     <div className="mt-8 flex w-full flex-col md:flex-row">
-      <div className="ml-12 flex w-max flex-col space-y-8 md:w-full">
+      <div className="ml-12 flex w-max flex-col space-y-8">
         <div className="flex flex-col space-y-3 xl:flex-row xl:space-x-4 xl:space-y-0">
           <Select onValueChange={(Value) => handleCustomerTypeChange(Value)}>
             <SelectTrigger className="w-[180px]">
@@ -224,7 +229,7 @@ const Main = () => {
           </Select>
         </div>
 
-        <div className="flex flex-col space-y-4 md:space-x-8 lg:flex-row">
+        <div className="flex flex-col space-y-4 md:space-x-8 xl:flex-row">
           <div className="space-x-4">
             <Label htmlFor="number">数量</Label>
             <Input
@@ -302,7 +307,6 @@ const Main = () => {
                       placeholder="数量"
                     />
                   </div>
-                  
 
                   <Button
                     className="w-min place-self-end"
@@ -318,7 +322,7 @@ const Main = () => {
         </div>
 
         <Button
-          className="font-bold w-min transform bg-green-500 transition-all duration-100 hover:scale-95 hover:bg-green-600"
+          className="w-min transform bg-green-500 font-bold transition-all duration-100 hover:scale-95 hover:bg-green-600"
           onClick={handleEstimate}
         >
           この内容で見積もる！
@@ -328,25 +332,35 @@ const Main = () => {
         <p className="mt-12 flex justify-center text-3xl font-bold md:mt-0">
           見積もり結果
         </p>
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
           {results.map((result, index) => (
-            <Card
-              key={index}
-              className="transform transition-all duration-100 hover:scale-105"
-            >
-              <CardHeader>
-                <CardTitle>会社名 : {result.brandName}</CardTitle>
-                <CardDescription>モデル名 : {result.modelName}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p>途中計算式 : {result.intermediateCalculation}</p>
-              </CardContent>
-              <CardFooter>
-                <p>
-                  金額 : <span className="font-medium">{result.price}</span>円
-                </p>
-              </CardFooter>
-            </Card>
+            <div key={index}>
+              <ReactToPrint
+                content={() => componentRefs[index].current}
+                trigger={() => (
+                  <Card className="transform cursor-pointer transition-all duration-100 hover:scale-105">
+                    <CardHeader>
+                      <CardTitle>会社名 : {result.brandName}</CardTitle>
+                      <CardDescription>
+                        モデル名 : {result.modelName}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p>途中計算式 : {result.intermediateCalculation}</p>
+                    </CardContent>
+                    <CardFooter>
+                      <p>
+                        金額 :{" "}
+                        <span className="font-medium">{result.price}</span>円
+                      </p>
+                    </CardFooter>
+                  </Card>
+                )}
+              />
+              <div className="hidden">
+                <PrintContent ref={componentRefs[index]} result={result} />
+              </div>
+            </div>
           ))}
         </div>
       </div>

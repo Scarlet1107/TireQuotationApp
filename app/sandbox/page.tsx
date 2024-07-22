@@ -27,7 +27,7 @@ const App = () => {
           content={() => componentRef.current}
         />
       </div>
-      <div className="border-2 w-1/2">
+      <div className="border-2 w-1/2 hidden">
         <ComponentToPrint ref={componentRef} content={content} />
       </div>
     </div>
