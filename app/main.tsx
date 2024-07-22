@@ -33,9 +33,6 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 
-import { Bold, Italic, Underline } from "lucide-react";
-
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
