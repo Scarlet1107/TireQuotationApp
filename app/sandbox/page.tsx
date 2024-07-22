@@ -27,7 +27,7 @@ const App = () => {
           content={() => componentRef.current}
         />
       </div>
-      <div className="border-2 w-1/2" style={{ display: "none" }}>
+      <div className="border-2 w-1/2">
         <ComponentToPrint ref={componentRef} content={content} />
       </div>
     </div>
@@ -35,3 +35,5 @@ const App = () => {
 };
 
 export default App;
+
+

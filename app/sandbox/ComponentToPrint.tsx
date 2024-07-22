@@ -4,7 +4,6 @@ interface ComponentToPrintProps {
   content: number;
 }
 
-// 関数コンポーネントに変更し、React.forwardRefを使用
 const ComponentToPrint = React.forwardRef<
   HTMLDivElement,
   ComponentToPrintProps

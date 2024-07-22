@@ -156,7 +156,7 @@ const Main = () => {
   };
 
   const addExtraOption = () => {
-    if (extraOptions.length >= 5) return;
+    if (extraOptions.length >= 9) return;
     setExtraOptions([
       ...extraOptions,
       { id: uuidv4(), option: "", price: 100, quantity: 4 },
@@ -302,6 +302,7 @@ const Main = () => {
                       placeholder="数量"
                     />
                   </div>
+                  
 
                   <Button
                     className="w-min place-self-end"
@@ -316,13 +317,8 @@ const Main = () => {
           </div>
         </div>
 
-        <div className="space-x-4">
-          <Label className="text-xl">値引き額</Label>
-          <Input className="w-min" />
-        </div>
-
         <Button
-          className="w-min transform bg-green-500 transition-all duration-100 hover:scale-95 hover:bg-green-600"
+          className="font-bold w-min transform bg-green-500 transition-all duration-100 hover:scale-95 hover:bg-green-600"
           onClick={handleEstimate}
         >
           この内容で見積もる！
