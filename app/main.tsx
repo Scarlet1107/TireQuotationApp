@@ -74,7 +74,6 @@ const Main = () => {
         new Set(names.data.map((item) => item.brandName)),
       );
       setBrandNames(uniqueBrandNames);
-      console.log("uniqueBrandNames", uniqueBrandNames); //Delete later
     }
   };
 
@@ -105,16 +104,33 @@ const Main = () => {
 
   const handleEstimate = async () => {
     const { tireSize, priceRate, brandName, numberOfTires } = selectedData;
-    console.log("selectedData", selectedData); //Delete later
-    if (!tireSize || priceRate === 0 || numberOfTires === 0) {
-      alert("必要な情報が入力されていません。");
+
+    if (!tireSize) {
+      toast({
+        variant: "destructive",
+        title: "タイヤサイズが選択されていません。",
+      });
+      return;
+    }
+
+    if (priceRate === 0) {
+      toast({
+        variant: "destructive",
+        title: "お客さんが選択されていません。",
+      });
+      return;
+    }
+
+    if (numberOfTires === 0) {
+      toast({
+        variant: "destructive",
+        title: "タイヤの数量が選択されていません。",
+      });
       return;
     }
 
     const res = await searchTires(tireSize, brandName);
-    console.log("res.data = ", res.data); //Delete later
     if (!res.data || (Array.isArray(res.data) && res.data.length === 0)) {
-      // alert("タイヤの情報が見つかりませんでした。");
       toast({
         variant: "destructive",
         title: "タイヤ情報が見つかりませんでした。",
@@ -139,7 +155,6 @@ const Main = () => {
         price: totalPrice,
       };
     });
-    console.log("newResults", newResults); //Delete later
     setResults(newResults);
   };
 
