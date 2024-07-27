@@ -14,9 +14,12 @@ export interface TireData {
 export interface Result {
   brandName: string;
   modelName: string;
-  intermediateCalculation: string;
   laborCostRank: string;
-  price: number;
+  tirePrice: number;
+  numberOfTires: number;
+  priceRate: number;
+  laborFee: number;
+  totalPrice: number;
   extraOptions: ExtraOption[];
 }
 

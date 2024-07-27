@@ -196,16 +196,24 @@ const Main = (props: any) => {
         (extraOption) => extraOption.option !== "",
       );
       const totalPrice =
-        Math.ceil((tirePrice * numberOfTires * priceRate + laborFee + filteredOptions.reduce((acc, option) => acc + (option.price * option.quantity), 0)) / 10) * 10;
+        Math.ceil(
+          (tirePrice * numberOfTires * priceRate +
+            laborFee +
+            filteredOptions.reduce(
+              (acc, option) => acc + option.price * option.quantity,
+              0,
+            )) /
+            10,
+        ) * 10;
       return {
         brandName: tire.brandName,
         modelName: tire.modelName,
-        intermediateCalculation:
-          laborFee === 0
-            ? `${tirePrice} × ${numberOfTires} × ${priceRate}`
-            : `${tirePrice} × ${numberOfTires} × ${priceRate} + ${laborFee}`,
+        tirePrice: tirePrice,
+        numberOfTires: numberOfTires,
+        priceRate: priceRate,
+        laborFee: laborFee,
         laborCostRank: tire.laborCostRank,
-        price: totalPrice,
+        totalPrice: totalPrice,
         extraOptions: filteredOptions,
       };
     });
@@ -419,7 +427,15 @@ const Main = (props: any) => {
                     </CardHeader>
                     <CardContent>
                       <p>工賃ランク：{result.laborCostRank}</p>
-                      <p>途中計算式 : {result.intermediateCalculation}</p>
+                      <p>
+                        タイヤホイール :{result.tirePrice} ×{" "}
+                        {result.numberOfTires} × {result.priceRate}{" "}
+                      </p>
+                      {result.laborFee !== 0 ? (
+                        <span>工賃 : {result.laborFee}</span>
+                      ) : (
+                        ""
+                      )}{" "}
                       {result.extraOptions.length > 0 && (
                         <div>
                           <ul>
@@ -436,7 +452,8 @@ const Main = (props: any) => {
                     <CardFooter>
                       <p>
                         金額 :{" "}
-                        <span className="font-medium">{result.price}</span>円
+                        <span className="font-medium">{result.totalPrice}</span>
+                        円
                       </p>
                     </CardFooter>
                   </Card>
