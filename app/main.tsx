@@ -1,10 +1,17 @@
 "use client";
-import { ExtraOption, Result, TireData } from "@/utils/interface";
+import {
+  CheckboxState,
+  ExtraOption,
+  Result,
+  ServiceFee,
+  TireData,
+} from "@/utils/interface";
 import {
   getAllTireSizes,
   getCustomerTypePriceRates,
   searchTires,
   getAllBrandNames,
+  getServiceFees,
 } from "@/utils/supabaseFunctions";
 import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -39,7 +46,13 @@ const Main = (props: any) => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
   const [tireSizes, setTireSizes] = useState<string[]>([]);
   const [brandNames, setBrandNames] = useState<string[]>([]);
+  const [serviceFees, setServiceFees] = useState<ServiceFee[]>([]);
   const { toast } = useToast();
+  const [checkedStates, setCheckedStates] = useState<CheckboxState>({
+    laborFee: true,
+    removalFee: true,
+    tireDisposalFee: true,
+  });
 
   const [selectedData, setSelectedData] = useState<TireData>({
     priceRate: 0,
@@ -74,11 +87,30 @@ const Main = (props: any) => {
     }
   };
 
+  const fetchServiceFees = async () => {
+    const res = await getServiceFees();
+    setServiceFees(res as ServiceFee[]);
+    console.log("serviceFees = ", res);
+  };
+
   useEffect(() => {
     fetchPriceRates();
     fetchTireSizes();
     fetchAllBrandNames();
+    fetchServiceFees();
   }, []);
+
+  const handleCheckboxChange =
+    (key: keyof CheckboxState) => (checked: boolean) => {
+      setCheckedStates((prevState) => ({
+        ...prevState,
+        [key]: checked,
+      }));
+    };
+
+  useEffect(() => {
+    console.log(checkedStates);
+  }, [checkedStates]); //Delete later
 
   const handleCustomerTypeChange = (value: string) => {
     setSelectedData((prev) => ({ ...prev, priceRate: Number(value) / 100 }));
@@ -102,6 +134,12 @@ const Main = (props: any) => {
   const [componentRefs, setComponentRefs] = useState<
     React.RefObject<HTMLDivElement>[]
   >([]);
+
+  const calculateLaborCost = (rank: string) => {
+    let totalCost = 0;
+    const laborFee = serviceFees.find((fee) => fee.rank === rank)?.laborFee;
+    return laborFee ? laborFee : 0;
+  };
 
   const handleEstimate = async () => {
     const { tireSize, priceRate, brandName, numberOfTires } = selectedData;
@@ -145,6 +183,8 @@ const Main = (props: any) => {
       });
     }
 
+    console.log(res.data);
+
     const newResults = res.data.map((tire: any) => {
       const tirePrice = tire.price;
       const totalPrice =
@@ -153,6 +193,7 @@ const Main = (props: any) => {
         brandName: tire.brandName,
         modelName: tire.modelName,
         intermediateCalculation: `${tirePrice} × ${numberOfTires} × ${priceRate}`,
+        laborCostRank: tire.laborCostRank,
         price: totalPrice,
       };
     });
@@ -243,16 +284,34 @@ const Main = (props: any) => {
           </div>
           <div className="flex flex-col space-y-4">
             <div className="items-top flex space-x-2">
-              <Checkbox id="terms1" defaultChecked />
-              <Label className="text-sm font-medium">作業工賃</Label>
+              <Checkbox
+                id="laborFee"
+                checked={checkedStates.laborFee}
+                onCheckedChange={handleCheckboxChange("laborFee")}
+              />
+              <Label className="text-sm font-medium" htmlFor="laborFee">
+                作業工賃
+              </Label>
             </div>
             <div className="items-top flex space-x-2">
-              <Checkbox id="terms2" defaultChecked />
-              <Label className="text-sm font-medium">脱着料</Label>
+              <Checkbox
+                id="removalFee"
+                checked={checkedStates.removalFee}
+                onCheckedChange={handleCheckboxChange("removalFee")}
+              />
+              <Label className="text-sm font-medium" htmlFor="removalFee">
+                脱着料
+              </Label>
             </div>
             <div className="items-top flex space-x-2">
-              <Checkbox id="terms3" defaultChecked />
-              <Label className="text-sm font-medium">廃タイヤ処分</Label>
+              <Checkbox
+                id="tireDisposalFee"
+                checked={checkedStates.tireDisposalFee}
+                onCheckedChange={handleCheckboxChange("tireDisposalFee")}
+              />
+              <Label className="text-sm font-medium" htmlFor="tireDisposalFee">
+                廃タイヤ処分
+              </Label>
             </div>
           </div>
         </div>
@@ -347,6 +406,7 @@ const Main = (props: any) => {
                     </CardHeader>
                     <CardContent>
                       <p>途中計算式 : {result.intermediateCalculation}</p>
+                      <p>工賃ランク：{result.laborCostRank}</p>
                     </CardContent>
                     <CardFooter>
                       <p>

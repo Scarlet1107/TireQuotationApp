@@ -7,11 +7,6 @@ export const getCustomerTypePriceRates = async () => {
   return CustomerTypePriceRate;
 };
 
-export const getAllTireInformation = async () => {
-  const TireInformation = await supabase.from("tirePrice").select("*");
-  return TireInformation;
-};
-
 export const getAllTireSizes = async () => {
   const TireSize = await supabase.from("tirePrice").select("size");
   return TireSize;
@@ -29,6 +24,11 @@ export const searchTires = async (size: string, brandName: string) => {
   }
   const results = await query;
   return results;
+};
+
+export const getServiceFees = async () => {
+  const serviceFees = await supabase.from("ServiceFees").select("*");
+  return serviceFees.data;
 };
 
 // For master page
