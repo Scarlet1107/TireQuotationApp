@@ -17,6 +17,7 @@ export interface Result {
   intermediateCalculation: string;
   laborCostRank: string;
   price: number;
+  extraOptions: ExtraOption[];
 }
 
 export interface ExtraOption {

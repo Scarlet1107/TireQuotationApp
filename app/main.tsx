@@ -192,8 +192,11 @@ const Main = (props: any) => {
     const newResults = res.data.map((tire: any) => {
       const tirePrice = tire.price;
       const laborFee = calculateLaborCost(tire.laborCostRank);
+      const filteredOptions = extraOptions.filter(
+        (extraOption) => extraOption.option !== "",
+      );
       const totalPrice =
-        Math.ceil((tirePrice * numberOfTires * priceRate + laborFee) / 10) * 10;
+        Math.ceil((tirePrice * numberOfTires * priceRate + laborFee + filteredOptions.reduce((acc, option) => acc + (option.price * option.quantity), 0)) / 10) * 10;
       return {
         brandName: tire.brandName,
         modelName: tire.modelName,
@@ -203,6 +206,7 @@ const Main = (props: any) => {
             : `${tirePrice} × ${numberOfTires} × ${priceRate} + ${laborFee}`,
         laborCostRank: tire.laborCostRank,
         price: totalPrice,
+        extraOptions: filteredOptions,
       };
     });
     setResults(newResults);
@@ -230,6 +234,7 @@ const Main = (props: any) => {
           option.id === id ? { ...option, [field]: newValue } : option,
         ),
       );
+      console.log(extraOptions);
     };
 
   return (
@@ -413,8 +418,20 @@ const Main = (props: any) => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p>途中計算式 : {result.intermediateCalculation}</p>
                       <p>工賃ランク：{result.laborCostRank}</p>
+                      <p>途中計算式 : {result.intermediateCalculation}</p>
+                      {result.extraOptions.length > 0 && (
+                        <div>
+                          <ul>
+                            {result.extraOptions.map((option) => (
+                              <li key={option.id}>
+                                {option.option} : {option.price} ×{" "}
+                                {option.quantity}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </CardContent>
                     <CardFooter>
                       <p>
