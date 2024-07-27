@@ -90,7 +90,6 @@ const Main = (props: any) => {
   const fetchServiceFees = async () => {
     const res = await getServiceFees();
     setServiceFees(res as ServiceFee[]);
-    console.log("serviceFees = ", res);
   };
 
   useEffect(() => {
@@ -107,10 +106,6 @@ const Main = (props: any) => {
         [key]: checked,
       }));
     };
-
-  useEffect(() => {
-    console.log(checkedStates);
-  }, [checkedStates]); //Delete later
 
   const handleCustomerTypeChange = (value: string) => {
     setSelectedData((prev) => ({ ...prev, priceRate: Number(value) / 100 }));
@@ -137,8 +132,17 @@ const Main = (props: any) => {
 
   const calculateLaborCost = (rank: string) => {
     let totalCost = 0;
-    const laborFee = serviceFees.find((fee) => fee.rank === rank)?.laborFee;
-    return laborFee ? laborFee : 0;
+    serviceFees.find((fee) => {
+      if (fee.rank === rank) {
+        if (checkedStates.laborFee) totalCost += fee.laborFee;
+        if (checkedStates.removalFee) totalCost += fee.removalFee;
+        if (checkedStates.tireDisposalFee) totalCost += fee.tireDisposalFee;
+        return true;
+      }
+      return false;
+    });
+
+    return totalCost;
   };
 
   const handleEstimate = async () => {
@@ -187,12 +191,16 @@ const Main = (props: any) => {
 
     const newResults = res.data.map((tire: any) => {
       const tirePrice = tire.price;
+      const laborFee = calculateLaborCost(tire.laborCostRank);
       const totalPrice =
-        Math.ceil((tirePrice * numberOfTires * priceRate) / 10) * 10;
+        Math.ceil((tirePrice * numberOfTires * priceRate + laborFee) / 10) * 10;
       return {
         brandName: tire.brandName,
         modelName: tire.modelName,
-        intermediateCalculation: `${tirePrice} × ${numberOfTires} × ${priceRate}`,
+        intermediateCalculation:
+          laborFee === 0
+            ? `${tirePrice} × ${numberOfTires} × ${priceRate}`
+            : `${tirePrice} × ${numberOfTires} × ${priceRate} + ${laborFee}`,
         laborCostRank: tire.laborCostRank,
         price: totalPrice,
       };
