@@ -131,12 +131,21 @@ const Main = (props: any) => {
   >([]);
 
   const calculateLaborCost = (rank: string) => {
-    let totalCost = 0;
+    let totalCost = {
+      laborFee: 0,
+      removalFee: 0,
+      tireDisposalFee: 0,
+      total: 0,
+    };
+
     serviceFees.find((fee) => {
       if (fee.rank === rank) {
-        if (checkedStates.laborFee) totalCost += fee.laborFee;
-        if (checkedStates.removalFee) totalCost += fee.removalFee;
-        if (checkedStates.tireDisposalFee) totalCost += fee.tireDisposalFee;
+        if (checkedStates.laborFee) totalCost.laborFee = fee.laborFee;
+        if (checkedStates.removalFee) totalCost.removalFee = fee.removalFee;
+        if (checkedStates.tireDisposalFee)
+          totalCost.tireDisposalFee = fee.tireDisposalFee;
+        totalCost.total =
+          totalCost.laborFee + totalCost.removalFee + totalCost.tireDisposalFee;
         return true;
       }
       return false;
@@ -191,28 +200,35 @@ const Main = (props: any) => {
 
     const newResults = res.data.map((tire: any) => {
       const tirePrice = tire.price;
-      const laborFee = calculateLaborCost(tire.laborCostRank);
+      const serviceFee = calculateLaborCost(tire.laborCostRank);
       const filteredOptions = extraOptions.filter(
         (extraOption) => extraOption.option !== "",
       );
       const totalPrice =
         Math.ceil(
           (tirePrice * numberOfTires * priceRate +
-            laborFee +
+            serviceFee.laborFee +
+            serviceFee.removalFee +
+            serviceFee.tireDisposalFee +
             filteredOptions.reduce(
               (acc, option) => acc + option.price * option.quantity,
               0,
             )) /
             10,
         ) * 10;
+
       return {
         brandName: tire.brandName,
         modelName: tire.modelName,
         tirePrice: tirePrice,
         numberOfTires: numberOfTires,
         priceRate: priceRate,
-        laborFee: laborFee,
-        laborCostRank: tire.laborCostRank,
+        serviceFee: {
+          rank: tire.laborCostRank,
+          laborFee: serviceFee.laborFee,
+          removalFee: serviceFee.removalFee,
+          tireDisposalFee: serviceFee.tireDisposalFee,
+        },
         totalPrice: totalPrice,
         extraOptions: filteredOptions,
       };
@@ -242,7 +258,6 @@ const Main = (props: any) => {
           option.id === id ? { ...option, [field]: newValue } : option,
         ),
       );
-      console.log(extraOptions);
     };
 
   return (
@@ -426,16 +441,25 @@ const Main = (props: any) => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p>工賃ランク：{result.laborCostRank}</p>
+                      <p>工賃ランク：{result.serviceFee.rank}</p>
                       <p>
                         タイヤホイール :{result.tirePrice} ×{" "}
                         {result.numberOfTires} × {result.priceRate}{" "}
                       </p>
-                      {result.laborFee !== 0 ? (
-                        <span>工賃 : {result.laborFee}</span>
-                      ) : (
-                        ""
-                      )}{" "}
+                      <p>
+                        {" "}
+                        {result.serviceFee.laborFee !== 0 ? (
+                          <span>
+                            工賃 :{" "}
+                            {result.serviceFee.laborFee +
+                              result.serviceFee.removalFee +
+                              result.serviceFee.tireDisposalFee}
+                          </span>
+                        ) : (
+                          ""
+                        )}{" "}
+                      </p>
+
                       {result.extraOptions.length > 0 && (
                         <div>
                           <ul>

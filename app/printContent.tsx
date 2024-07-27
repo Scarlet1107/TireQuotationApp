@@ -21,10 +21,34 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>(
           <h1>会社名 : {result.brandName}</h1>
           <p>モデル名 : {result.modelName}</p>
           <p>
-            タイヤホイール :{result.tirePrice * result.numberOfTires}円
-            {result.priceRate}{" "}
+            タイヤホイール :
+            {Math.ceil(
+              (result.tirePrice * result.numberOfTires * result.priceRate) / 10,
+            ) * 10}
+            円
           </p>
-          {result.laborFee !== 0 ? <span>工賃 : {result.laborFee}円</span> : ""}{" "}
+          <p>
+            {" "}
+            {result.serviceFee.laborFee !== 0 ? (
+              <span>作業工賃 : {result.serviceFee.laborFee}円</span>
+            ) : (
+              ""
+            )}{" "}
+          </p>
+          <p>
+            {result.serviceFee.removalFee !== 0 ? (
+              <span>脱着工賃 : {result.serviceFee.removalFee}円</span>
+            ) : (
+              ""
+            )}{" "}
+          </p>
+          <p>
+            {result.serviceFee.tireDisposalFee !== 0 ? (
+              <span>廃タイヤ処分 : {result.serviceFee.tireDisposalFee}円</span>
+            ) : (
+              ""
+            )}{" "}
+          </p>
           {result.extraOptions.length > 0 && (
             <div>
               <ul>
