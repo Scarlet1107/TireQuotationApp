@@ -263,6 +263,24 @@ const Main = (props: any) => {
   return (
     <div className="mt-8 flex w-full flex-col md:flex-row">
       <div className="ml-12 flex w-max flex-col space-y-8">
+        {/* <div className="flex justify-around">
+          <div className="flex">
+            <Label htmlFor="number">お客様名</Label>
+            <Input
+              type="string"
+              className="w-min"
+            />
+            <span >様</span>
+          </div>
+          <div className="flex">
+            <Label htmlFor="number">車種</Label>
+            <Input
+              type="string"
+              className="w-min"
+            />
+          </div>
+        </div> */}
+
         <div className="flex flex-col space-y-3 xl:flex-row xl:space-x-4 xl:space-y-0">
           <Select onValueChange={(Value) => handleCustomerTypeChange(Value)}>
             <SelectTrigger className="w-[180px]">
