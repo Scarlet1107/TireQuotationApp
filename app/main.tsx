@@ -238,7 +238,7 @@ const Main = (props: any) => {
   };
 
   const addExtraOption = () => {
-    if (extraOptions.length >= 9) return;
+    if (extraOptions.length >= 5) return;
     setExtraOptions([
       ...extraOptions,
       { id: uuidv4(), option: "", price: 100, quantity: 4 },
