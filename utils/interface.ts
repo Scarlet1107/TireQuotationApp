@@ -35,3 +35,10 @@ export interface ServiceFee {
   removalFee: number;
   tireDisposalFee: number;
 }
+
+
+export interface Wheel{
+  size: string;
+  quantity: number;
+  price: number;
+}

@@ -5,6 +5,7 @@ import {
   Result,
   ServiceFee,
   TireData,
+  Wheel,
 } from "@/utils/interface";
 import {
   getAllTireSizes,
@@ -47,6 +48,11 @@ const Main = (props: any) => {
   const [tireSizes, setTireSizes] = useState<string[]>([]);
   const [brandNames, setBrandNames] = useState<string[]>([]);
   const [serviceFees, setServiceFees] = useState<ServiceFee[]>([]);
+  const [wheel, setWheel] = useState<Wheel>({
+    size: "",
+    quantity: 4,
+    price: 1000,
+  });
   const { toast } = useToast();
   const [checkedStates, setCheckedStates] = useState<CheckboxState>({
     laborFee: true,
@@ -369,6 +375,47 @@ const Main = (props: any) => {
             </div>
           </div>
         </div>
+        {/* ここにホイールの入力欄を追加 */}
+        <div className="mt-6 flex flex-col space-y-2 lg:flex-row lg:space-x-4 lg:space-y-0">
+          <div>
+            <Label>
+              ホイールを追加
+              <Input
+                name="option"
+                type="text"
+                onChange={(e) => setWheel({ ...wheel, size: e.target.value })}
+                value={wheel.size}
+                placeholder="ホイール名"
+              />
+            </Label>
+          </div>
+          <div>
+            <Label>金額</Label>
+            <Input
+              name="price"
+              type="number"
+              step={100}
+              onChange={(e) =>
+                setWheel({ ...wheel, price: Number(e.target.value) })
+              }
+              value={wheel.price}
+              placeholder="金額"
+            />
+          </div>
+          <div>
+            <Label>数量</Label>
+            <Input
+              name="quantity"
+              type="number"
+              min={1}
+              onChange={(e) =>
+                setWheel({ ...wheel, quantity: Number(e.target.value) })
+              }
+              value={wheel.quantity}
+              placeholder="数量"
+            />
+          </div>
+        </div>
 
         <div>
           <Label className="mr-2 text-lg">その他のオプション</Label>
@@ -459,11 +506,15 @@ const Main = (props: any) => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p>工賃ランク：{result.serviceFee.rank}</p>
+                      {/* <p>工賃ランク：{result.serviceFee.rank}</p> */}
                       <p>
-                        タイヤホイール :{result.tirePrice} ×{" "}
-                        {result.numberOfTires} × {result.priceRate}{" "}
+                        タイヤ :{result.tirePrice} × {result.numberOfTires} ×{" "}
+                        {result.priceRate}{" "}
                       </p>
+                      {/* ここなんか違う */}
+                      {wheel.size !== "" && wheel.quantity !== 0 && (
+                        <p>ホイール: {wheel.price * wheel.quantity}</p>
+                      )}
                       <p>
                         {" "}
                         {result.serviceFee.laborFee !== 0 ? (
