@@ -516,12 +516,18 @@ const Main = () => {
                         タイヤ :{result.tirePrice} × {result.priceRate} ×{" "}
                         {result.numberOfTires}{" "}
                       </p>
-                      {result.wheel.size !== "" && result.wheel.quantity !== 0 && (
-                        <p>ホイール: {result.wheel.price * result.wheel.quantity}</p>
-                      )}
+                      {result.wheel.size !== "" &&
+                        result.wheel.quantity !== 0 && (
+                          <p>
+                            ホイール:{" "}
+                            {result.wheel.price * result.wheel.quantity}
+                          </p>
+                        )}
                       <p>
                         {" "}
-                        {result.serviceFee.laborFee !== 0 ? (
+                        {result.serviceFee.laborFee !== 0 ||
+                        result.serviceFee.tireDisposalFee !== 0 ||
+                        result.serviceFee.removalFee !== 0 ? (
                           <span>
                             工賃 :{" "}
                             {result.serviceFee.laborFee +
