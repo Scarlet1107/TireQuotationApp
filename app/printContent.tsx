@@ -1,5 +1,5 @@
 import React from "react";
-import { Result } from "@/utils/interface";
+import { SearchResult } from "@/utils/interface";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -13,7 +13,7 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 
 interface Props {
-  result: Result;
+  result: SearchResult;
 }
 
 const PrintContent = React.forwardRef<HTMLDivElement, Props>(
@@ -64,7 +64,7 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>(
               <TableBody>
                 <TableRow>
                   <TableCell>
-                    タイヤ （{result.brandName} {result.modelName}）
+                    タイヤ （{result.manufacturer} {result.pattern}）
                     <br />
                     <span className="text-sm text-gray-600">
                       {result.numberOfTires}本 ×{" "}
@@ -89,7 +89,7 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>(
                 </TableRow>
                 {result.serviceFee.laborFee !== 0 && (
                   <TableRow>
-                    <TableCell>作業工賃</TableCell>
+                    <TableCell>作業工賃（入替・バランス）</TableCell>
                     <TableCell className="text-right">
                       {formatNumber(result.serviceFee.laborFee)}円
                     </TableCell>
@@ -103,6 +103,16 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>(
                     </TableCell>
                   </TableRow>
                 )}
+
+                {result.serviceFee.tireStorageFee !== 0 && (
+                  <TableRow>
+                    <TableCell>タイヤ預かり料</TableCell>
+                    <TableCell className="text-right">
+                      {formatNumber(result.serviceFee.tireStorageFee)}円
+                    </TableCell>
+                  </TableRow>
+                )}
+
                 {result.serviceFee.tireDisposalFee !== 0 && (
                   <TableRow>
                     <TableCell>廃タイヤ処分</TableCell>

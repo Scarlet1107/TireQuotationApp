@@ -12,9 +12,9 @@ export const getAllTireSizes = async () => {
   return TireSize;
 };
 
-export const getAllBrandNames = async () => {
-  const BrandNames = await supabase.from("tirePrice").select("manufacturer");
-  return BrandNames;
+export const getAllmanufacturer = async () => {
+  const manufacturer = await supabase.from("tirePrice").select("manufacturer");
+  return manufacturer;
 };
 
 export const searchTires = async (size: string, brandName: string) => {

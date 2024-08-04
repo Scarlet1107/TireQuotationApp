@@ -2,6 +2,7 @@
 import {
   CheckboxState,
   ExtraOption,
+  PrintData,
   SearchResult,
   ServiceFee,
   TireData,
@@ -11,7 +12,7 @@ import {
   getAllTireSizes,
   getCustomerTypePriceRates,
   searchTires,
-  getAllBrandNames,
+  getAllmanufacturer,
   getServiceFees,
 } from "@/utils/supabaseFunctions";
 import React, { useEffect, useRef, useState } from "react";
@@ -42,11 +43,12 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import ReactToPrint from "react-to-print";
 import PrintContent from "./printContent";
+import { set } from "date-fns";
 
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
   const [tireSizes, setTireSizes] = useState<string[]>([]);
-  const [brandNames, setBrandNames] = useState<string[]>([]);
+  const [manufacturer, setmanufacturer] = useState<string[]>([]);
   const [serviceFees, setServiceFees] = useState<ServiceFee[]>([]);
   const [wheel, setWheel] = useState<Wheel>({
     size: "",
@@ -57,6 +59,7 @@ const Main = () => {
   const [checkedStates, setCheckedStates] = useState<CheckboxState>({
     laborFee: true,
     removalFee: true,
+    tireStorageFee: true,
     tireDisposalFee: true,
   });
   const taxRate = 1.1; // 消費税をここで設定
@@ -69,6 +72,11 @@ const Main = () => {
   });
   const [extraOptions, setExtraOptions] = useState<ExtraOption[]>([]);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [printData, setPrintData] = useState<PrintData>({
+    customerName: "",
+    carModel: "",
+    searchResults: [],
+  });
 
   const fetchPriceRates = async () => {
     const rates = await getCustomerTypePriceRates();
@@ -84,13 +92,13 @@ const Main = () => {
     }
   };
 
-  const fetchAllBrandNames = async () => {
-    const names = await getAllBrandNames();
+  const fetchAllmanufacturer = async () => {
+    const names = await getAllmanufacturer();
     if (names.data) {
-      const uniqueBrandNames = Array.from(
+      const uniquemanufacturer = Array.from(
         new Set(names.data.map((item) => item.manufacturer)),
       );
-      setBrandNames(uniqueBrandNames);
+      setmanufacturer(uniquemanufacturer);
     }
   };
 
@@ -102,7 +110,7 @@ const Main = () => {
   useEffect(() => {
     fetchPriceRates();
     fetchTireSizes();
-    fetchAllBrandNames();
+    fetchAllmanufacturer();
     fetchServiceFees();
   }, []);
 
@@ -137,10 +145,13 @@ const Main = () => {
     React.RefObject<HTMLDivElement>[]
   >([]);
 
+
+  // ここ冗長な書き方になってるので後々リファクタリングする
   const calculateLaborCost = (rank: string) => {
     let totalCost = {
       laborFee: 0,
       removalFee: 0,
+      tireStorageFee: 0,
       tireDisposalFee: 0,
       total: 0,
     };
@@ -149,10 +160,15 @@ const Main = () => {
       if (fee.rank === rank) {
         if (checkedStates.laborFee) totalCost.laborFee = fee.laborFee;
         if (checkedStates.removalFee) totalCost.removalFee = fee.removalFee;
+        if (checkedStates.tireStorageFee)
+          totalCost.tireStorageFee = fee.tireStorageFee;
         if (checkedStates.tireDisposalFee)
           totalCost.tireDisposalFee = fee.tireDisposalFee;
         totalCost.total =
-          totalCost.laborFee + totalCost.removalFee + totalCost.tireDisposalFee;
+          totalCost.laborFee +
+          totalCost.removalFee +
+          totalCost.tireStorageFee +
+          totalCost.tireDisposalFee;
         return true;
       }
       return false;
@@ -217,6 +233,7 @@ const Main = () => {
         (sellingPrice * numberOfTires +
           serviceFee.laborFee +
           serviceFee.removalFee +
+          serviceFee.tireStorageFee +
           serviceFee.tireDisposalFee +
           filteredOptions.reduce(
             (acc, option) => acc + option.price * option.quantity,
@@ -237,6 +254,7 @@ const Main = () => {
           rank: tire.laborCostRank,
           laborFee: serviceFee.laborFee,
           removalFee: serviceFee.removalFee,
+          tireStorageFee: serviceFee.tireStorageFee,
           tireDisposalFee: serviceFee.tireDisposalFee,
         },
         totalPrice: totalPrice,
@@ -275,23 +293,39 @@ const Main = () => {
   return (
     <div className="mt-8 flex w-full flex-col md:flex-row">
       <div className="ml-12 flex w-max flex-col space-y-8">
-        {/* <div className="flex justify-around">
+        <div className="flex justify-around">
           <div className="flex">
-            <Label htmlFor="number">お客様名</Label>
-            <Input
-              type="string"
-              className="w-min"
-            />
-            <span >様</span>
+            <Label>
+              お客様名
+              <div className="mt-2 flex space-x-2">
+                <Input
+                  type="string"
+                  className="w-min"
+                  value={printData.customerName}
+                  onChange={(e) =>
+                    setPrintData({ ...printData, customerName: e.target.value })
+                  }
+                />
+                <span className="place-content-center text-xl">様</span>
+              </div>
+            </Label>
           </div>
           <div className="flex">
-            <Label htmlFor="number">車種</Label>
-            <Input
-              type="string"
-              className="w-min"
-            />
+            <Label>
+              車種
+              <div className="mt-2 flex space-x-2">
+                <Input
+                  type="string"
+                  className="w-min"
+                  value={printData.carModel}
+                  onChange={(e) =>
+                    setPrintData({ ...printData, carModel: e.target.value })
+                  }
+                />
+              </div>
+            </Label>
           </div>
-        </div> */}
+        </div>
 
         <div className="flex flex-col space-y-3 xl:flex-row xl:space-x-4 xl:space-y-0">
           <Select onValueChange={(Value) => handleCustomerTypeChange(Value)}>
@@ -327,7 +361,7 @@ const Main = () => {
               <SelectItem key="All" value="all">
                 すべて
               </SelectItem>
-              {brandNames.map((brandName) => (
+              {manufacturer.map((brandName) => (
                 <SelectItem key={brandName} value={brandName}>
                   {brandName}
                 </SelectItem>
@@ -369,6 +403,18 @@ const Main = () => {
                 脱着料
               </Label>
             </div>
+
+            <div className="items-top flex space-x-2">
+              <Checkbox
+                id="tireStorageFee"
+                checked={checkedStates.tireStorageFee}
+                onCheckedChange={handleCheckboxChange("tireStorageFee")}
+              />
+              <Label className="text-sm font-medium" htmlFor="tireStorageFee">
+                タイヤ預かり料
+              </Label>
+            </div>
+
             <div className="items-top flex space-x-2">
               <Checkbox
                 id="tireDisposalFee"
@@ -511,7 +557,7 @@ const Main = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      {/* <p>工賃ランク：{result.serviceFee.rank}</p> */}
+                      <p>工賃ランク：{result.serviceFee.rank}</p>
                       <p>
                         タイヤ :{result.tirePrice} × {result.priceRate} ×{" "}
                         {result.numberOfTires}{" "}
@@ -527,12 +573,15 @@ const Main = () => {
                         {" "}
                         {result.serviceFee.laborFee !== 0 ||
                         result.serviceFee.tireDisposalFee !== 0 ||
-                        result.serviceFee.removalFee !== 0 ? (
+                        result.serviceFee.removalFee !== 0 || 
+                        result.serviceFee.tireStorageFee !== 0
+                        ? (
                           <span>
                             工賃 :{" "}
                             {result.serviceFee.laborFee +
                               result.serviceFee.removalFee +
-                              result.serviceFee.tireDisposalFee}
+                              result.serviceFee.tireDisposalFee +
+                              result.serviceFee.tireStorageFee}
                           </span>
                         ) : (
                           ""

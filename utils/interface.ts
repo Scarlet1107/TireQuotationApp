@@ -1,9 +1,3 @@
-export interface CheckboxState {
-  laborFee: boolean;
-  removalFee: boolean;
-  tireDisposalFee: boolean;
-}
-
 export interface TireData {
   priceRate: number;
   numberOfTires: number;
@@ -37,10 +31,18 @@ export interface ExtraOption {
   quantity: number;
 }
 
+export interface CheckboxState {
+  laborFee: boolean;
+  removalFee: boolean;
+  tireStorageFee: boolean;
+  tireDisposalFee: boolean;
+}
+
 export interface ServiceFee {
   rank: string;
   laborFee: number;
   removalFee: number;
+  tireStorageFee: number;
   tireDisposalFee: number;
 }
 
