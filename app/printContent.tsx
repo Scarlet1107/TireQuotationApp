@@ -91,7 +91,16 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>(
                   <TableRow>
                     <TableCell>作業工賃（入替・バランス）</TableCell>
                     <TableCell className="text-right">
-                      {formatNumber(result.serviceFee.laborFee)}円
+                      {formatNumber(
+                        (result.serviceFee.laborFee *
+                          (100 - result.discountRate.laborFee)) /
+                          100,
+                      )}
+                      円 (
+                      {(result.serviceFee.laborFee *
+                        result.discountRate.laborFee) /
+                        100}
+                      円引き)
                     </TableCell>
                   </TableRow>
                 )}
@@ -99,7 +108,16 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>(
                   <TableRow>
                     <TableCell>脱着工賃</TableCell>
                     <TableCell className="text-right">
-                      {formatNumber(result.serviceFee.removalFee)}円
+                      {formatNumber(
+                        (result.serviceFee.removalFee *
+                          (100 - result.discountRate.removalFee)) /
+                          100,
+                      )}
+                      円 (
+                      {(result.serviceFee.removalFee *
+                        result.discountRate.removalFee) /
+                        100}
+                      円引き)
                     </TableCell>
                   </TableRow>
                 )}
@@ -108,7 +126,16 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>(
                   <TableRow>
                     <TableCell>タイヤ預かり料</TableCell>
                     <TableCell className="text-right">
-                      {formatNumber(result.serviceFee.tireStorageFee)}円
+                      {formatNumber(
+                        (result.serviceFee.tireStorageFee *
+                          (100 - result.discountRate.tireStorageFee)) /
+                          100,
+                      )}
+                      円 (
+                      {(result.serviceFee.tireStorageFee *
+                        result.discountRate.tireStorageFee) /
+                        100}
+                      円引き)
                     </TableCell>
                   </TableRow>
                 )}
