@@ -1,6 +1,7 @@
 "use client";
 import {
   CheckboxState,
+  DiscoundRate,
   ExtraOption,
   PrintData,
   SearchResult,
@@ -78,6 +79,12 @@ const Main = () => {
     searchResults: [],
   });
 
+  const [discountRate, setDiscountRate] = useState<DiscoundRate>({
+    laborFee: 0,
+    removalFee: 0,
+    tireStorageFee: 0,
+  });
+
   const fetchPriceRates = async () => {
     const rates = await getCustomerTypePriceRates();
     setPriceRates(rates.data as any[]);
@@ -145,8 +152,8 @@ const Main = () => {
     React.RefObject<HTMLDivElement>[]
   >([]);
 
-
   // ここ冗長な書き方になってるので後々リファクタリングする
+  // 名前がひどい
   const calculateLaborCost = (rank: string) => {
     let totalCost = {
       laborFee: 0,
@@ -224,6 +231,7 @@ const Main = () => {
     const newResults = res.data.map((tire: any) => {
       const tirePrice = tire.price;
       const serviceFee = calculateLaborCost(tire.laborCostRank);
+      const totalServiceFee = calculateTotalServiceFee(serviceFee);
       const filteredOptions = extraOptions.filter(
         (extraOption) => extraOption.option !== "",
       );
@@ -231,10 +239,7 @@ const Main = () => {
 
       const totalPrice = Math.floor(
         (sellingPrice * numberOfTires +
-          serviceFee.laborFee +
-          serviceFee.removalFee +
-          serviceFee.tireStorageFee +
-          serviceFee.tireDisposalFee +
+          totalServiceFee +
           filteredOptions.reduce(
             (acc, option) => acc + option.price * option.quantity,
             0,
@@ -259,12 +264,26 @@ const Main = () => {
         },
         totalPrice: totalPrice,
         extraOptions: filteredOptions,
+        discountRate: discountRate,
       };
     });
     console.log(newResults);
     // ここでSearchResult型に入れるのでインターフェイスと同じ形にする
     setSearchResults(newResults);
     setComponentRefs(newResults.map(() => React.createRef<HTMLDivElement>()));
+  };
+
+  const calculateTotalServiceFee = (serviceFee: any) => {
+    let total = 0;
+    if (checkedStates.laborFee)
+      total += (serviceFee.laborFee * (100 - discountRate.laborFee)) / 100;
+    if (checkedStates.removalFee)
+      total += (serviceFee.removalFee * (100 - discountRate.removalFee)) / 100;
+    if (checkedStates.tireStorageFee)
+      total +=
+        (serviceFee.tireStorageFee * (100 - discountRate.tireStorageFee)) / 100;
+    if (checkedStates.tireDisposalFee) total += serviceFee.tireDisposalFee;
+    return total;
   };
 
   const addExtraOption = () => {
@@ -383,28 +402,58 @@ const Main = () => {
             />
           </div>
           <div className="flex flex-col space-y-4">
-            <div className="items-top flex space-x-2">
+            <div className="flex items-center space-x-2">
               <Checkbox
                 id="laborFee"
                 checked={checkedStates.laborFee}
                 onCheckedChange={handleCheckboxChange("laborFee")}
               />
-              <Label className="text-sm font-medium" htmlFor="laborFee">
+              <Label className="pr-4 text-sm font-medium" htmlFor="laborFee">
                 作業工賃
               </Label>
+              <Input
+                className="h-8 w-20"
+                value={discountRate.laborFee}
+                type="number"
+                min={0}
+                max={100}
+                step={10}
+                onChange={(e) =>
+                  setDiscountRate({
+                    ...discountRate,
+                    laborFee: Number(e.target.value),
+                  })
+                }
+              />
+              <span>%割引</span>
             </div>
-            <div className="items-top flex space-x-2">
+            <div className="flex items-center space-x-2">
               <Checkbox
                 id="removalFee"
                 checked={checkedStates.removalFee}
                 onCheckedChange={handleCheckboxChange("removalFee")}
               />
-              <Label className="text-sm font-medium" htmlFor="removalFee">
+              <Label className="pr-4 text-sm font-medium" htmlFor="removalFee">
                 脱着料
               </Label>
+              <Input
+                className="h-8 w-20"
+                value={discountRate.removalFee}
+                type="number"
+                min={0}
+                max={100}
+                step={10}
+                onChange={(e) =>
+                  setDiscountRate({
+                    ...discountRate,
+                    removalFee: Number(e.target.value),
+                  })
+                }
+              />
+              <span>%割引</span>
             </div>
 
-            <div className="items-top flex space-x-2">
+            <div className="flex items-center space-x-2">
               <Checkbox
                 id="tireStorageFee"
                 checked={checkedStates.tireStorageFee}
@@ -413,6 +462,21 @@ const Main = () => {
               <Label className="text-sm font-medium" htmlFor="tireStorageFee">
                 タイヤ預かり料
               </Label>
+              <Input
+                className="h-8 w-20"
+                value={discountRate.tireStorageFee}
+                type="number"
+                min={0}
+                max={100}
+                step={10}
+                onChange={(e) =>
+                  setDiscountRate({
+                    ...discountRate,
+                    tireStorageFee: Number(e.target.value),
+                  })
+                }
+              />
+              <span>%割引</span>
             </div>
 
             <div className="items-top flex space-x-2">
@@ -573,15 +637,14 @@ const Main = () => {
                         {" "}
                         {result.serviceFee.laborFee !== 0 ||
                         result.serviceFee.tireDisposalFee !== 0 ||
-                        result.serviceFee.removalFee !== 0 || 
-                        result.serviceFee.tireStorageFee !== 0
-                        ? (
+                        result.serviceFee.removalFee !== 0 ||
+                        result.serviceFee.tireStorageFee !== 0 ? (
                           <span>
                             工賃 :{" "}
-                            {result.serviceFee.laborFee +
-                              result.serviceFee.removalFee +
+                            {result.serviceFee.laborFee * (100 - result.discountRate.laborFee) / 100+
+                              result.serviceFee.removalFee * (100 - result.discountRate.removalFee) / 100 +
                               result.serviceFee.tireDisposalFee +
-                              result.serviceFee.tireStorageFee}
+                              result.serviceFee.tireStorageFee * (100 - result.discountRate.tireStorageFee) / 100}
                           </span>
                         ) : (
                           ""

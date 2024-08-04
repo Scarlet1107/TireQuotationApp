@@ -16,6 +16,7 @@ export interface SearchResult {
   serviceFee: ServiceFee;
   totalPrice: number;
   extraOptions: ExtraOption[];
+  discountRate: DiscoundRate;
 }
 
 export interface PrintData {
@@ -36,6 +37,12 @@ export interface CheckboxState {
   removalFee: boolean;
   tireStorageFee: boolean;
   tireDisposalFee: boolean;
+}
+
+export interface DiscoundRate{
+  laborFee: number;
+  removalFee: number;
+  tireStorageFee: number;
 }
 
 export interface ServiceFee {

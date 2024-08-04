@@ -140,7 +140,7 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>(
 
             <div className="mt-6 text-right">
               <p className="text-xl font-bold">
-                合計金額: {formatNumber(result.totalPrice)}円 （税抜）
+                合計金額: {formatNumber(result.totalPrice)}円 （税込）
               </p>
             </div>
 
