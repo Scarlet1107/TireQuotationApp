@@ -43,7 +43,7 @@ import { useToast } from "@/components/ui/use-toast";
 import ReactToPrint from "react-to-print";
 import PrintContent from "./printContent";
 
-const Main = (props: any) => {
+const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
   const [tireSizes, setTireSizes] = useState<string[]>([]);
   const [brandNames, setBrandNames] = useState<string[]>([]);
@@ -59,6 +59,7 @@ const Main = (props: any) => {
     removalFee: true,
     tireDisposalFee: true,
   });
+  const taxRate = 1.1; // 消費税をここで設定
 
   const [selectedData, setSelectedData] = useState<TireData>({
     priceRate: 0,
@@ -87,7 +88,7 @@ const Main = (props: any) => {
     const names = await getAllBrandNames();
     if (names.data) {
       const uniqueBrandNames = Array.from(
-        new Set(names.data.map((item) => item.brandName)),
+        new Set(names.data.map((item) => item.manufacturer)),
       );
       setBrandNames(uniqueBrandNames);
     }
@@ -212,22 +213,21 @@ const Main = (props: any) => {
       );
       const sellingPrice = Math.ceil((tirePrice * priceRate) / 10) * 10;
 
-      const totalPrice =
-        Math.ceil(
-          (sellingPrice * numberOfTires +
-            serviceFee.laborFee +
-            serviceFee.removalFee +
-            serviceFee.tireDisposalFee +
-            filteredOptions.reduce(
-              (acc, option) => acc + option.price * option.quantity,
-              0,
-            )) /
-            10,
-        ) * 10;
+      const totalPrice = Math.floor(
+        (sellingPrice * numberOfTires +
+          serviceFee.laborFee +
+          serviceFee.removalFee +
+          serviceFee.tireDisposalFee +
+          filteredOptions.reduce(
+            (acc, option) => acc + option.price * option.quantity,
+            0,
+          )) *
+          taxRate,
+      );
 
       return {
-        brandName: tire.brandName,
-        modelName: tire.modelName,
+        manufacturer: tire.manufacturer,
+        pattern: tire.pattern,
         tireSize: tire.tireSize,
         tirePrice: tirePrice,
         numberOfTires: numberOfTires,
@@ -243,7 +243,7 @@ const Main = (props: any) => {
         extraOptions: filteredOptions,
       };
     });
-    console.log(newResults)
+    console.log(newResults);
     // ここでSearchResult型に入れるのでインターフェイスと同じ形にする
     setSearchResults(newResults);
     setComponentRefs(newResults.map(() => React.createRef<HTMLDivElement>()));
@@ -381,7 +381,6 @@ const Main = (props: any) => {
             </div>
           </div>
         </div>
-        {/* ここにホイールの入力欄を追加 */}
         <div className="mt-6 flex flex-col space-y-2 lg:flex-row lg:space-x-4 lg:space-y-0">
           <div>
             <Label>
@@ -506,20 +505,19 @@ const Main = (props: any) => {
                 trigger={() => (
                   <Card className="transform cursor-pointer transition-all duration-100 hover:scale-105">
                     <CardHeader>
-                      <CardTitle>会社名 : {result.brandName}</CardTitle>
+                      <CardTitle>メーカー : {result.manufacturer}</CardTitle>
                       <CardDescription>
-                        モデル名 : {result.modelName}
+                        パターン : {result.pattern}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
                       {/* <p>工賃ランク：{result.serviceFee.rank}</p> */}
                       <p>
-                        タイヤ :{result.tirePrice} × {result.numberOfTires} ×{" "}
-                        {result.priceRate}{" "}
+                        タイヤ :{result.tirePrice} × {result.priceRate} ×{" "}
+                        {result.numberOfTires}{" "}
                       </p>
-                      {/* ここなんか違う */}
-                      {wheel.size !== "" && wheel.quantity !== 0 && (
-                        <p>ホイール: {wheel.price * wheel.quantity}</p>
+                      {result.wheel.size !== "" && result.wheel.quantity !== 0 && (
+                        <p>ホイール: {result.wheel.price * result.wheel.quantity}</p>
                       )}
                       <p>
                         {" "}
@@ -549,11 +547,25 @@ const Main = (props: any) => {
                       )}
                     </CardContent>
                     <CardFooter>
-                      <p>
-                        金額 :{" "}
-                        <span className="font-medium">{result.totalPrice}</span>
-                        円
-                      </p>
+                      <div className="flex flex-col">
+                        <p>
+                          合計（税込み）：{" "}
+                          <span className="font-medium">
+                            {result.totalPrice}
+                          </span>
+                          円
+                        </p>
+                        <p>
+                          利益：{" "}
+                          {(Math.ceil(
+                            (result.tirePrice * result.priceRate) / 10,
+                          ) *
+                            10 -
+                            result.tirePrice) *
+                            result.numberOfTires}
+                          <span>円</span>
+                        </p>
+                      </div>
                     </CardFooter>
                   </Card>
                 )}

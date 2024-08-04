@@ -13,14 +13,14 @@ export const getAllTireSizes = async () => {
 };
 
 export const getAllBrandNames = async () => {
-  const BrandNames = await supabase.from("tirePrice").select("brandName");
+  const BrandNames = await supabase.from("tirePrice").select("manufacturer");
   return BrandNames;
 };
 
 export const searchTires = async (size: string, brandName: string) => {
   let query = supabase.from("tirePrice").select("*").eq("size", size);
   if (brandName != "all") {
-    query = query.eq("brandName", brandName);
+    query = query.eq("manufacturer", brandName);
   }
   const results = await query;
   return results;

@@ -12,8 +12,8 @@ export interface TireData {
 }
 
 export interface SearchResult {
-  brandName: string;
-  modelName: string;
+  manufacturer: string;
+  pattern: string;
   tireSize: string;
   tirePrice: number;
   numberOfTires: number;
