@@ -76,6 +76,7 @@ const Main = () => {
   const [printData, setPrintData] = useState<PrintData>({
     customerName: "",
     carModel: "",
+    expiryDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), //デフォルトで14日後
     searchResults: [],
   });
 
@@ -641,10 +642,17 @@ const Main = () => {
                         result.serviceFee.tireStorageFee !== 0 ? (
                           <span>
                             工賃 :{" "}
-                            {result.serviceFee.laborFee * (100 - result.discountRate.laborFee) / 100+
-                              result.serviceFee.removalFee * (100 - result.discountRate.removalFee) / 100 +
+                            {(result.serviceFee.laborFee *
+                              (100 - result.discountRate.laborFee)) /
+                              100 +
+                              (result.serviceFee.removalFee *
+                                (100 - result.discountRate.removalFee)) /
+                                100 +
                               result.serviceFee.tireDisposalFee +
-                              result.serviceFee.tireStorageFee * (100 - result.discountRate.tireStorageFee) / 100}
+                              (result.serviceFee.tireStorageFee *
+                                (100 - result.discountRate.tireStorageFee)) /
+                                100}
+                            円
                           </span>
                         ) : (
                           ""

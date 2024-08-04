@@ -22,6 +22,7 @@ export interface SearchResult {
 export interface PrintData {
   customerName: string;
   carModel: string;
+  expiryDate: Date;
   searchResults: SearchResult[];
 }
 
