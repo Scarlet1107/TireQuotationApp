@@ -46,7 +46,19 @@ import ReactToPrint from "react-to-print";
 import PrintContent from "./printContent";
 import { set } from "date-fns";
 
+import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+
 const Main = () => {
+  const [date, setDate] = React.useState<Date>(); //delete later
+
   const [priceRates, setPriceRates] = useState<any[]>([]);
   const [tireSizes, setTireSizes] = useState<string[]>([]);
   const [manufacturer, setmanufacturer] = useState<string[]>([]);
@@ -346,6 +358,33 @@ const Main = () => {
             </Label>
           </div>
         </div>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-[280px] justify-start text-left font-normal",
+                !printData.expiryDate && "text-muted-foreground",
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {printData.expiryDate ? format(printData.expiryDate, "PPP") : <span>有効期限を選択</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={printData.expiryDate}
+              onSelect={(date) => {
+                if (date) {
+                  setPrintData({...printData, expiryDate: date});
+                }
+              }}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
 
         <div className="flex flex-col space-y-3 xl:flex-row xl:space-x-4 xl:space-y-0">
           <Select onValueChange={(Value) => handleCustomerTypeChange(Value)}>
