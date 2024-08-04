@@ -11,15 +11,23 @@ export interface TireData {
   tireSize: string;
 }
 
-export interface Result {
+export interface SearchResult {
   brandName: string;
   modelName: string;
+  tireSize: string;
   tirePrice: number;
   numberOfTires: number;
   priceRate: number;
+  wheel: Wheel;
   serviceFee: ServiceFee;
   totalPrice: number;
   extraOptions: ExtraOption[];
+}
+
+export interface PrintData {
+  customerName: string;
+  carModel: string;
+  searchResults: SearchResult[];
 }
 
 export interface ExtraOption {

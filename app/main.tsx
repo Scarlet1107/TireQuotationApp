@@ -2,7 +2,7 @@
 import {
   CheckboxState,
   ExtraOption,
-  Result,
+  SearchResult,
   ServiceFee,
   TireData,
   Wheel,
@@ -67,7 +67,7 @@ const Main = (props: any) => {
     tireSize: "",
   });
   const [extraOptions, setExtraOptions] = useState<ExtraOption[]>([]);
-  const [results, setResults] = useState<Result[]>([]);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 
   const fetchPriceRates = async () => {
     const rates = await getCustomerTypePriceRates();
@@ -210,9 +210,11 @@ const Main = (props: any) => {
       const filteredOptions = extraOptions.filter(
         (extraOption) => extraOption.option !== "",
       );
+      const sellingPrice = Math.ceil((tirePrice * priceRate) / 10) * 10;
+
       const totalPrice =
         Math.ceil(
-          (tirePrice * numberOfTires * priceRate +
+          (sellingPrice * numberOfTires +
             serviceFee.laborFee +
             serviceFee.removalFee +
             serviceFee.tireDisposalFee +
@@ -226,9 +228,11 @@ const Main = (props: any) => {
       return {
         brandName: tire.brandName,
         modelName: tire.modelName,
+        tireSize: tire.tireSize,
         tirePrice: tirePrice,
         numberOfTires: numberOfTires,
         priceRate: priceRate,
+        wheel: wheel,
         serviceFee: {
           rank: tire.laborCostRank,
           laborFee: serviceFee.laborFee,
@@ -239,7 +243,9 @@ const Main = (props: any) => {
         extraOptions: filteredOptions,
       };
     });
-    setResults(newResults);
+    console.log(newResults)
+    // ここでSearchResult型に入れるのでインターフェイスと同じ形にする
+    setSearchResults(newResults);
     setComponentRefs(newResults.map(() => React.createRef<HTMLDivElement>()));
   };
 
@@ -493,7 +499,7 @@ const Main = (props: any) => {
           見積もり結果
         </p>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
-          {results.map((result, index) => (
+          {searchResults.map((result, index) => (
             <div key={index}>
               <ReactToPrint
                 content={() => componentRefs[index].current}
