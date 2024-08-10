@@ -727,7 +727,7 @@ const Main = () => {
                           円
                         </p>
                         <p>
-                          利益：{" "}
+                          タイヤ利益：{" "}
                           {(Math.ceil(
                             (result.tirePrice * result.priceRate) / 10,
                           ) *
