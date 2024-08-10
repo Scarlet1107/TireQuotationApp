@@ -369,7 +369,11 @@ const Main = () => {
               )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
-              {printData.expiryDate ? format(printData.expiryDate, "PPP") : <span>有効期限を選択</span>}
+              {printData.expiryDate ? (
+                format(printData.expiryDate, "PPP")
+              ) : (
+                <span>有効期限を選択</span>
+              )}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0">
@@ -378,7 +382,7 @@ const Main = () => {
               selected={printData.expiryDate}
               onSelect={(date) => {
                 if (date) {
-                  setPrintData({...printData, expiryDate: date});
+                  setPrintData({ ...printData, expiryDate: date });
                 }
               }}
               initialFocus
