@@ -536,18 +536,20 @@ const Main = () => {
           </div>
         </div>
         <div className="mt-6 flex flex-col space-y-2 lg:flex-row lg:space-x-4 lg:space-y-0">
-          <div>
-            <Label>
-              ホイールを追加
-              <Input
-                name="option"
-                type="text"
-                onChange={(e) => setWheel({ ...wheel, size: e.target.value })}
-                value={wheel.size}
-                placeholder="ホイール名"
-              />
-            </Label>
-          </div>
+            <Input
+              name="option"
+              type="text"
+              onChange={(e) => setWheel({ ...wheel, name: e.target.value })}
+              value={wheel.name}
+              placeholder="ホイール名"
+            />
+            <Input
+              name="option"
+              type="text"
+              onChange={(e) => setWheel({ ...wheel, size: e.target.value })}
+              value={wheel.size}
+              placeholder="ホイールサイズ"
+            />
           <div>
             <Label>金額</Label>
             <Input

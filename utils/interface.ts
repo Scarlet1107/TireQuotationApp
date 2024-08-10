@@ -56,6 +56,7 @@ export interface ServiceFee {
 
 
 export interface Wheel{
+  name: string;
   size: string;
   quantity: number;
   price: number;
