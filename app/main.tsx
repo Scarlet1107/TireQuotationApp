@@ -107,7 +107,7 @@ const Main = () => {
   const [discountRate, setDiscountRate] = useState<DiscoundRate>({
     laborFee: 0,
     removalFee: 0,
-    tireStorageFee: 0,
+    tireStorageFee: 100,
   });
 
   const fetchPriceRates = async () => {
