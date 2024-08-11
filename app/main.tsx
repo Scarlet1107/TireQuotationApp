@@ -32,6 +32,11 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/toaster";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 import {
   Card,
@@ -46,7 +51,14 @@ import ReactToPrint from "react-to-print";
 import PrintContent from "./printContent";
 import { set } from "date-fns";
 
-import { Calendar as CalendarIcon } from "lucide-react";
+import {
+  Calendar as CalendarIcon,
+  ChevronsDown,
+  ChevronsDownUp,
+  ChevronsUpDown,
+  Minus,
+  Plus,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -57,13 +69,13 @@ import {
 import { format } from "date-fns";
 
 const Main = () => {
-  const [date, setDate] = React.useState<Date>(); //delete later
-
   const [priceRates, setPriceRates] = useState<any[]>([]);
   const [tireSizes, setTireSizes] = useState<string[]>([]);
   const [manufacturer, setmanufacturer] = useState<string[]>([]);
   const [serviceFees, setServiceFees] = useState<ServiceFee[]>([]);
   const [wheel, setWheel] = useState<Wheel>({
+    isIncluded: false,
+    name: "",
     size: "",
     quantity: 4,
     price: 1000,
@@ -224,6 +236,14 @@ const Main = () => {
       return;
     }
 
+    if (wheel.isIncluded && (wheel.name === "" || wheel.size === "")) {
+      toast({
+        variant: "destructive",
+        title: "ホイールの名前とサイズを入力してください。",
+      });
+      return;
+    }
+
     const res = await searchTires(tireSize, brandName);
     if (!res.data || (Array.isArray(res.data) && res.data.length === 0)) {
       toast({
@@ -249,10 +269,12 @@ const Main = () => {
         (extraOption) => extraOption.option !== "",
       );
       const sellingPrice = Math.ceil((tirePrice * priceRate) / 10) * 10;
+      const wheelPrice = wheel.isIncluded ? wheel.price * wheel.quantity : 0;
 
       const totalPrice = Math.floor(
         (sellingPrice * numberOfTires +
           totalServiceFee +
+          wheelPrice +
           filteredOptions.reduce(
             (acc, option) => acc + option.price * option.quantity,
             0,
@@ -535,52 +557,79 @@ const Main = () => {
             </div>
           </div>
         </div>
-        <div className="mt-6 flex flex-col space-y-2 lg:flex-row lg:space-x-4 lg:space-y-0">
-            <Input
-              name="option"
-              type="text"
-              onChange={(e) => setWheel({ ...wheel, name: e.target.value })}
-              value={wheel.name}
-              placeholder="ホイール名"
-            />
-            <Input
-              name="option"
-              type="text"
-              onChange={(e) => setWheel({ ...wheel, size: e.target.value })}
-              value={wheel.size}
-              placeholder="ホイールサイズ"
-            />
-          <div>
-            <Label>金額</Label>
-            <Input
-              name="price"
-              type="number"
-              step={100}
-              onChange={(e) =>
-                setWheel({ ...wheel, price: Number(e.target.value) })
-              }
-              value={wheel.price}
-              placeholder="金額"
-            />
-          </div>
-          <div>
-            <Label>数量</Label>
-            <Input
-              name="quantity"
-              type="number"
-              min={1}
-              onChange={(e) =>
-                setWheel({ ...wheel, quantity: Number(e.target.value) })
-              }
-              value={wheel.quantity}
-              placeholder="数量"
-            />
-          </div>
-        </div>
+
+        <Collapsible
+          open={wheel.isIncluded}
+          onOpenChange={() =>
+            setWheel({ ...wheel, isIncluded: !wheel.isIncluded })
+          }
+        >
+          <CollapsibleTrigger asChild>
+            <div className="flex w-max items-center space-x-2">
+              <Label>ホイール</Label>
+              {wheel.isIncluded ? (
+                <Checkbox checked={true} />
+              ) : (
+                <Checkbox checked={false} />
+              )}
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="mt-6 flex flex-col space-y-4">
+              <div className="flex w-max space-x-4">
+                <Input
+                  name="option"
+                  type="text"
+                  onChange={(e) => setWheel({ ...wheel, name: e.target.value })}
+                  value={wheel.name}
+                  placeholder="ホイール名"
+                />
+                <Input
+                  name="option"
+                  type="text"
+                  onChange={(e) => setWheel({ ...wheel, size: e.target.value })}
+                  value={wheel.size}
+                  placeholder="ホイールサイズ"
+                />
+              </div>
+              <div className="flex items-center">
+                <div className="flex items-end">
+                  <Input
+                    name="price"
+                    type="number"
+                    step={100}
+                    onChange={(e) =>
+                      setWheel({ ...wheel, price: Number(e.target.value) })
+                    }
+                    value={wheel.price}
+                    placeholder="金額"
+                  />
+                  <span className="text-xl">円</span>
+                </div>
+                <span className="mx-2 text-xl">✕</span>
+                <div className="flex items-end">
+                  <Input
+                    name="quantity"
+                    type="number"
+                    min={1}
+                    onChange={(e) =>
+                      setWheel({ ...wheel, quantity: Number(e.target.value) })
+                    }
+                    value={wheel.quantity}
+                    placeholder="数量"
+                  />
+                  <span className="text-xl">個</span>
+                </div>
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
 
         <div>
           <Label className="mr-2 text-lg">その他のオプション</Label>
-          <Button onClick={addExtraOption}>+</Button>
+          <Button className="text-xl" onClick={addExtraOption}>
+            +
+          </Button>
           <div className="mt-4">
             {extraOptions.map((extraOption, index) => (
               <div key={extraOption.id}>
@@ -672,13 +721,13 @@ const Main = () => {
                         タイヤ :{result.tirePrice} × {result.priceRate} ×{" "}
                         {result.numberOfTires}{" "}
                       </p>
-                      {result.wheel.size !== "" &&
-                        result.wheel.quantity !== 0 && (
-                          <p>
-                            ホイール:{" "}
-                            {result.wheel.price * result.wheel.quantity}
-                          </p>
-                        )}
+                      {result.wheel.isIncluded ? (
+                        <p>
+                          ホイール: {result.wheel.price * result.wheel.quantity}
+                        </p>
+                      ) : (
+                        ""
+                      )}
                       <p>
                         {" "}
                         {result.serviceFee.laborFee !== 0 ||

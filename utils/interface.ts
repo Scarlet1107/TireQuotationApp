@@ -56,6 +56,7 @@ export interface ServiceFee {
 
 
 export interface Wheel{
+  isIncluded: boolean;
   name: string;
   size: string;
   quantity: number;
