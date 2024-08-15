@@ -1,17 +1,19 @@
 export interface TireData {
-  priceRate: number;
+  target: string;
   numberOfTires: number;
-  brandName: string;
+  manufacturer: string;
   tireSize: string;
 }
 
 export interface SearchResult {
+  id: number;
   manufacturer: string;
   pattern: string;
   tireSize: string;
   tirePrice: number;
   numberOfTires: number;
   priceRate: number;
+  profit: number;
   wheel: Wheel;
   serviceFee: ServiceFee;
   totalPrice: number;
@@ -23,7 +25,7 @@ export interface PrintData {
   customerName: string;
   carModel: string;
   expiryDate: Date;
-  searchResults: SearchResult[];
+  ids: number[];
 }
 
 export interface ExtraOption {
@@ -40,7 +42,7 @@ export interface CheckboxState {
   tireDisposalFee: boolean;
 }
 
-export interface DiscoundRate{
+export interface DiscoundRate {
   laborFee: number;
   removalFee: number;
   tireStorageFee: number;
@@ -54,8 +56,7 @@ export interface ServiceFee {
   tireDisposalFee: number;
 }
 
-
-export interface Wheel{
+export interface Wheel {
   isIncluded: boolean;
   name: string;
   size: string;

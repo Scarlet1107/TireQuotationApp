@@ -4,6 +4,7 @@ import {
   TAX_RATE,
   DEFAULT_DISCOUNT_RATE,
   DEFAULT_CHECKED_STATUS,
+  CUSTOMER_TYPE,
 } from "@/config/constants";
 import {
   CheckboxState,
@@ -58,6 +59,7 @@ import PrintContent from "./printContent";
 import { set } from "date-fns";
 
 import {
+  AlarmCheck,
   Calendar as CalendarIcon,
   ChevronsDown,
   ChevronsDownUp,
@@ -92,9 +94,9 @@ const Main = () => {
   );
 
   const [selectedData, setSelectedData] = useState<TireData>({
-    priceRate: 0,
+    target: "",
     numberOfTires: 4,
-    brandName: "all",
+    manufacturer: "all",
     tireSize: "",
   });
   const [extraOptions, setExtraOptions] = useState<ExtraOption[]>([]);
@@ -103,7 +105,7 @@ const Main = () => {
     customerName: "",
     carModel: "",
     expiryDate: new Date(Date.now() + DEFAULT_EXPIRY_DATE),
-    searchResults: [],
+    ids: [],
   });
 
   const [discountRate, setDiscountRate] = useState<DiscoundRate>(
@@ -112,6 +114,7 @@ const Main = () => {
 
   const fetchPriceRates = async () => {
     const rates = await getCustomerTypePriceRates();
+    console.log("priceRates = ", rates.data);
     setPriceRates(rates.data as any[]);
   };
   const fetchTireSizes = async () => {
@@ -155,15 +158,15 @@ const Main = () => {
     };
 
   const handleCustomerTypeChange = (value: string) => {
-    setSelectedData((prev) => ({ ...prev, priceRate: Number(value) / 100 }));
+    setSelectedData((prev) => ({ ...prev, target: value }));
   };
 
   const handleTireSizeChange = (size: string) => {
     setSelectedData((prev) => ({ ...prev, tireSize: size }));
   };
 
-  const handleBrandNameChange = (brandName: string) => {
-    setSelectedData((prev) => ({ ...prev, brandName: brandName }));
+  const handleManufacturerChange = (manufacturer: string) => {
+    setSelectedData((prev) => ({ ...prev, manufacturer: manufacturer }));
   };
 
   const handleNumberOfTiresChange = (
@@ -209,8 +212,25 @@ const Main = () => {
     return totalCost;
   };
 
+  // タイヤのパターンとお客さんのターゲットによって価格を検索する。割合で返す
+  const searchMarkupRate = (pattern: string, target: string): number => {
+    const rate = priceRates.find((item) => {
+      return pattern === item.pattern;
+    });
+
+    if (!rate) {
+      toast({
+        variant: "destructive",
+        title:
+          "該当するパターンが見つかりません。テーブルデータが間違って入力されている可能性があります。",
+      });
+    }
+    return rate[target] / 100;
+  };
+
+  // 計算がわかりにくいのでリファクタリングする
   const handleEstimate = async () => {
-    const { tireSize, priceRate, brandName, numberOfTires } = selectedData;
+    const { tireSize, manufacturer, numberOfTires } = selectedData;
 
     if (!tireSize) {
       toast({
@@ -220,7 +240,8 @@ const Main = () => {
       return;
     }
 
-    if (priceRate === 0) {
+    // ここがうまく動いてるかチェック
+    if (selectedData.target === "") {
       toast({
         variant: "destructive",
         title: "お客さんが選択されていません。",
@@ -244,7 +265,7 @@ const Main = () => {
       return;
     }
 
-    const res = await searchTires(tireSize, brandName);
+    const res = await searchTires(tireSize, manufacturer);
     if (!res.data || (Array.isArray(res.data) && res.data.length === 0)) {
       toast({
         variant: "destructive",
@@ -253,7 +274,7 @@ const Main = () => {
       return;
     }
 
-    if (brandName === "all") {
+    if (manufacturer === "all") {
       toast({
         title: "すべてのメーカーで検索しました",
       });
@@ -268,7 +289,16 @@ const Main = () => {
       const filteredOptions = extraOptions.filter(
         (extraOption) => extraOption.option !== "",
       );
-      const sellingPrice = Math.ceil((tirePrice * priceRate) / 10) * 10;
+      const priceRate: number = searchMarkupRate(
+        tire.pattern,
+        selectedData.target,
+      );
+
+      const sellingPrice = Math.ceil((tirePrice * Number(priceRate)) / 10) * 10;
+
+      const profit =
+        Math.ceil((sellingPrice - tirePrice * searchMarkupRate(tire.pattern, "cost")) *
+        numberOfTires);
       const wheelPrice = wheel.isIncluded ? wheel.price * wheel.quantity : 0;
 
       const totalPrice = Math.floor(
@@ -283,12 +313,14 @@ const Main = () => {
       );
 
       return {
+        id: tire.id,
         manufacturer: tire.manufacturer,
         pattern: tire.pattern,
         tireSize: tire.tireSize,
         tirePrice: tirePrice,
         numberOfTires: numberOfTires,
         priceRate: priceRate,
+        profit: profit,
         wheel: wheel,
         serviceFee: {
           rank: tire.laborCostRank,
@@ -344,43 +376,36 @@ const Main = () => {
       );
     };
 
+  const toggleQuotationDataById = (id: number) => {
+    const ids = printData.ids;
+
+    // 既にidが存在するかどうか確認
+    const idIndex = ids.indexOf(id);
+
+    if (idIndex !== -1) {
+      // idが存在する場合、削除する
+      ids.splice(idIndex, 1);
+    } else {
+      // idが存在しない場合、追加する
+      if (ids.length >= 3) {
+        // もしidsが上限に達している場合は、警告を出して終了
+        toast({
+          title: "最大3つまでしか選択できません",
+        });
+        return;
+      }
+      ids.push(id);
+    }
+
+    console.log(ids);
+
+    // 更新されたidsを反映
+    setPrintData({ ...printData, ids: ids });
+  };
+
   return (
     <div className="mt-8 flex w-full flex-col md:flex-row">
       <div className="ml-12 flex w-max flex-col space-y-8">
-        <div className="flex justify-around">
-          <div className="flex">
-            <Label>
-              お客様名
-              <div className="mt-2 flex space-x-2">
-                <Input
-                  type="string"
-                  className="w-min"
-                  value={printData.customerName}
-                  onChange={(e) =>
-                    setPrintData({ ...printData, customerName: e.target.value })
-                  }
-                />
-                <span className="place-content-center text-xl">様</span>
-              </div>
-            </Label>
-          </div>
-          <div className="flex">
-            <Label>
-              車種
-              <div className="mt-2 flex space-x-2">
-                <Input
-                  type="string"
-                  className="w-min"
-                  value={printData.carModel}
-                  onChange={(e) =>
-                    setPrintData({ ...printData, carModel: e.target.value })
-                  }
-                />
-              </div>
-            </Label>
-          </div>
-        </div>
-
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -411,19 +436,52 @@ const Main = () => {
             />
           </PopoverContent>
         </Popover>
+        <div className="flex justify-around">
+          <div className="flex">
+            <Label>
+              お客様名
+              <div className="mt-2 flex space-x-2">
+                <Input
+                  placeholder="タケウチ パーツ"
+                  type="string"
+                  className="w-min"
+                  value={printData.customerName}
+                  onChange={(e) =>
+                    setPrintData({ ...printData, customerName: e.target.value })
+                  }
+                />
+                <span className="place-content-center text-xl">様</span>
+              </div>
+            </Label>
+          </div>
+          <div className="flex">
+            <Label>
+              車種
+              <div className="mt-2 flex space-x-2">
+                <Input
+                  type="string"
+                  className="w-min"
+                  value={printData.carModel}
+                  onChange={(e) =>
+                    setPrintData({ ...printData, carModel: e.target.value })
+                  }
+                />
+              </div>
+            </Label>
+          </div>
+        </div>
 
         <div className="flex flex-col space-y-3 xl:flex-row xl:space-x-4 xl:space-y-0">
-          <Select onValueChange={(Value) => handleCustomerTypeChange(Value)}>
+          <Select onValueChange={(value) => handleCustomerTypeChange(value)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="お客さんを選択" />
             </SelectTrigger>
             <SelectContent>
-              {priceRates &&
-                priceRates.map((rate: any) => (
-                  <SelectItem key={rate.target} value={rate.percent}>
-                    {rate.target}
-                  </SelectItem>
-                ))}
+              {CUSTOMER_TYPE.map((type, index) => (
+                <SelectItem key={index} value={type.value}>
+                  {type.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Select onValueChange={(Value) => handleTireSizeChange(Value)}>
@@ -438,7 +496,7 @@ const Main = () => {
               ))}
             </SelectContent>
           </Select>
-          <Select onValueChange={(Value) => handleBrandNameChange(Value)}>
+          <Select onValueChange={(Value) => handleManufacturerChange(Value)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="メーカーを選択" />
             </SelectTrigger>
@@ -446,9 +504,9 @@ const Main = () => {
               <SelectItem key="All" value="all">
                 すべて
               </SelectItem>
-              {manufacturer.map((brandName) => (
-                <SelectItem key={brandName} value={brandName}>
-                  {brandName}
+              {manufacturer.map((name, index) => (
+                <SelectItem key={index} value={name}>
+                  {name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -705,94 +763,82 @@ const Main = () => {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
           {searchResults.map((result, index) => (
             <div key={index}>
-              <ReactToPrint
-                content={() => componentRefs[index].current}
-                trigger={() => (
-                  <Card className="transform cursor-pointer transition-all duration-100 hover:scale-105">
-                    <CardHeader>
-                      <CardTitle>メーカー : {result.manufacturer}</CardTitle>
-                      <CardDescription>
-                        パターン : {result.pattern}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p>工賃ランク：{result.serviceFee.rank}</p>
-                      <p>
-                        タイヤ :{result.tirePrice} × {result.priceRate} ×{" "}
-                        {result.numberOfTires}{" "}
-                      </p>
-                      {result.wheel.isIncluded ? (
-                        <p>
-                          ホイール: {result.wheel.price * result.wheel.quantity}
-                        </p>
-                      ) : (
-                        ""
-                      )}
-                      <p>
-                        {" "}
-                        {result.serviceFee.laborFee !== 0 ||
-                        result.serviceFee.tireDisposalFee !== 0 ||
-                        result.serviceFee.removalFee !== 0 ||
-                        result.serviceFee.tireStorageFee !== 0 ? (
-                          <span>
-                            工賃 :{" "}
-                            {(result.serviceFee.laborFee *
-                              (100 - result.discountRate.laborFee)) /
-                              100 +
-                              (result.serviceFee.removalFee *
-                                (100 - result.discountRate.removalFee)) /
-                                100 +
-                              result.serviceFee.tireDisposalFee +
-                              (result.serviceFee.tireStorageFee *
-                                (100 - result.discountRate.tireStorageFee)) /
-                                100}
-                            円
-                          </span>
-                        ) : (
-                          ""
-                        )}{" "}
-                      </p>
+              <Card
+                className={`transform cursor-pointer transition-all duration-100 hover:scale-105 ${
+                  printData.ids.includes(result.id)
+                    ? "border-4 border-red-400 bg-gray-100"
+                    : ""
+                } select-none`} // ここで選択を無効化
+                onClick={() => toggleQuotationDataById(result.id)}
+              >
+                <CardHeader>
+                  <CardTitle>メーカー : {result.manufacturer}</CardTitle>
+                  <CardDescription>パターン : {result.pattern}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p>id : {result.id}</p>
+                  <p>工賃ランク：{result.serviceFee.rank}</p>
+                  <p>
+                    タイヤ :{result.tirePrice} × {result.priceRate} ×{" "}
+                    {result.numberOfTires}{" "}
+                  </p>
+                  {result.wheel.isIncluded ? (
+                    <p>
+                      ホイール: {result.wheel.price * result.wheel.quantity}
+                    </p>
+                  ) : (
+                    ""
+                  )}
+                  <p>
+                    {" "}
+                    {result.serviceFee.laborFee !== 0 ||
+                    result.serviceFee.tireDisposalFee !== 0 ||
+                    result.serviceFee.removalFee !== 0 ||
+                    result.serviceFee.tireStorageFee !== 0 ? (
+                      <span>
+                        工賃 :{" "}
+                        {(result.serviceFee.laborFee *
+                          (100 - result.discountRate.laborFee)) /
+                          100 +
+                          (result.serviceFee.removalFee *
+                            (100 - result.discountRate.removalFee)) /
+                            100 +
+                          result.serviceFee.tireDisposalFee +
+                          (result.serviceFee.tireStorageFee *
+                            (100 - result.discountRate.tireStorageFee)) /
+                            100}
+                        円
+                      </span>
+                    ) : (
+                      ""
+                    )}{" "}
+                  </p>
 
-                      {result.extraOptions.length > 0 && (
-                        <div>
-                          <ul>
-                            {result.extraOptions.map((option) => (
-                              <li key={option.id}>
-                                {option.option} : {option.price} ×{" "}
-                                {option.quantity}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </CardContent>
-                    <CardFooter>
-                      <div className="flex flex-col">
-                        <p>
-                          合計（税込み）：{" "}
-                          <span className="font-medium">
-                            {result.totalPrice}
-                          </span>
-                          円
-                        </p>
-                        <p>
-                          タイヤ利益：{" "}
-                          {(Math.ceil(
-                            (result.tirePrice * result.priceRate) / 10,
-                          ) *
-                            10 -
-                            result.tirePrice) *
-                            result.numberOfTires}
-                          <span>円</span>
-                        </p>
-                      </div>
-                    </CardFooter>
-                  </Card>
-                )}
-              />
-              <div className="hidden">
-                <PrintContent ref={componentRefs[index]} result={result} />
-              </div>
+                  {result.extraOptions.length > 0 && (
+                    <div>
+                      <ul>
+                        {result.extraOptions.map((option) => (
+                          <li key={option.id}>
+                            {option.option} : {option.price} × {option.quantity}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </CardContent>
+                <CardFooter>
+                  <div className="flex flex-col">
+                    <p>
+                      合計（税込み）：{" "}
+                      <span className="font-medium">{result.totalPrice}</span>円
+                    </p>
+                    <p>
+                      タイヤ利益：{result.profit}
+                      <span>円</span>
+                    </p>
+                  </div>
+                </CardFooter>
+              </Card>
             </div>
           ))}
         </div>
