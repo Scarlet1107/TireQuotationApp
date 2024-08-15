@@ -22,10 +22,15 @@ export interface SearchResult {
   discountRate: DiscoundRate;
 }
 
+// 編集中。すべてのタイヤにおいて共通のものは値として持っておいて、タイヤでフェッチできるものはidだけ持っておく
 export interface PrintData {
   customerName: string;
   carModel: string;
   expiryDate: Date;
+  // numberOfTires: number;
+  // checkBoxState: CheckboxState;
+  // wheel: Wheel;
+  // extraOptions: ExtraOption[];
   ids: number[];
 }
 

@@ -406,6 +406,19 @@ const Main = () => {
     setPrintData({ ...printData, ids: ids });
   };
 
+  const resetSelect = () => {
+    if (printData.ids.length === 0) return;
+    if (window.confirm("選択したタイヤをリセットしますか？")) {
+      const reset = () => {
+        setPrintData({ ...printData, ids: [] });
+      };
+      reset();
+      toast({
+        title: "リセットしました",
+      });
+    }
+  };
+
   return (
     <div className="mt-8 flex w-full flex-col md:flex-row">
       <div className="ml-12 flex w-max flex-col space-y-8">
@@ -760,6 +773,32 @@ const Main = () => {
         </Button>
       </div>
       <div className="flex w-full flex-col space-x-8 space-y-8">
+        <div className="relative">
+          <Button
+            className="absolute right-8 top-2 mr-8 w-max place-self-end font-medium"
+            variant={"destructive"}
+            onClick={() => resetSelect()}
+            id="resetButton"
+          >
+            リセット
+          </Button>
+          {printData.ids.length > 0 ? (
+            <Label
+              htmlFor="resetButton"
+              className={`absolute right-12 top-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-red-600 text-center font-bold text-black ${
+                printData.ids.length === 1
+                  ? "bg-white"
+                  : printData.ids.length === 2
+                    ? "bg-orange-100"
+                    : printData.ids.length === 3
+                      ? "bg-red-300"
+                      : "bg-white"
+              }`}
+            >
+              {printData.ids.length}
+            </Label>
+          ) : null}
+        </div>{" "}
         <p className="mt-12 flex justify-center text-3xl font-bold md:mt-0">
           見積もり結果
         </p>
@@ -847,6 +886,7 @@ const Main = () => {
           ))}
         </div>
       </div>
+
       <Toaster />
     </div>
   );
