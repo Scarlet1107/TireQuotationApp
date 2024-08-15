@@ -17,6 +17,7 @@ export interface SearchResult {
   wheel: Wheel;
   serviceFee: ServiceFee;
   totalPrice: number;
+  totalPriceWithTax: number;
   extraOptions: ExtraOption[];
   discountRate: DiscoundRate;
 }

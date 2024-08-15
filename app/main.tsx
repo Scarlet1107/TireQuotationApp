@@ -296,21 +296,23 @@ const Main = () => {
 
       const sellingPrice = Math.ceil((tirePrice * Number(priceRate)) / 10) * 10;
 
-      const profit =
-        Math.ceil((sellingPrice - tirePrice * searchMarkupRate(tire.pattern, "cost")) *
-        numberOfTires);
+      const profit = Math.ceil(
+        (sellingPrice - tirePrice * searchMarkupRate(tire.pattern, "cost")) *
+          numberOfTires,
+      );
       const wheelPrice = wheel.isIncluded ? wheel.price * wheel.quantity : 0;
 
       const totalPrice = Math.floor(
-        (sellingPrice * numberOfTires +
+        sellingPrice * numberOfTires +
           totalServiceFee +
           wheelPrice +
           filteredOptions.reduce(
             (acc, option) => acc + option.price * option.quantity,
             0,
-          )) *
-          TAX_RATE,
+          ),
       );
+
+      const totalPriceWithTax = Math.floor(totalPrice * TAX_RATE);
 
       return {
         id: tire.id,
@@ -330,6 +332,7 @@ const Main = () => {
           tireDisposalFee: serviceFee.tireDisposalFee,
         },
         totalPrice: totalPrice,
+        totalPriceWithTax: totalPriceWithTax,
         extraOptions: filteredOptions,
         discountRate: discountRate,
       };
@@ -829,8 +832,9 @@ const Main = () => {
                 <CardFooter>
                   <div className="flex flex-col">
                     <p>
-                      合計（税込み）：{" "}
-                      <span className="font-medium">{result.totalPrice}</span>円
+                      合計（税抜き）：{" "}
+                      <span className="font-bold">{result.totalPrice}</span>円
+                      <p>(税込み{result.totalPriceWithTax}円)</p>
                     </p>
                     <p>
                       タイヤ利益：{result.profit}
