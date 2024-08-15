@@ -1,5 +1,11 @@
 "use client";
 import {
+  DEFAULT_EXPIRY_DATE,
+  TAX_RATE,
+  DEFAULT_DISCOUNT_RATE,
+  DEFAULT_CHECKED_STATUS,
+} from "@/config/constants";
+import {
   CheckboxState,
   DiscoundRate,
   ExtraOption,
@@ -81,13 +87,9 @@ const Main = () => {
     price: 1000,
   });
   const { toast } = useToast();
-  const [checkedStates, setCheckedStates] = useState<CheckboxState>({
-    laborFee: true,
-    removalFee: true,
-    tireStorageFee: true,
-    tireDisposalFee: true,
-  });
-  const taxRate = 1.1; // 消費税をここで設定
+  const [checkedStates, setCheckedStates] = useState<CheckboxState>(
+    DEFAULT_CHECKED_STATUS,
+  );
 
   const [selectedData, setSelectedData] = useState<TireData>({
     priceRate: 0,
@@ -100,15 +102,13 @@ const Main = () => {
   const [printData, setPrintData] = useState<PrintData>({
     customerName: "",
     carModel: "",
-    expiryDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), //デフォルトで14日後
+    expiryDate: new Date(Date.now() + DEFAULT_EXPIRY_DATE),
     searchResults: [],
   });
 
-  const [discountRate, setDiscountRate] = useState<DiscoundRate>({
-    laborFee: 0,
-    removalFee: 0,
-    tireStorageFee: 100,
-  });
+  const [discountRate, setDiscountRate] = useState<DiscoundRate>(
+    DEFAULT_DISCOUNT_RATE,
+  );
 
   const fetchPriceRates = async () => {
     const rates = await getCustomerTypePriceRates();
@@ -279,7 +279,7 @@ const Main = () => {
             (acc, option) => acc + option.price * option.quantity,
             0,
           )) *
-          taxRate,
+          TAX_RATE,
       );
 
       return {
