@@ -773,19 +773,17 @@ const Main = () => {
         </Button>
       </div>
       <div className="flex w-full flex-col space-x-8 space-y-8">
-        <div className="relative">
-          <Button
-            className="absolute right-8 top-2 mr-8 w-max place-self-end font-medium"
-            variant={"destructive"}
-            onClick={() => resetSelect()}
-            id="resetButton"
-          >
-            リセット
-          </Button>
-          {printData.ids.length > 0 ? (
+        <Button
+          className="relative mr-8 mt-2 w-max place-self-end font-medium"
+          variant={"destructive"}
+          onClick={() => resetSelect()}
+          id="resetButton"
+        >
+          リセット
+          {printData.ids.length >= 0 ? (
             <Label
               htmlFor="resetButton"
-              className={`absolute right-12 top-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-red-600 text-center font-bold text-black ${
+              className={`absolute -right-3 -top-3 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-red-600 text-center font-bold text-black ${
                 printData.ids.length === 1
                   ? "bg-white"
                   : printData.ids.length === 2
@@ -798,8 +796,8 @@ const Main = () => {
               {printData.ids.length}
             </Label>
           ) : null}
-        </div>{" "}
-        <p className="mt-12 flex justify-center text-3xl font-bold md:mt-0">
+        </Button>
+        <p className="mt-8 flex justify-center text-3xl font-bold md:mt-0">
           見積もり結果
         </p>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
