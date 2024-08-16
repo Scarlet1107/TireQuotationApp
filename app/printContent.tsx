@@ -1,190 +1,77 @@
-import React from "react";
-import { SearchResult } from "@/utils/interface";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { format } from "date-fns";
-import { ja } from "date-fns/locale";
+import React, { useEffect, useState } from "react";
+import { PrintData, ServiceFee } from "@/utils/interface";
+import { getServiceFees } from "@/utils/supabaseFunctions";
 
 interface Props {
-  result: SearchResult;
+  printData: PrintData;
 }
 
-const PrintContent = React.forwardRef<HTMLDivElement, Props>(
-  function ComponentToPrint(props, ref) {
-    const { result } = props;
-    const today = format(new Date(), "yyyy年MM月dd日", { locale: ja });
-    const deadLine = format(
-      new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
-      "yyyy年MM月dd日",
-      { locale: ja },
-    );
+// Forward ref needs to be typed correctly
+const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
+  // Component display name
+  PrintContent.displayName = "PrintContent";
+  const { printData } = props;
 
-    const formatNumber = (num: number) => {
-      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    };
+  const [serviceFees, setServiceFees] = useState<ServiceFee[]>([]);
 
-    return (
-      <div ref={ref} className="m-8">
-        <Card className="border-2 border-gray-300">
-          <CardHeader className="border-b-2 border-gray-300 bg-gray-100 text-center">
-            <CardTitle className="text-3xl font-bold">
-              スタッドレスタイヤ御見積書
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="mb-6 flex justify-between">
-              <div>
-                <p className="font-bold">お客様名: ________________様</p>
-                <p>車種: ________________</p>
-              </div>
-              <div className="text-right">
-                <p>見積日: {today}</p>
-                <p>有効期限: {deadLine}</p>
-              </div>
-            </div>
+  // Fetch service fees asynchronously
+  const fetchServiceFees = async () => {
+    const res = await getServiceFees();
+    setServiceFees(res as ServiceFee[]);
+  };
 
-            <p className="mb-6 text-lg">
-              お見積もりありがとうございます。以下の内容でお見積もりを作成いたしました。
-            </p>
+  // Use effect to trigger the fetch on component mount
+  useEffect(() => {
+    fetchServiceFees();
+  }, []);
 
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-1/2">項目</TableHead>
-                  <TableHead className="text-right">金額</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell>
-                    タイヤ （{result.manufacturer} {result.pattern}）
-                    <br />
-                    <span className="text-sm text-gray-600">
-                      {result.numberOfTires}本 ×{" "}
-                      {formatNumber(
-                        Math.ceil((result.tirePrice * result.priceRate) / 1) *
-                          1,
-                      )}
-                      円
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {formatNumber(
-                      Math.ceil(
-                        (result.tirePrice *
-                          result.numberOfTires *
-                          result.priceRate) /
-                          10,
-                      ) * 10,
-                    )}
-                    円
-                  </TableCell>
-                </TableRow>
-                {result.serviceFee.laborFee !== 0 && (
-                  <TableRow>
-                    <TableCell>作業工賃（入替・バランス）</TableCell>
-                    <TableCell className="text-right">
-                      {formatNumber(
-                        (result.serviceFee.laborFee *
-                          (100 - result.discountRate.laborFee)) /
-                          100,
-                      )}
-                      円 (
-                      {(result.serviceFee.laborFee *
-                        result.discountRate.laborFee) /
-                        100}
-                      円引き)
-                    </TableCell>
-                  </TableRow>
-                )}
-                {result.serviceFee.removalFee !== 0 && (
-                  <TableRow>
-                    <TableCell>脱着工賃</TableCell>
-                    <TableCell className="text-right">
-                      {formatNumber(
-                        (result.serviceFee.removalFee *
-                          (100 - result.discountRate.removalFee)) /
-                          100,
-                      )}
-                      円 (
-                      {(result.serviceFee.removalFee *
-                        result.discountRate.removalFee) /
-                        100}
-                      円引き)
-                    </TableCell>
-                  </TableRow>
-                )}
+  return (
+    <div ref={ref} className="m-8">
+      <h1>This is print content</h1>
+      <h2>Fetch Test Result here</h2>
+      <p>ServiceFees.laborFee</p>
+      {serviceFees.map((data, index) => (
+        <div key={index}>{data.laborFee}</div>
+      ))}
 
-                {result.serviceFee.tireStorageFee !== 0 && (
-                  <TableRow>
-                    <TableCell>タイヤ預かり料</TableCell>
-                    <TableCell className="text-right">
-                      {formatNumber(
-                        (result.serviceFee.tireStorageFee *
-                          (100 - result.discountRate.tireStorageFee)) /
-                          100,
-                      )}
-                      円 (
-                      {(result.serviceFee.tireStorageFee *
-                        result.discountRate.tireStorageFee) /
-                        100}
-                      円引き)
-                    </TableCell>
-                  </TableRow>
-                )}
 
-                {result.serviceFee.tireDisposalFee !== 0 && (
-                  <TableRow>
-                    <TableCell>廃タイヤ処分</TableCell>
-                    <TableCell className="text-right">
-                      {formatNumber(result.serviceFee.tireDisposalFee)}円
-                    </TableCell>
-                  </TableRow>
-                )}
-                {result.extraOptions.map((option) => (
-                  <TableRow key={option.id}>
-                    <TableCell>
-                      {option.option}
-                      <br />
-                      <span className="text-sm text-gray-600">
-                        {formatNumber(option.price)}円 × {option.quantity}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {formatNumber(option.price * option.quantity)}円
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+      <h2>Print Data</h2>
+      <p>Customer Name: {printData.customerName}</p>
+      <p>Car Model: {printData.carModel}</p>
+      <p>Expiry Date: {printData.expiryDate.toString()}</p>
+      <p>Number of Tires: {printData.numberOfTires}</p>
+      <p>Wheel Name: {printData.wheel.name}</p>
+      <p>Wheel Size: {printData.wheel.size}</p>
+      <p>Wheel Quantity: {printData.wheel.quantity}</p>
+      <p>Wheel Price: {printData.wheel.price}</p>
+      <p>Extra Options:</p>
+      {printData.extraOptions.map((option, index) => (
+        <div key={index}>
+          <p>Option: {option.option}</p>
+          <p>Price: {option.price}</p>
+          <p>Quantity: {option.quantity}</p>
+        </div>
+      ))}
+      <p>Checkbox State:</p>
+      <p>Labor Fee: {printData.checkBoxState.laborFee ? "True" : "False"}</p>
+      <p>Removal Fee: {printData.checkBoxState.removalFee ? "True" : "False"}</p>
+      <p>
+        Tire Storage Fee: {printData.checkBoxState.tireStorageFee ? "True" : "False"}
+      </p>
+      <p>
+        Tire Disposal Fee: {printData.checkBoxState.tireDisposalFee ? "True" : "False"}
+      </p>
+      <p>Discount Rate:</p>
+      <p>Labor Fee: {printData.discountRate.laborFee}</p>
+      <p>Removal Fee: {printData.discountRate.removalFee}</p>
+      <p>Tire Storage Fee: {printData.discountRate.tireStorageFee}</p>
+      <p>{printData.ids}</p>
 
-            <div className="mt-6 text-right">
-              <p className="text-xl font-bold">
-                合計金額: {formatNumber(result.totalPrice)}円 （税込）
-              </p>
-            </div>
 
-            <div className="mt-8 text-sm">
-              <p>※ この見積もりの有効期限は発行日より10日間です。</p>
-              <p>
-                ※ タイヤの在庫状況により、納期が変更になる場合がございます。
-              </p>
-              <p>
-                ※ ご不明な点がございましたら、お気軽にお問い合わせください。
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  },
-);
+
+
+    </div>
+  );
+});
 
 export default PrintContent;

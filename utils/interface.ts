@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export interface TireData {
   target: string;
   numberOfTires: number;
@@ -27,10 +29,11 @@ export interface PrintData {
   customerName: string;
   carModel: string;
   expiryDate: Date;
-  // numberOfTires: number;
-  // checkBoxState: CheckboxState;
-  // wheel: Wheel;
-  // extraOptions: ExtraOption[];
+  numberOfTires: number;
+  checkBoxState: CheckboxState;
+  wheel: Wheel;
+  discountRate: DiscoundRate;
+  extraOptions: ExtraOption[];
   ids: number[];
 }
 

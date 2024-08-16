@@ -54,7 +54,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import ReactToPrint from "react-to-print";
+import ReactToPrint, { useReactToPrint } from "react-to-print";
 import PrintContent from "./printContent";
 import { set } from "date-fns";
 
@@ -75,6 +75,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
+import { Result } from "postcss";
 
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
@@ -105,6 +106,11 @@ const Main = () => {
     customerName: "",
     carModel: "",
     expiryDate: new Date(Date.now() + DEFAULT_EXPIRY_DATE),
+    numberOfTires: 4,
+    checkBoxState: DEFAULT_CHECKED_STATUS,
+    wheel: wheel,
+    discountRate: DEFAULT_DISCOUNT_RATE,
+    extraOptions: [],
     ids: [],
   });
 
@@ -419,6 +425,44 @@ const Main = () => {
     }
   };
 
+  // const componentRef = useRef();
+  // const handlePrint = useReactToPrint({
+  //   content: () => componentRefs,
+  // });
+
+  const handlePrint = useReactToPrint({
+    content: () => componentRefs[0].current,
+  });
+
+  const handlePrintButtonClick = () => {
+    if (printData.ids.length === 0) {
+      toast({
+        title: "タイヤを選択してください",
+      });
+      return;
+    }
+    if (printData.customerName === "") {
+      toast({
+        title: "お客様名を入力してください",
+      });
+      return;
+    }
+    if (printData.carModel === "") {
+      toast({
+        title: "車種を入力してください",
+      });
+      return;
+    }
+    if (componentRefs[0].current) {
+      handlePrint();
+    }
+  };
+
+  //delete later
+  useEffect(() => {
+    console.log("printData = ", printData);
+  }, [printData]);
+
   return (
     <div className="mt-8 flex w-full flex-col md:flex-row">
       <div className="ml-12 flex w-max flex-col space-y-8">
@@ -463,7 +507,10 @@ const Main = () => {
                   className="w-min"
                   value={printData.customerName}
                   onChange={(e) =>
-                    setPrintData({ ...printData, customerName: e.target.value })
+                    setPrintData({
+                      ...printData,
+                      customerName: e.target.value,
+                    })
                   }
                 />
                 <span className="place-content-center text-xl">様</span>
@@ -766,37 +813,63 @@ const Main = () => {
         </div>
 
         <Button
-          className="w-min transform bg-green-500 font-bold transition-all duration-100 hover:scale-95 hover:bg-green-600"
+          className="w-min transform bg-green-500 hover:bg-green-600"
           onClick={handleEstimate}
         >
           この内容で見積もる！
         </Button>
       </div>
       <div className="flex w-full flex-col space-x-8 space-y-8">
-        <Button
-          className="relative mr-8 mt-2 w-max place-self-end font-medium"
-          variant={"destructive"}
-          onClick={() => resetSelect()}
-          id="resetButton"
-        >
-          リセット
-          {printData.ids.length >= 0 ? (
-            <Label
-              htmlFor="resetButton"
-              className={`absolute -right-3 -top-3 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-red-600 text-center font-bold text-black ${
-                printData.ids.length === 1
-                  ? "bg-white"
-                  : printData.ids.length === 2
-                    ? "bg-orange-100"
-                    : printData.ids.length === 3
-                      ? "bg-red-300"
-                      : "bg-white"
-              }`}
-            >
-              {printData.ids.length}
-            </Label>
-          ) : null}
-        </Button>
+        <div className="mr-8 flex justify-end space-x-8">
+          <Button
+            className="relative w-max place-self-end font-medium"
+            variant={"destructive"}
+            onClick={() => resetSelect()}
+            id="resetButton"
+          >
+            リセット
+            {printData.ids.length >= 0 ? (
+              <Label
+                htmlFor="resetButton"
+                className={`absolute -right-3 -top-3 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-red-600 text-center font-bold text-black ${
+                  printData.ids.length === 1
+                    ? "bg-white"
+                    : printData.ids.length === 2
+                      ? "bg-orange-100"
+                      : printData.ids.length === 3
+                        ? "bg-red-300"
+                        : "bg-white"
+                }`}
+              >
+                {printData.ids.length}
+              </Label>
+            ) : null}
+          </Button>
+          {/* <ReactToPrint
+            trigger={() => ( */}
+          <Button
+            className="w-min transform bg-green-500 font-bold transition-all duration-100 hover:scale-95 hover:bg-green-600"
+            onClick={() => handlePrintButtonClick()}
+          >
+            選択した内容をプリント
+          </Button>
+          {/* )}
+            content={() => componentRefs[0].current}
+          /> */}
+          <div className="hidden">
+            <PrintContent
+              ref={componentRefs[0]}
+              printData={{
+                ...printData,
+                numberOfTires: selectedData.numberOfTires,
+                checkBoxState: checkedStates,
+                wheel: wheel,
+                discountRate: discountRate,
+                extraOptions: extraOptions,
+              }}
+            />
+          </div>
+        </div>
         <p className="mt-8 flex justify-center text-3xl font-bold md:mt-0">
           見積もり結果
         </p>
@@ -871,8 +944,8 @@ const Main = () => {
                     <p>
                       合計（税抜き）：{" "}
                       <span className="font-bold">{result.totalPrice}</span>円
-                      <p>(税込み{result.totalPriceWithTax}円)</p>
                     </p>
+                    <p>(税込み{result.totalPriceWithTax}円)</p>
                     <p>
                       タイヤ利益：{result.profit}
                       <span>円</span>
