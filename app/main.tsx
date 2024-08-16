@@ -557,7 +557,7 @@ const Main = () => {
                 type="number"
                 min={0}
                 max={100}
-                step={10}
+                step={50}
                 onChange={(e) =>
                   setDiscountRate({
                     ...discountRate,
@@ -582,7 +582,7 @@ const Main = () => {
                 type="number"
                 min={0}
                 max={100}
-                step={10}
+                step={50}
                 onChange={(e) =>
                   setDiscountRate({
                     ...discountRate,
@@ -608,7 +608,7 @@ const Main = () => {
                 type="number"
                 min={0}
                 max={100}
-                step={10}
+                step={50}
                 onChange={(e) =>
                   setDiscountRate({
                     ...discountRate,

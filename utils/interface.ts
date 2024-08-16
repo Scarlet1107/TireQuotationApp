@@ -22,7 +22,7 @@ export interface SearchResult {
   discountRate: DiscoundRate;
 }
 
-// 編集中。すべてのタイヤにおいて共通のものは値として持っておいて、タイヤでフェッチできるものはidだけ持っておく
+// すべてのタイヤにおいて共通のものは値として持っておいて、タイヤでフェッチできるものはidだけ持っておく
 export interface PrintData {
   customerName: string;
   carModel: string;
