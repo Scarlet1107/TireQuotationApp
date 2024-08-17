@@ -5,6 +5,8 @@ import {
   DEFAULT_DISCOUNT_RATE,
   DEFAULT_CHECKED_STATUS,
   CUSTOMER_TYPE,
+  DEFAULT_PRINTDATA,
+  DEFAULT_WHEEL,
 } from "@/config/constants";
 import {
   CheckboxState,
@@ -82,13 +84,7 @@ const Main = () => {
   const [tireSizes, setTireSizes] = useState<string[]>([]);
   const [manufacturer, setmanufacturer] = useState<string[]>([]);
   const [serviceFees, setServiceFees] = useState<ServiceFee[]>([]);
-  const [wheel, setWheel] = useState<Wheel>({
-    isIncluded: false,
-    name: "",
-    size: "",
-    quantity: 4,
-    price: 1000,
-  });
+  const [wheel, setWheel] = useState<Wheel>(DEFAULT_WHEEL);
   const { toast } = useToast();
   const [checkedStates, setCheckedStates] = useState<CheckboxState>(
     DEFAULT_CHECKED_STATUS,
@@ -102,19 +98,9 @@ const Main = () => {
   });
   const [extraOptions, setExtraOptions] = useState<ExtraOption[]>([]);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [printData, setPrintData] = useState<PrintData>({
-    ids: [],
-    tires: [],
-    customerName: "",
-    carModel: "",
-    expiryDate: new Date(DEFAULT_EXPIRY_DATE),
-    serviceFees: [],
-    numberOfTires: 4,
-    checkBoxState: DEFAULT_CHECKED_STATUS,
-    wheel: wheel,
-    discountRate: DEFAULT_DISCOUNT_RATE,
-    extraOptions: [],
-  });
+  const [printData, setPrintData] = useState<PrintData>(
+    DEFAULT_PRINTDATA
+  );
 
   const [discountRate, setDiscountRate] = useState<DiscoundRate>(
     DEFAULT_DISCOUNT_RATE,
@@ -329,7 +315,7 @@ const Main = () => {
         id: tire.id,
         manufacturer: tire.manufacturer,
         pattern: tire.pattern,
-        tireSize: tire.tireSize,
+        tireSize: selectedData.tireSize,
         tirePrice: tirePrice,
         numberOfTires: numberOfTires,
         priceRate: priceRate,
@@ -394,6 +380,7 @@ const Main = () => {
     const ids = [...printData.ids]; // Clone the ids array to avoid direct mutation
     const tires = [...printData.tires]; // Clone the tires array to avoid direct mutation
     const serviceFees = [...printData.serviceFees]; // Clone the serviceFees array to avoid direct mutation
+    console.log("toggle関数内のserviceFees = ", serviceFees);
 
     // Find the index of the id in the ids array
     const idIndex = ids.indexOf(id);
@@ -414,19 +401,18 @@ const Main = () => {
       }
 
       ids.push(id);
-
+      
       // Find the corresponding tire in searchResults and add it to tires
       const tireToAdd = searchResults.find((result) => result.id === id);
-      // console.log("tireToAdd = ", tireToAdd);
       if (tireToAdd) {
-        const tireWithSize = { ...tireToAdd, tireSize: selectedData.tireSize };
-        tires.push(tireWithSize);
+        tires.push(tireToAdd);
+        serviceFees.push(tireToAdd.serviceFee)
       }
-      console.log("tires = ", tires);
+      console.log("tireToAdd = ", tireToAdd);
     }
 
     // Update the printData with the modified ids and tires arrays
-    setPrintData({ ...printData, ids, tires });
+    setPrintData({ ...printData, ids, tires, serviceFees });
   };
 
   // useEffect(() => {
@@ -438,7 +424,7 @@ const Main = () => {
     if (printData.ids.length === 0) return;
     if (window.confirm("選択したタイヤをリセットしますか？")) {
       const reset = () => {
-        setPrintData({ ...printData, ids: [] });
+        setPrintData({...printData, ids:[], serviceFees:[], tires:[]});
       };
       reset();
       toast({
@@ -868,7 +854,6 @@ const Main = () => {
               ref={componentRefs[0]}
               printData={{
                 ...printData,
-                serviceFees: serviceFees,
                 numberOfTires: selectedData.numberOfTires,
                 checkBoxState: checkedStates,
                 wheel: wheel,

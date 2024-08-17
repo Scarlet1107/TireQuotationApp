@@ -10,9 +10,6 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   PrintContent.displayName = "PrintContent";
   const { printData } = props;
 
-  // これは工賃のテーブル。これ消してもいいかも
-  const [serviceFees, setServiceFees] = useState<ServiceFee[]>([]);
-
   useEffect(() => {
     printData.ids.forEach(async (id) => {
       const tire = await searchTireByID(id);
@@ -52,13 +49,26 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
         ))}
       </div>
 
+      <p className="mt-2 flex justify-center">工賃ランク</p>
+      <div className="flex space-x-4">
+        {printData.serviceFees.map((fee, index) => (
+          <p key={index} className="">{fee.rank}</p>
+        ))}
+      </div>
+      
       <p className="mt-2 flex justify-center">作業工賃</p>
       <div className="flex space-x-4">
         {printData.serviceFees.map((fee, index) => (
           <p key={index} className="">{fee.laborFee}</p>
         ))}
       </div>
-      
+
+      <p className="mt-2 flex justify-center">脱着工賃</p>
+      <div className="flex space-x-4">
+        {printData.serviceFees.map((fee, index) => (
+          <p key={index} className="">{fee.removalFee}</p>
+        ))}
+      </div>
 
       <p>Customer Name: {printData.customerName}</p>
       <p>Car Model: {printData.carModel}</p>
