@@ -78,6 +78,7 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { Result } from "postcss";
+import Image from "next/image";
 
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
@@ -98,9 +99,7 @@ const Main = () => {
   });
   const [extraOptions, setExtraOptions] = useState<ExtraOption[]>([]);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [printData, setPrintData] = useState<PrintData>(
-    DEFAULT_PRINTDATA
-  );
+  const [printData, setPrintData] = useState<PrintData>(DEFAULT_PRINTDATA);
 
   const [discountRate, setDiscountRate] = useState<DiscoundRate>(
     DEFAULT_DISCOUNT_RATE,
@@ -401,12 +400,12 @@ const Main = () => {
       }
 
       ids.push(id);
-      
+
       // Find the corresponding tire in searchResults and add it to tires
       const tireToAdd = searchResults.find((result) => result.id === id);
       if (tireToAdd) {
         tires.push(tireToAdd);
-        serviceFees.push(tireToAdd.serviceFee)
+        serviceFees.push(tireToAdd.serviceFee);
       }
       console.log("tireToAdd = ", tireToAdd);
     }
@@ -424,7 +423,7 @@ const Main = () => {
     if (printData.ids.length === 0) return;
     if (window.confirm("選択したタイヤをリセットしますか？")) {
       const reset = () => {
-        setPrintData({...printData, ids:[], serviceFees:[], tires:[]});
+        setPrintData({ ...printData, ids: [], serviceFees: [], tires: [] });
       };
       reset();
       toast({
@@ -464,6 +463,7 @@ const Main = () => {
   return (
     <div className="mt-8 flex w-full flex-col md:flex-row">
       <div className="ml-12 flex w-max flex-col space-y-8">
+
         <Popover>
           <PopoverTrigger asChild>
             <Button
