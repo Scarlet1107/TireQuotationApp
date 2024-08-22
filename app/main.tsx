@@ -463,7 +463,6 @@ const Main = () => {
   return (
     <div className="mt-8 flex w-full flex-col md:flex-row">
       <div className="ml-12 flex w-max flex-col space-y-8">
-
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -494,6 +493,23 @@ const Main = () => {
             />
           </PopoverContent>
         </Popover>
+        <Label>
+          担当者
+          <div className="mt-2 flex space-x-2">
+            <Input
+              type="string"
+              className="w-min"
+              // value={printData.customerName}
+              // onChange={(e) =>
+              //   setPrintData({
+              //     ...printData,
+              //     customerName: e.target.value,
+              //   })
+              // }
+            />
+          </div>
+        </Label>
+
         <div className="flex justify-around">
           <div className="flex">
             <Label>
@@ -864,7 +880,7 @@ const Main = () => {
           </div>
         </div>
         <p className="mt-8 flex justify-center text-3xl font-bold md:mt-0">
-          見積もり結果
+          見積り結果
         </p>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
           {searchResults.map((result, index) => (
@@ -882,8 +898,8 @@ const Main = () => {
                   <CardDescription>パターン : {result.pattern}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p>id : {result.id}</p>
-                  <p>工賃ランク：{result.serviceFee.rank}</p>
+                  {/* <p>id : {result.id}</p> */}
+                  {/* <p>工賃ランク：{result.serviceFee.rank}</p> */}
                   <p>
                     タイヤ :{result.tirePrice} × {result.priceRate} ×{" "}
                     {result.numberOfTires}{" "}
@@ -935,12 +951,13 @@ const Main = () => {
                 <CardFooter>
                   <div className="flex flex-col">
                     <p>
-                      合計（税抜き）：{" "}
-                      <span className="font-bold">{result.totalPrice}</span>円
+                      合計（税抜）： <span>{result.totalPrice}</span>円
                     </p>
-                    <p>(税込み{result.totalPriceWithTax}円)</p>
+                    <p className="font-bold">
+                      税込{result.totalPriceWithTax}円
+                    </p>
                     <p>
-                      タイヤ利益：{result.profit}
+                      タイヤ利益(税抜)：{result.profit}
                       <span>円</span>
                     </p>
                   </div>
