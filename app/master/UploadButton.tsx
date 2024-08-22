@@ -1,13 +1,14 @@
 import Papa from "papaparse";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/utils/supabase";
 import { useState } from "react";
 import { Upload } from "lucide-react";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
-const supabase = createClient(supabaseUrl, supabaseKey);
+interface UploadButtonProps {
+  children: React.ReactNode;
+  tableName: string;
+}
 
-const UploadButton = () => {
+const UploadButton: React.FC<UploadButtonProps> = ({ children, tableName }) => {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState<boolean>(false);
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,7 +40,7 @@ const UploadButton = () => {
         for (let i = 0; i < data.length; i += chunkSize) {
           const chunk = data.slice(i, i + chunkSize);
 
-          const { error } = await supabase.from("tirePrice").insert(chunk);
+          const { error } = await supabase.from(tableName).insert(chunk);
 
           if (error) {
             console.error(error);
@@ -56,7 +57,7 @@ const UploadButton = () => {
 
   return (
     <div className="rounded-lg bg-white p-6 shadow-md">
-      <h2 className="mb-4 text-2xl font-semibold text-gray-700">Upload file</h2>
+      <h2 className="mb-4 text-2xl font-semibold text-gray-700">{children}</h2>
       <div className="relative">
         <input
           type="file"

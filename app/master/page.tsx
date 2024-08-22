@@ -3,20 +3,12 @@ import React from "react";
 import Header from "@/components/Header";
 import { deleteAllData } from "@/utils/supabaseFunctions";
 import AlertButton from "./AlertButton";
-
 import CSVUploader from "./CSVUploader";
 
 const page = () => {
-  const deleteData = async () => {
+  const handleClick = async (tableName: string) => {
     try {
-      await deleteAllData();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  const handleClick = async () => {
-    try {
-      await deleteAllData();
+      await deleteAllData(tableName);
     } catch (error) {
       console.error(error);
     }
@@ -24,18 +16,32 @@ const page = () => {
   return (
     <div>
       <Header />
+
       <div className="mt-10 flex">
-        <div className="w-1/2">
+        <div className="w-2/3">
           <CSVUploader />
         </div>
-        <div className="w-1/2">
-          <button
-            className="rounded bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700"
-            onClick={() => handleClick()}
+        <div className="w-1/3">
+          <AlertButton
+            message="現在のデータを消去しても良いですか？"
+            onPush={() => handleClick("tirePrice")}
           >
-            テーブルのデータをすべて削除する
-          </button>
-          <AlertButton></AlertButton>
+            tirePriceの消去
+          </AlertButton>
+
+          <AlertButton
+            message="現在のデータを消去しても良いですか？"
+            onPush={() => handleClick("ServiceFees")}
+          >
+            ServiceFeesの消去
+          </AlertButton>
+
+          <AlertButton
+            message="現在のデータを消去しても良いですか？"
+            onPush={() => handleClick("CustomerTypePriceRate")}
+          >
+            CustomerTypePriceRateの消去
+          </AlertButton>
         </div>
       </div>
     </div>

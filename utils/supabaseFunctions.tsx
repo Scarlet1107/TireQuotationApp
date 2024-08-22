@@ -33,11 +33,8 @@ export const getServiceFees = async () => {
 
 // For master page
 
-export const deleteAllData = async () => {
-  const { data, error } = await supabase
-    .from("tirePrice")
-    .delete()
-    .neq("id", "0");
+export const deleteAllData = async (name: string) => {
+  const { data, error } = await supabase.from(name).delete().neq("id", "0");
 
   if (error) {
     console.error(error);
