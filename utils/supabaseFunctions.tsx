@@ -31,6 +31,11 @@ export const getServiceFees = async () => {
   return serviceFees.data;
 };
 
+export const searchTireByID = async (id: number) => {
+  const tire = await supabase.from("tirePrice").select("*").eq("id", id);
+  return tire;
+};
+
 // For master page
 
 export const deleteAllData = async (name: string) => {

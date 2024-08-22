@@ -5,6 +5,8 @@ import {
   DEFAULT_DISCOUNT_RATE,
   DEFAULT_CHECKED_STATUS,
   CUSTOMER_TYPE,
+  DEFAULT_PRINTDATA,
+  DEFAULT_WHEEL,
 } from "@/config/constants";
 import {
   CheckboxState,
@@ -13,7 +15,7 @@ import {
   PrintData,
   SearchResult,
   ServiceFee,
-  TireData,
+  SelectData,
   Wheel,
 } from "@/utils/interface";
 import {
@@ -76,25 +78,20 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { Result } from "postcss";
+import Image from "next/image";
 
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
   const [tireSizes, setTireSizes] = useState<string[]>([]);
   const [manufacturer, setmanufacturer] = useState<string[]>([]);
   const [serviceFees, setServiceFees] = useState<ServiceFee[]>([]);
-  const [wheel, setWheel] = useState<Wheel>({
-    isIncluded: false,
-    name: "",
-    size: "",
-    quantity: 4,
-    price: 1000,
-  });
+  const [wheel, setWheel] = useState<Wheel>(DEFAULT_WHEEL);
   const { toast } = useToast();
   const [checkedStates, setCheckedStates] = useState<CheckboxState>(
     DEFAULT_CHECKED_STATUS,
   );
 
-  const [selectedData, setSelectedData] = useState<TireData>({
+  const [selectedData, setSelectedData] = useState<SelectData>({
     target: "",
     numberOfTires: 4,
     manufacturer: "all",
@@ -102,17 +99,7 @@ const Main = () => {
   });
   const [extraOptions, setExtraOptions] = useState<ExtraOption[]>([]);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [printData, setPrintData] = useState<PrintData>({
-    customerName: "",
-    carModel: "",
-    expiryDate: new Date(Date.now() + DEFAULT_EXPIRY_DATE),
-    numberOfTires: 4,
-    checkBoxState: DEFAULT_CHECKED_STATUS,
-    wheel: wheel,
-    discountRate: DEFAULT_DISCOUNT_RATE,
-    extraOptions: [],
-    ids: [],
-  });
+  const [printData, setPrintData] = useState<PrintData>(DEFAULT_PRINTDATA);
 
   const [discountRate, setDiscountRate] = useState<DiscoundRate>(
     DEFAULT_DISCOUNT_RATE,
@@ -120,7 +107,6 @@ const Main = () => {
 
   const fetchPriceRates = async () => {
     const rates = await getCustomerTypePriceRates();
-    console.log("priceRates = ", rates.data);
     setPriceRates(rates.data as any[]);
   };
   const fetchTireSizes = async () => {
@@ -153,6 +139,10 @@ const Main = () => {
     fetchTireSizes();
     fetchAllmanufacturer();
     fetchServiceFees();
+    setPrintData({
+      ...printData,
+      expiryDate: new Date(Date.now() + DEFAULT_EXPIRY_DATE),
+    });
   }, []);
 
   const handleCheckboxChange =
@@ -324,7 +314,7 @@ const Main = () => {
         id: tire.id,
         manufacturer: tire.manufacturer,
         pattern: tire.pattern,
-        tireSize: tire.tireSize,
+        tireSize: selectedData.tireSize,
         tirePrice: tirePrice,
         numberOfTires: numberOfTires,
         priceRate: priceRate,
@@ -386,37 +376,54 @@ const Main = () => {
     };
 
   const toggleQuotationDataById = (id: number) => {
-    const ids = printData.ids;
+    const ids = [...printData.ids]; // Clone the ids array to avoid direct mutation
+    const tires = [...printData.tires]; // Clone the tires array to avoid direct mutation
+    const serviceFees = [...printData.serviceFees]; // Clone the serviceFees array to avoid direct mutation
+    console.log("toggle関数内のserviceFees = ", serviceFees);
 
-    // 既にidが存在するかどうか確認
+    // Find the index of the id in the ids array
     const idIndex = ids.indexOf(id);
 
     if (idIndex !== -1) {
-      // idが存在する場合、削除する
+      // If id exists, remove it from ids and tires
       ids.splice(idIndex, 1);
+      tires.splice(idIndex, 1);
+      serviceFees.splice(idIndex, 1);
     } else {
-      // idが存在しない場合、追加する
+      // If id does not exist, add it
       if (ids.length >= 3) {
-        // もしidsが上限に達している場合は、警告を出して終了
+        // If ids length exceeds the limit, show a warning toast
         toast({
           title: "最大3つまでしか選択できません",
         });
         return;
       }
+
       ids.push(id);
+
+      // Find the corresponding tire in searchResults and add it to tires
+      const tireToAdd = searchResults.find((result) => result.id === id);
+      if (tireToAdd) {
+        tires.push(tireToAdd);
+        serviceFees.push(tireToAdd.serviceFee);
+      }
+      console.log("tireToAdd = ", tireToAdd);
     }
 
-    console.log(ids);
-
-    // 更新されたidsを反映
-    setPrintData({ ...printData, ids: ids });
+    // Update the printData with the modified ids and tires arrays
+    setPrintData({ ...printData, ids, tires, serviceFees });
   };
+
+  // useEffect(() => {
+  //   console.log("printData = ", printData);
+  // }),
+  //   [printData];
 
   const resetSelect = () => {
     if (printData.ids.length === 0) return;
     if (window.confirm("選択したタイヤをリセットしますか？")) {
       const reset = () => {
-        setPrintData({ ...printData, ids: [] });
+        setPrintData({ ...printData, ids: [], serviceFees: [], tires: [] });
       };
       reset();
       toast({
@@ -424,11 +431,6 @@ const Main = () => {
       });
     }
   };
-
-  // const componentRef = useRef();
-  // const handlePrint = useReactToPrint({
-  //   content: () => componentRefs,
-  // });
 
   const handlePrint = useReactToPrint({
     content: () => componentRefs[0].current,
@@ -458,14 +460,10 @@ const Main = () => {
     }
   };
 
-  //delete later
-  useEffect(() => {
-    console.log("printData = ", printData);
-  }, [printData]);
-
   return (
     <div className="mt-8 flex w-full flex-col md:flex-row">
       <div className="ml-12 flex w-max flex-col space-y-8">
+
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -845,17 +843,12 @@ const Main = () => {
               </Label>
             ) : null}
           </Button>
-          {/* <ReactToPrint
-            trigger={() => ( */}
           <Button
             className="w-min transform bg-green-500 font-bold transition-all duration-100 hover:scale-95 hover:bg-green-600"
             onClick={() => handlePrintButtonClick()}
           >
             選択した内容をプリント
           </Button>
-          {/* )}
-            content={() => componentRefs[0].current}
-          /> */}
           <div className="hidden">
             <PrintContent
               ref={componentRefs[0]}

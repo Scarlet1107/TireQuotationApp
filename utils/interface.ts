@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-export interface TireData {
+export interface SelectData {
   target: string;
   numberOfTires: number;
   manufacturer: string;
@@ -24,17 +24,33 @@ export interface SearchResult {
   discountRate: DiscoundRate;
 }
 
+export interface Tire{
+  manufacturer: string;
+  pattern: string;
+  tireSize: string;
+  tirePrice: number;
+  priceRate: number;
+}
+
 // すべてのタイヤにおいて共通のものは値として持っておいて、タイヤでフェッチできるものはidだけ持っておく
 export interface PrintData {
+  ids: number[];
+  tires: Tire[];
+  
+  serviceFees: ServiceFee[];
+  
   customerName: string;
   carModel: string;
   expiryDate: Date;
-  numberOfTires: number;
-  checkBoxState: CheckboxState;
+  
+  numberOfTires: number; //タイヤの数
+
+  checkBoxState: CheckboxState; //工賃のチェックリスト(すべて同じ)
+  discountRate: DiscoundRate; // 工賃の割引率（すべて同じ）
+  
+  
   wheel: Wheel;
-  discountRate: DiscoundRate;
   extraOptions: ExtraOption[];
-  ids: number[];
 }
 
 export interface ExtraOption {
