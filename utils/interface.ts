@@ -40,6 +40,7 @@ export interface PrintData {
   serviceFees: ServiceFee[];
 
   customerName: string;
+  staffName: string;
   carModel: string;
   expiryDate: Date;
 

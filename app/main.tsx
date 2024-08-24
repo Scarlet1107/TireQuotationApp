@@ -499,13 +499,13 @@ const Main = () => {
             <Input
               type="string"
               className="w-min"
-              // value={printData.customerName}
-              // onChange={(e) =>
-              //   setPrintData({
-              //     ...printData,
-              //     customerName: e.target.value,
-              //   })
-              // }
+              value={printData.staffName}
+              onChange={(e) =>
+                setPrintData({
+                  ...printData,
+                  staffName: e.target.value,
+                })
+              }
             />
           </div>
         </Label>

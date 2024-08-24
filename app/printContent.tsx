@@ -120,6 +120,9 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
             </span>
           </p>
         </div>
+        <p className="text-right">
+          担当者: <span className="font-semibold">{printData.staffName}</span>
+        </p>
       </div>
 
       <table className="mb-4 w-full border-collapse border border-gray-800">
