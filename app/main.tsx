@@ -104,6 +104,7 @@ const Main = () => {
   const [discountRate, setDiscountRate] = useState<DiscoundRate>(
     DEFAULT_DISCOUNT_RATE,
   );
+  const [quotationNumber, setQuotationNumber] = useState<string>("");
 
   const fetchPriceRates = async () => {
     const rates = await getCustomerTypePriceRates();
@@ -139,6 +140,7 @@ const Main = () => {
     fetchTireSizes();
     fetchAllmanufacturer();
     fetchServiceFees();
+    setQuotationNumber(generateQuotationNumber());
     setPrintData({
       ...printData,
       expiryDate: new Date(Date.now() + DEFAULT_EXPIRY_DATE),
@@ -432,8 +434,22 @@ const Main = () => {
     }
   };
 
+  // 見積もりナンバーを日時から生成する関数
+  const generateQuotationNumber = (): string => {
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const quotationNumber = `${year}${month}${day}${hours}${minutes}`;
+    return quotationNumber;
+  };
+
   const handlePrint = useReactToPrint({
     content: () => componentRefs[0].current,
+    documentTitle: printData.customerName + "様-" + quotationNumber,
   });
 
   const handlePrintButtonClick = () => {

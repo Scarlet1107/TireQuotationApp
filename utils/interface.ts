@@ -43,6 +43,7 @@ export interface PrintData {
   staffName: string;
   carModel: string;
   expiryDate: Date;
+  quotationNumber: string;
 
   numberOfTires: number; //タイヤの数
 
