@@ -8,8 +8,6 @@ interface Props {
 }
 
 const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
-  const [quotationNumber, setQuotationNumber] = useState<string>("");
-
   PrintContent.displayName = "PrintContent";
   const { printData } = props;
 
@@ -125,7 +123,7 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
           </p>
         </div>
         <div className="flex justify-between">
-          <p>見積番号: {quotationNumber}</p>
+          <p>見積番号: {printData.quotationNumber}</p>
           <p>
             担当者: <span className="font-semibold">{printData.staffName}</span>
           </p>

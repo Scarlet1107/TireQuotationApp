@@ -43,8 +43,10 @@ export const DEFAULT_WHEEL = <Wheel>{
 export const DEFAULT_PRINTDATA = <PrintData>{
   ids: [],
   tires: [],
+  staffName: "",
   customerName: "",
   carModel: "",
+  quotationNumber: "",
   expiryDate: new Date(DEFAULT_EXPIRY_DATE),
   serviceFees: [],
   numberOfTires: 4,

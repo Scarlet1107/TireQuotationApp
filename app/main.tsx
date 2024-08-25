@@ -104,8 +104,6 @@ const Main = () => {
   const [discountRate, setDiscountRate] = useState<DiscoundRate>(
     DEFAULT_DISCOUNT_RATE,
   );
-  const [quotationNumber, setQuotationNumber] = useState<string>("");
-
   const fetchPriceRates = async () => {
     const rates = await getCustomerTypePriceRates();
     setPriceRates(rates.data as any[]);
@@ -140,7 +138,6 @@ const Main = () => {
     fetchTireSizes();
     fetchAllmanufacturer();
     fetchServiceFees();
-    setQuotationNumber(generateQuotationNumber());
     setPrintData({
       ...printData,
       expiryDate: new Date(Date.now() + DEFAULT_EXPIRY_DATE),
@@ -279,6 +276,12 @@ const Main = () => {
     }
 
     console.log(res.data);
+
+    // 見積もりナンバーを生成
+    setPrintData({
+      ...printData,
+      quotationNumber: generateQuotationNumber(),
+    });
 
     const newResults = res.data.map((tire: any) => {
       const tirePrice = tire.price;
@@ -449,7 +452,7 @@ const Main = () => {
 
   const handlePrint = useReactToPrint({
     content: () => componentRefs[0].current,
-    documentTitle: printData.customerName + "様-" + quotationNumber,
+    documentTitle: printData.customerName + "様-" + printData.quotationNumber,
   });
 
   const handlePrintButtonClick = () => {
