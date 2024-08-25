@@ -79,6 +79,7 @@ import {
 import { format } from "date-fns";
 import { Result } from "postcss";
 import Image from "next/image";
+import { ja } from "date-fns/locale";
 
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
@@ -104,7 +105,6 @@ const Main = () => {
   const [discountRate, setDiscountRate] = useState<DiscoundRate>(
     DEFAULT_DISCOUNT_RATE,
   );
-
   const fetchPriceRates = async () => {
     const rates = await getCustomerTypePriceRates();
     setPriceRates(rates.data as any[]);
@@ -278,6 +278,12 @@ const Main = () => {
 
     console.log(res.data);
 
+    // 見積もりナンバーを生成
+    setPrintData({
+      ...printData,
+      quotationNumber: generateQuotationNumber(),
+    });
+
     const newResults = res.data.map((tire: any) => {
       const tirePrice = tire.price;
       const serviceFee = calculateLaborCost(tire.laborCostRank);
@@ -376,23 +382,19 @@ const Main = () => {
     };
 
   const toggleQuotationDataById = (id: number) => {
-    const ids = [...printData.ids]; // Clone the ids array to avoid direct mutation
-    const tires = [...printData.tires]; // Clone the tires array to avoid direct mutation
-    const serviceFees = [...printData.serviceFees]; // Clone the serviceFees array to avoid direct mutation
+    const ids = [...printData.ids];
+    const tires = [...printData.tires];
+    const serviceFees = [...printData.serviceFees];
     console.log("toggle関数内のserviceFees = ", serviceFees);
 
-    // Find the index of the id in the ids array
     const idIndex = ids.indexOf(id);
 
     if (idIndex !== -1) {
-      // If id exists, remove it from ids and tires
       ids.splice(idIndex, 1);
       tires.splice(idIndex, 1);
       serviceFees.splice(idIndex, 1);
     } else {
-      // If id does not exist, add it
       if (ids.length >= 3) {
-        // If ids length exceeds the limit, show a warning toast
         toast({
           title: "最大3つまでしか選択できません",
         });
@@ -401,7 +403,6 @@ const Main = () => {
 
       ids.push(id);
 
-      // Find the corresponding tire in searchResults and add it to tires
       const tireToAdd = searchResults.find((result) => result.id === id);
       if (tireToAdd) {
         tires.push(tireToAdd);
@@ -410,14 +411,8 @@ const Main = () => {
       console.log("tireToAdd = ", tireToAdd);
     }
 
-    // Update the printData with the modified ids and tires arrays
     setPrintData({ ...printData, ids, tires, serviceFees });
   };
-
-  // useEffect(() => {
-  //   console.log("printData = ", printData);
-  // }),
-  //   [printData];
 
   const resetSelect = () => {
     if (printData.ids.length === 0) return;
@@ -432,8 +427,22 @@ const Main = () => {
     }
   };
 
+  // 見積もりナンバーを日時から生成する関数
+  const generateQuotationNumber = (): string => {
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const quotationNumber = `${year}${month}${day}${hours}${minutes}`;
+    return quotationNumber;
+  };
+
   const handlePrint = useReactToPrint({
     content: () => componentRefs[0].current,
+    documentTitle: printData.customerName + "様-" + printData.quotationNumber,
   });
 
   const handlePrintButtonClick = () => {
@@ -463,7 +472,6 @@ const Main = () => {
   return (
     <div className="mt-8 flex w-full flex-col md:flex-row">
       <div className="ml-12 flex w-max flex-col space-y-8">
-
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -475,7 +483,7 @@ const Main = () => {
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
               {printData.expiryDate ? (
-                format(printData.expiryDate, "PPP")
+                format(printData.expiryDate, "PPP", { locale: ja }) // 日本語ロケールを指定
               ) : (
                 <span>有効期限を選択</span>
               )}
@@ -494,6 +502,23 @@ const Main = () => {
             />
           </PopoverContent>
         </Popover>
+        <Label>
+          担当者
+          <div className="mt-2 flex space-x-2">
+            <Input
+              type="string"
+              className="w-min"
+              value={printData.staffName}
+              onChange={(e) =>
+                setPrintData({
+                  ...printData,
+                  staffName: e.target.value,
+                })
+              }
+            />
+          </div>
+        </Label>
+
         <div className="flex justify-around">
           <div className="flex">
             <Label>
@@ -864,7 +889,7 @@ const Main = () => {
           </div>
         </div>
         <p className="mt-8 flex justify-center text-3xl font-bold md:mt-0">
-          見積もり結果
+          見積り結果
         </p>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
           {searchResults.map((result, index) => (
@@ -882,8 +907,8 @@ const Main = () => {
                   <CardDescription>パターン : {result.pattern}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p>id : {result.id}</p>
-                  <p>工賃ランク：{result.serviceFee.rank}</p>
+                  {/* <p>id : {result.id}</p> */}
+                  {/* <p>工賃ランク：{result.serviceFee.rank}</p> */}
                   <p>
                     タイヤ :{result.tirePrice} × {result.priceRate} ×{" "}
                     {result.numberOfTires}{" "}
@@ -935,12 +960,13 @@ const Main = () => {
                 <CardFooter>
                   <div className="flex flex-col">
                     <p>
-                      合計（税抜き）：{" "}
-                      <span className="font-bold">{result.totalPrice}</span>円
+                      合計（税抜）： <span>{result.totalPrice}</span>円
                     </p>
-                    <p>(税込み{result.totalPriceWithTax}円)</p>
+                    <p className="font-bold">
+                      税込{result.totalPriceWithTax}円
+                    </p>
                     <p>
-                      タイヤ利益：{result.profit}
+                      タイヤ利益(税抜)：{result.profit}
                       <span>円</span>
                     </p>
                   </div>

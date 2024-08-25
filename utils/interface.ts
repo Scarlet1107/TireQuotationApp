@@ -24,7 +24,7 @@ export interface SearchResult {
   discountRate: DiscoundRate;
 }
 
-export interface Tire{
+export interface Tire {
   manufacturer: string;
   pattern: string;
   tireSize: string;
@@ -36,19 +36,20 @@ export interface Tire{
 export interface PrintData {
   ids: number[];
   tires: Tire[];
-  
+
   serviceFees: ServiceFee[];
-  
+
   customerName: string;
+  staffName: string;
   carModel: string;
   expiryDate: Date;
-  
+  quotationNumber: string;
+
   numberOfTires: number; //タイヤの数
 
   checkBoxState: CheckboxState; //工賃のチェックリスト(すべて同じ)
   discountRate: DiscoundRate; // 工賃の割引率（すべて同じ）
-  
-  
+
   wheel: Wheel;
   extraOptions: ExtraOption[];
 }

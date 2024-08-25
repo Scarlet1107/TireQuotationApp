@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { PrintData, ServiceFee, DiscoundRate } from "@/utils/interface";
 import { TAX_RATE } from "@/config/constants";
 import Image from "next/image";
@@ -46,10 +46,7 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   };
 
   const extraOptionsTotal = calculateExtraOptionsTotal();
-
-  // if (printData.wheel.isIncluded) {
   const wheelTotal = printData.wheel.price * printData.wheel.quantity;
-  // }
 
   const renderDiscountedPrice = (price: number, discountRate: number) => {
     if (discountRate === 100) {
@@ -81,10 +78,15 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   };
 
   return (
-    <div ref={ref} className="m-8 font-sans text-sm">
-      <h1 className="mb-4 text-center text-2xl font-bold">御見積書</h1>
+    <div
+      ref={ref}
+      className="m-8 font-sans text-sm print:text-xs print:leading-tight"
+    >
+      <h1 className="mb-4 text-center text-2xl font-bold print:text-xl">
+        御見積書
+      </h1>
 
-      <p className="mb-4 text-center text-xl">
+      <p className="mb-4 text-center text-xl print:text-lg">
         お見積りいただきありがとうございます。以下の内容でお見積りを作成いたしました。
       </p>
 
@@ -120,14 +122,20 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
             </span>
           </p>
         </div>
+        <div className="flex justify-between">
+          <p>見積番号: {printData.quotationNumber}</p>
+          <p>
+            担当者: <span className="font-semibold">{printData.staffName}</span>
+          </p>
+        </div>
       </div>
 
-      <table className="mb-4 w-full border-collapse border border-gray-800">
+      <table className="mb-4 w-full border-collapse border border-gray-800 print:text-xs">
         <thead>
           <tr className="bg-gray-200">
-            <th className="border border-gray-800 p-2">項目</th>
+            <th className="border border-gray-800 p-1">項目</th>
             {printData.tires.map((tire, index) => (
-              <th key={index} className="border border-gray-800 p-2">
+              <th key={index} className="border border-gray-800 p-1">
                 {tire.manufacturer} {tire.pattern}
               </th>
             ))}
@@ -135,21 +143,21 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
         </thead>
         <tbody>
           <tr>
-            <td className="border border-gray-800 p-2 font-semibold">
+            <td className="border border-gray-800 p-1 font-semibold">
               タイヤサイズ
             </td>
             {printData.tires.map((tire, index) => (
-              <td key={index} className="border border-gray-800 p-2">
+              <td key={index} className="border border-gray-800 p-1">
                 {tire.tireSize}
               </td>
             ))}
           </tr>
           <tr>
-            <td className="border border-gray-800 p-2 font-semibold">
+            <td className="border border-gray-800 p-1 font-semibold">
               タイヤ価格
             </td>
             {printData.tires.map((tire, index) => (
-              <td key={index} className="border border-gray-800 p-2">
+              <td key={index} className="border border-gray-800 p-1">
                 <div>
                   {formatPrice(
                     Math.ceil((tire.tirePrice * tire.priceRate) / 10) * 10,
@@ -169,11 +177,11 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
           </tr>
           {printData.checkBoxState.laborFee && (
             <tr>
-              <td className="border border-gray-800 p-2 font-semibold">
+              <td className="border border-gray-800 p-1 font-semibold">
                 作業工賃（入替・バランス）
               </td>
               {printData.serviceFees.map((fee, index) => (
-                <td key={index} className="border border-gray-800 p-2">
+                <td key={index} className="border border-gray-800 p-1">
                   {renderDiscountedPrice(
                     fee.laborFee,
                     printData.discountRate.laborFee,
@@ -184,11 +192,11 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
           )}
           {printData.checkBoxState.removalFee && (
             <tr>
-              <td className="border border-gray-800 p-2 font-semibold">
+              <td className="border border-gray-800 p-1 font-semibold">
                 脱着工賃
               </td>
               {printData.serviceFees.map((fee, index) => (
-                <td key={index} className="border border-gray-800 p-2">
+                <td key={index} className="border border-gray-800 p-1">
                   {renderDiscountedPrice(
                     fee.removalFee,
                     printData.discountRate.removalFee,
@@ -199,11 +207,11 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
           )}
           {printData.checkBoxState.tireDisposalFee && (
             <tr>
-              <td className="border border-gray-800 p-2 font-semibold">
+              <td className="border border-gray-800 p-1 font-semibold">
                 廃タイヤ処分
               </td>
               {printData.serviceFees.map((fee, index) => (
-                <td key={index} className="border border-gray-800 p-2">
+                <td key={index} className="border border-gray-800 p-1">
                   ¥{formatPrice(fee.tireDisposalFee)}
                 </td>
               ))}
@@ -211,11 +219,11 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
           )}
           {printData.checkBoxState.tireStorageFee && (
             <tr>
-              <td className="border border-gray-800 p-2 font-semibold">
+              <td className="border border-gray-800 p-1 font-semibold">
                 タイヤ預かり料
               </td>
               {printData.serviceFees.map((fee, index) => (
-                <td key={index} className="border border-gray-800 p-2">
+                <td key={index} className="border border-gray-800 p-1">
                   {renderDiscountedPrice(
                     fee.tireStorageFee,
                     printData.discountRate.tireStorageFee,
@@ -226,11 +234,11 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
           )}
           {printData.wheel.isIncluded && (
             <tr>
-              <td className="border border-gray-800 p-2 font-semibold">
+              <td className="border border-gray-800 p-1 font-semibold">
                 ホイール
               </td>
               {printData.tires.map((_, index) => (
-                <td key={index} className="border border-gray-800 p-2">
+                <td key={index} className="border border-gray-800 p-1">
                   <div className="font-semibold">
                     ¥{formatPrice(wheelTotal)}
                   </div>
@@ -240,22 +248,22 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
           )}
           {extraOptionsTotal > 0 && (
             <tr>
-              <td className="border border-gray-800 p-2 font-semibold">
+              <td className="border border-gray-800 p-1 font-semibold">
                 その他オプション
               </td>
               {printData.tires.map((_, index) => (
-                <td key={index} className="border border-gray-800 p-2">
+                <td key={index} className="border border-gray-800 p-1">
                   ¥{formatPrice(extraOptionsTotal)}
                 </td>
               ))}
             </tr>
           )}
           <tr className="bg-gray-200">
-            <td className="border border-gray-800 p-2 font-semibold">
+            <td className="border border-gray-800 p-1 font-semibold">
               合計金額（税込）
             </td>
             {printData.tires.map((tire, index) => (
-              <td key={index} className="border border-gray-800 p-2 font-bold">
+              <td key={index} className="border border-gray-800 p-1 font-bold">
                 ¥
                 {formatPrice(
                   (calculateTotalPrice(
@@ -291,33 +299,35 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
       </table>
 
       {printData.wheel.isIncluded && (
-        <div className="mb-4">
-          <h2 className="mb-2 text-xl font-semibold">ホイール詳細</h2>
-          <table className="w-full border-collapse border border-gray-800">
+        <div className="avoid-page-break mb-4">
+          <h2 className="mb-2 text-xl font-semibold print:text-lg">
+            ホイール詳細
+          </h2>
+          <table className="w-full border-collapse border border-gray-800 print:text-xs">
             <thead>
               <tr className="bg-gray-200">
-                <th className="border border-gray-800 p-2">ホイール名</th>
-                <th className="border border-gray-800 p-2">サイズ</th>
-                <th className="border border-gray-800 p-2">価格</th>
-                <th className="border border-gray-800 p-2">数量</th>
-                <th className="border border-gray-800 p-2">小計</th>
+                <th className="border border-gray-800 p-1">ホイール名</th>
+                <th className="border border-gray-800 p-1">サイズ</th>
+                <th className="border border-gray-800 p-1">価格</th>
+                <th className="border border-gray-800 p-1">数量</th>
+                <th className="border border-gray-800 p-1">小計</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="border border-gray-800 p-2">
+                <td className="border border-gray-800 p-1">
                   {printData.wheel.name}
                 </td>
-                <td className="border border-gray-800 p-2">
+                <td className="border border-gray-800 p-1">
                   {printData.wheel.size}
                 </td>
-                <td className="border border-gray-800 p-2">
+                <td className="border border-gray-800 p-1">
                   ¥{formatPrice(printData.wheel.price)}
                 </td>
-                <td className="border border-gray-800 p-2">
+                <td className="border border-gray-800 p-1">
                   {printData.wheel.quantity}本
                 </td>
-                <td className="border border-gray-800 p-2 font-semibold">
+                <td className="border border-gray-800 p-1 font-semibold">
                   ¥{formatPrice(wheelTotal)}
                 </td>
               </tr>
@@ -327,30 +337,32 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
       )}
 
       {extraOptionsTotal > 0 && (
-        <div className="mb-4">
-          <h2 className="mb-2 text-xl font-semibold">その他のオプション内訳</h2>
-          <table className="w-full border-collapse border border-gray-800">
+        <div className="avoid-page-break mb-4">
+          <h2 className="mb-2 text-xl font-semibold print:text-lg">
+            その他のオプション内訳
+          </h2>
+          <table className="w-full border-collapse border border-gray-800 print:text-xs">
             <thead>
               <tr className="bg-gray-200">
-                <th className="border border-gray-800 p-2">オプション</th>
-                <th className="border border-gray-800 p-2">価格</th>
-                <th className="border border-gray-800 p-2">数量</th>
-                <th className="border border-gray-800 p-2">小計</th>
+                <th className="border border-gray-800 p-1">オプション</th>
+                <th className="border border-gray-800 p-1">価格</th>
+                <th className="border border-gray-800 p-1">数量</th>
+                <th className="border border-gray-800 p-1">小計</th>
               </tr>
             </thead>
             <tbody>
               {printData.extraOptions.map((option, index) => (
                 <tr key={index}>
-                  <td className="border border-gray-800 p-2">
+                  <td className="border border-gray-800 p-1">
                     {option.option}
                   </td>
-                  <td className="border border-gray-800 p-2">
+                  <td className="border border-gray-800 p-1">
                     ¥{formatPrice(option.price)}
                   </td>
-                  <td className="border border-gray-800 p-2">
+                  <td className="border border-gray-800 p-1">
                     {option.quantity}
                   </td>
-                  <td className="border border-gray-800 p-2">
+                  <td className="border border-gray-800 p-1">
                     ¥{formatPrice(option.price * option.quantity)}
                   </td>
                 </tr>
@@ -358,11 +370,11 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
               <tr className="font-semibold">
                 <td
                   colSpan={3}
-                  className="border border-gray-800 p-2 text-right"
+                  className="border border-gray-800 p-1 text-right"
                 >
                   合計
                 </td>
-                <td className="border border-gray-800 p-2">
+                <td className="border border-gray-800 p-1">
                   ¥{formatPrice(extraOptionsTotal)}
                 </td>
               </tr>

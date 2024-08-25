@@ -1,6 +1,11 @@
 // 変数の変更はここで行ってください
 
-import { CheckboxState, DiscoundRate, PrintData, Wheel } from "@/utils/interface";
+import {
+  CheckboxState,
+  DiscoundRate,
+  PrintData,
+  Wheel,
+} from "@/utils/interface";
 
 export const TAX_RATE = 1.1; // 消費税率。2024年8月時点で10%
 export const DEFAULT_EXPIRY_DATE = 14 * 24 * 60 * 60 * 1000; // 見積もりの有効期限。デフォルトは14日
@@ -33,14 +38,15 @@ export const DEFAULT_WHEEL = <Wheel>{
   size: "",
   quantity: 4,
   price: 1000,
-}
-
+};
 
 export const DEFAULT_PRINTDATA = <PrintData>{
   ids: [],
   tires: [],
+  staffName: "",
   customerName: "",
   carModel: "",
+  quotationNumber: "",
   expiryDate: new Date(DEFAULT_EXPIRY_DATE),
   serviceFees: [],
   numberOfTires: 4,
@@ -48,4 +54,4 @@ export const DEFAULT_PRINTDATA = <PrintData>{
   wheel: DEFAULT_WHEEL,
   discountRate: DEFAULT_DISCOUNT_RATE,
   extraOptions: [],
-}
+};
