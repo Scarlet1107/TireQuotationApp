@@ -79,6 +79,7 @@ import {
 import { format } from "date-fns";
 import { Result } from "postcss";
 import Image from "next/image";
+import { ja } from "date-fns/locale";
 
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
@@ -381,23 +382,19 @@ const Main = () => {
     };
 
   const toggleQuotationDataById = (id: number) => {
-    const ids = [...printData.ids]; // Clone the ids array to avoid direct mutation
-    const tires = [...printData.tires]; // Clone the tires array to avoid direct mutation
-    const serviceFees = [...printData.serviceFees]; // Clone the serviceFees array to avoid direct mutation
+    const ids = [...printData.ids];
+    const tires = [...printData.tires];
+    const serviceFees = [...printData.serviceFees];
     console.log("toggle関数内のserviceFees = ", serviceFees);
 
-    // Find the index of the id in the ids array
     const idIndex = ids.indexOf(id);
 
     if (idIndex !== -1) {
-      // If id exists, remove it from ids and tires
       ids.splice(idIndex, 1);
       tires.splice(idIndex, 1);
       serviceFees.splice(idIndex, 1);
     } else {
-      // If id does not exist, add it
       if (ids.length >= 3) {
-        // If ids length exceeds the limit, show a warning toast
         toast({
           title: "最大3つまでしか選択できません",
         });
@@ -406,7 +403,6 @@ const Main = () => {
 
       ids.push(id);
 
-      // Find the corresponding tire in searchResults and add it to tires
       const tireToAdd = searchResults.find((result) => result.id === id);
       if (tireToAdd) {
         tires.push(tireToAdd);
@@ -415,14 +411,8 @@ const Main = () => {
       console.log("tireToAdd = ", tireToAdd);
     }
 
-    // Update the printData with the modified ids and tires arrays
     setPrintData({ ...printData, ids, tires, serviceFees });
   };
-
-  // useEffect(() => {
-  //   console.log("printData = ", printData);
-  // }),
-  //   [printData];
 
   const resetSelect = () => {
     if (printData.ids.length === 0) return;
@@ -493,7 +483,7 @@ const Main = () => {
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
               {printData.expiryDate ? (
-                format(printData.expiryDate, "PPP")
+                format(printData.expiryDate, "PPP", { locale: ja }) // 日本語ロケールを指定
               ) : (
                 <span>有効期限を選択</span>
               )}
