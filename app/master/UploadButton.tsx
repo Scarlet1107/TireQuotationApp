@@ -57,7 +57,6 @@ const UploadButton: React.FC<UploadButtonProps> = ({ children, tableName }) => {
 
   return (
     <div className="rounded-lg bg-white p-6 shadow-md">
-      <h2 className="mb-4 text-2xl font-semibold text-gray-700">{children}</h2>
       <div className="relative">
         <input
           type="file"
@@ -71,7 +70,7 @@ const UploadButton: React.FC<UploadButtonProps> = ({ children, tableName }) => {
           onClick={handleUpload}
           disabled={uploading}
         >
-          {uploading ? "Uploading..." : "Upload"}
+          {uploading ? "アップロード中..." : "アップロード開始"}
         </button>
         <label
           htmlFor="file-upload"
@@ -91,11 +90,11 @@ const UploadButton: React.FC<UploadButtonProps> = ({ children, tableName }) => {
               d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
             />
           </svg>
-          <span>Choose file</span>
+          <span>ファイル選択</span>
         </label>
       </div>
       <p className="mt-2 text-sm text-gray-500">
-        {file ? file.name : "No selected"}
+        {file ? file.name : "ファイルが選択されていません"}
       </p>
     </div>
   );
