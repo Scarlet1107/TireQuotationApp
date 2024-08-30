@@ -211,6 +211,10 @@ const Main = () => {
     return totalCost;
   };
 
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("ja-JP").format(Math.floor(price));
+  };
+
   // タイヤのパターンとお客さんのターゲットによって価格を検索する。割合で返す
   const searchMarkupRate = (pattern: string, target: string): number => {
     const rate = priceRates.find((item) => {
@@ -396,6 +400,7 @@ const Main = () => {
     const ids = [...printData.ids];
     const tires = [...printData.tires];
     const serviceFees = [...printData.serviceFees];
+    const wheels = [...printData.wheels];
     console.log("toggle関数内のserviceFees = ", serviceFees);
 
     const idIndex = ids.indexOf(id);
@@ -404,6 +409,7 @@ const Main = () => {
       ids.splice(idIndex, 1);
       tires.splice(idIndex, 1);
       serviceFees.splice(idIndex, 1);
+      wheels.splice(idIndex, 1);
     } else {
       if (ids.length >= 3) {
         toast({
@@ -418,11 +424,12 @@ const Main = () => {
       if (tireToAdd) {
         tires.push(tireToAdd);
         serviceFees.push(tireToAdd.serviceFee);
+        wheels.push(tireToAdd.wheel);
       }
       console.log("tireToAdd = ", tireToAdd);
     }
 
-    setPrintData({ ...printData, ids, tires, serviceFees });
+    setPrintData({ ...printData, ids, tires, serviceFees, wheels });
   };
 
   const resetSelect = () => {
@@ -909,12 +916,14 @@ const Main = () => {
                   {/* <p>id : {result.id}</p> */}
                   {/* <p>工賃ランク：{result.serviceFee.rank}</p> */}
                   <p>
-                    タイヤ :{result.tirePrice} × {result.priceRate} ×{" "}
-                    {result.numberOfTires} 円
+                    タイヤ: {formatPrice(result.tirePrice)} × {result.priceRate}{" "}
+                    × {result.numberOfTires} 円
                   </p>
                   {result.wheel.isIncluded ? (
                     <p>
-                      ホイール: {result.wheel.price * result.wheel.quantity}
+                      ホイール:{" "}
+                      {formatPrice(result.wheel.price * result.wheel.quantity)}
+                      円
                     </p>
                   ) : (
                     ""
@@ -926,17 +935,19 @@ const Main = () => {
                     result.serviceFee.removalFee !== 0 ||
                     result.serviceFee.tireStorageFee !== 0 ? (
                       <span>
-                        工賃 :{" "}
-                        {(result.serviceFee.laborFee *
-                          (100 - result.discountRate.laborFee)) /
-                          100 +
-                          (result.serviceFee.removalFee *
-                            (100 - result.discountRate.removalFee)) /
+                        工賃:{" "}
+                        {formatPrice(
+                          (result.serviceFee.laborFee *
+                            (100 - result.discountRate.laborFee)) /
                             100 +
-                          result.serviceFee.tireDisposalFee +
-                          (result.serviceFee.tireStorageFee *
-                            (100 - result.discountRate.tireStorageFee)) /
-                            100}
+                            (result.serviceFee.removalFee *
+                              (100 - result.discountRate.removalFee)) /
+                              100 +
+                            result.serviceFee.tireDisposalFee +
+                            (result.serviceFee.tireStorageFee *
+                              (100 - result.discountRate.tireStorageFee)) /
+                              100,
+                        )}
                         円
                       </span>
                     ) : (
@@ -944,20 +955,23 @@ const Main = () => {
                     )}{" "}
                   </p>
                   {totalExtraOptionPrice !== 0 ? (
-                    <p>その他のオプション合計：{totalExtraOptionPrice}円</p>
+                    <p>
+                      その他のオプション合計:{" "}
+                      {formatPrice(totalExtraOptionPrice)}円
+                    </p>
                   ) : null}
                 </CardContent>
                 <CardFooter>
                   <div className="flex flex-col">
                     <p>
-                      合計（税抜）： <span>{result.totalPrice}</span>円
+                      合計（税抜）:{" "}
+                      <span>{formatPrice(result.totalPrice)}</span>円
                     </p>
                     <p className="font-bold">
-                      税込{result.totalPriceWithTax}円
+                      税込: {formatPrice(result.totalPriceWithTax)}円
                     </p>
                     <p className="mt-2">
-                      タイヤ利益(税抜)：{result.profit}
-                      <span>円</span>
+                      タイヤ利益(税抜) : {formatPrice(result.profit)}円
                     </p>
                   </div>
                 </CardFooter>
@@ -973,7 +987,6 @@ const Main = () => {
                 ...printData,
                 numberOfTires: selectedData.numberOfTires,
                 checkBoxState: checkedStates,
-                wheel: wheel,
                 discountRate: discountRate,
                 extraOptions: extraOptions,
               }}
@@ -981,7 +994,6 @@ const Main = () => {
           </div>
         </div>
       </div>
-
       <Toaster />
     </div>
   );

@@ -50,7 +50,7 @@ export interface PrintData {
   checkBoxState: CheckboxState; //工賃のチェックリスト(すべて同じ)
   discountRate: DiscoundRate; // 工賃の割引率（すべて同じ）
 
-  wheel: Wheel;
+  wheels: Wheel[];
   extraOptions: ExtraOption[];
 }
 

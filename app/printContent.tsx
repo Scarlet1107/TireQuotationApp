@@ -46,7 +46,11 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   };
 
   const extraOptionsTotal = calculateExtraOptionsTotal();
-  const wheelTotal = printData.wheel.price * printData.wheel.quantity;
+
+  const wheelTotals = printData.wheels.map((wheel) => {
+    if (!wheel.isIncluded) return 0;
+    else return wheel.price * wheel.quantity;
+  });
 
   const renderDiscountedPrice = (price: number, discountRate: number) => {
     if (discountRate === 100) {
@@ -232,20 +236,32 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
               ))}
             </tr>
           )}
-          {printData.wheel.isIncluded && (
+          {printData.wheels.length !== 0 && (
             <tr>
               <td className="border border-gray-800 p-1 font-semibold">
                 ホイール
               </td>
-              {printData.tires.map((_, index) => (
-                <td key={index} className="border border-gray-800 p-1">
-                  <div className="font-semibold">
-                    ¥{formatPrice(wheelTotal)}
-                  </div>
-                </td>
-              ))}
+              {/* ここでホイールの設定をする。Edit here later and delete this comment after finish */}
+              {printData.tires.map((_, index) => {
+                return printData.wheels[index].isIncluded ? (
+                  <td key={index} className="border border-gray-800 p-1">
+                    <p>
+                      {printData.wheels[index].name} (
+                      {printData.wheels[index].size})
+                    </p>
+                    <div className="font-semibold">
+                      ¥{formatPrice(wheelTotals[index])}
+                    </div>
+                  </td>
+                ) : (
+                  <td key={index} className="border border-gray-800 p-1">
+                    <p>なし</p>
+                  </td>
+                );
+              })}
             </tr>
           )}
+
           {extraOptionsTotal > 0 && (
             <tr>
               <td className="border border-gray-800 p-1 font-semibold">
@@ -272,7 +288,7 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
                     printData.discountRate,
                   ) +
                     extraOptionsTotal +
-                    (printData.wheel.isIncluded ? wheelTotal : 0)) *
+                    wheelTotals[index]) *
                     TAX_RATE,
                 )}
                 <span className="mx-2">
@@ -286,7 +302,7 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
                         printData.discountRate,
                       ) +
                         extraOptionsTotal +
-                        (printData.wheel.isIncluded ? wheelTotal : 0)) *
+                        wheelTotals[index]) *
                         (TAX_RATE - 1.0),
                     )}
                     )
@@ -297,45 +313,6 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
           </tr>
         </tbody>
       </table>
-
-      {printData.wheel.isIncluded && (
-        <div className="avoid-page-break mb-4">
-          <h2 className="mb-2 text-xl font-semibold print:text-lg">
-            ホイール詳細
-          </h2>
-          <table className="w-full border-collapse border border-gray-800 print:text-xs">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="border border-gray-800 p-1">ホイール名</th>
-                <th className="border border-gray-800 p-1">サイズ</th>
-                <th className="border border-gray-800 p-1">価格</th>
-                <th className="border border-gray-800 p-1">数量</th>
-                <th className="border border-gray-800 p-1">小計</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="border border-gray-800 p-1">
-                  {printData.wheel.name}
-                </td>
-                <td className="border border-gray-800 p-1">
-                  {printData.wheel.size}
-                </td>
-                <td className="border border-gray-800 p-1">
-                  ¥{formatPrice(printData.wheel.price)}
-                </td>
-                <td className="border border-gray-800 p-1">
-                  {printData.wheel.quantity}本
-                </td>
-                <td className="border border-gray-800 p-1 font-semibold">
-                  ¥{formatPrice(wheelTotal)}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      )}
-
       {extraOptionsTotal > 0 && (
         <div className="avoid-page-break mb-4">
           <h2 className="mb-2 text-xl font-semibold print:text-lg">

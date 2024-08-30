@@ -52,7 +52,7 @@ export const DEFAULT_PRINTDATA = <PrintData>{
   serviceFees: [],
   numberOfTires: 4,
   checkBoxState: DEFAULT_CHECKED_STATUS,
-  wheel: DEFAULT_WHEEL,
+  wheels: [],
   discountRate: DEFAULT_DISCOUNT_RATE,
   extraOptions: [],
 };
