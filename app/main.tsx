@@ -885,19 +885,7 @@ const Main = () => {
           >
             選択した内容をプリント
           </Button>
-          <div className="hidden">
-            <PrintContent
-              ref={componentRefs[0]}
-              printData={{
-                ...printData,
-                numberOfTires: selectedData.numberOfTires,
-                checkBoxState: checkedStates,
-                wheel: wheel,
-                discountRate: discountRate,
-                extraOptions: extraOptions,
-              }}
-            />
-          </div>
+          <div></div>
         </div>
         <p className="mt-8 flex justify-center text-3xl font-bold md:mt-0">
           見積り結果
@@ -976,6 +964,21 @@ const Main = () => {
               </Card>
             </div>
           ))}
+        </div>
+        <div className="flex justify-center">
+          <div className="w-3/4">
+            <PrintContent
+              ref={componentRefs[0]}
+              printData={{
+                ...printData,
+                numberOfTires: selectedData.numberOfTires,
+                checkBoxState: checkedStates,
+                wheel: wheel,
+                discountRate: discountRate,
+                extraOptions: extraOptions,
+              }}
+            />
+          </div>
         </div>
       </div>
 
