@@ -7,6 +7,7 @@ import {
   CUSTOMER_TYPE,
   DEFAULT_PRINTDATA,
   DEFAULT_WHEEL,
+  MAX_EXTRAOPTIONS,
 } from "@/config/constants";
 import {
   CheckboxState,
@@ -105,6 +106,8 @@ const Main = () => {
   const [discountRate, setDiscountRate] = useState<DiscoundRate>(
     DEFAULT_DISCOUNT_RATE,
   );
+  const [totalExtraOptionPrice, setTotalExtraOptionPrice] = useState(0);
+
   const fetchPriceRates = async () => {
     const rates = await getCustomerTypePriceRates();
     setPriceRates(rates.data as any[]);
@@ -284,6 +287,14 @@ const Main = () => {
       quotationNumber: generateQuotationNumber(),
     });
 
+    // その他のオプションの合計金額を計算
+    setTotalExtraOptionPrice(
+      extraOptions.reduce(
+        (total, option) => total + option.price * option.quantity,
+        0,
+      ),
+    );
+
     const newResults = res.data.map((tire: any) => {
       const tirePrice = tire.price;
       const serviceFee = calculateLaborCost(tire.laborCostRank);
@@ -359,7 +370,7 @@ const Main = () => {
   };
 
   const addExtraOption = () => {
-    if (extraOptions.length >= 5) return;
+    if (extraOptions.length >= MAX_EXTRAOPTIONS) return;
     setExtraOptions([
       ...extraOptions,
       { id: uuidv4(), option: "", price: 100, quantity: 4 },
@@ -911,7 +922,7 @@ const Main = () => {
                   {/* <p>工賃ランク：{result.serviceFee.rank}</p> */}
                   <p>
                     タイヤ :{result.tirePrice} × {result.priceRate} ×{" "}
-                    {result.numberOfTires}{" "}
+                    {result.numberOfTires} 円
                   </p>
                   {result.wheel.isIncluded ? (
                     <p>
@@ -944,18 +955,9 @@ const Main = () => {
                       ""
                     )}{" "}
                   </p>
-
-                  {result.extraOptions.length > 0 && (
-                    <div>
-                      <ul>
-                        {result.extraOptions.map((option) => (
-                          <li key={option.id}>
-                            {option.option} : {option.price} × {option.quantity}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                  {totalExtraOptionPrice !== 0 ? (
+                    <p>その他のオプション合計：{totalExtraOptionPrice}円</p>
+                  ) : null}
                 </CardContent>
                 <CardFooter>
                   <div className="flex flex-col">
@@ -965,7 +967,7 @@ const Main = () => {
                     <p className="font-bold">
                       税込{result.totalPriceWithTax}円
                     </p>
-                    <p>
+                    <p className="mt-2">
                       タイヤ利益(税抜)：{result.profit}
                       <span>円</span>
                     </p>
