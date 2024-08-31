@@ -401,7 +401,7 @@ const Main = () => {
     const tires = [...printData.tires];
     const serviceFees = [...printData.serviceFees];
     const wheels = [...printData.wheels];
-    console.log("toggle関数内のserviceFees = ", serviceFees);
+    console.log("toggle関数内のwheels = ", wheels);
 
     const idIndex = ids.indexOf(id);
 
@@ -921,7 +921,7 @@ const Main = () => {
                   </p>
                   {result.wheel.isIncluded ? (
                     <p>
-                      ホイール:{" "}
+                      ホイール({result.wheel.name}, {result.wheel.size}):{" "}
                       {formatPrice(result.wheel.price * result.wheel.quantity)}
                       円
                     </p>
