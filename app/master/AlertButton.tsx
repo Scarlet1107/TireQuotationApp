@@ -71,7 +71,7 @@ const AlertButton: React.FC<AlertButtonProps> = ({
     <div className="mt-5">
       <button
         onClick={handleShowAlert}
-        className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+        className="rounded bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700"
       >
         {children}
       </button>

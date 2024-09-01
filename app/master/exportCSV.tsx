@@ -1,19 +1,46 @@
-import { createClient } from "@supabase/supabase-js";
 import Papa from "papaparse";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-export async function exportCSV(tableName: string) {
+export const exportCSV = async (tableName: string) => {
   try {
     // Supabaseからデータを取得
-    const { data, error } = await supabase.from(tableName).select("*");
+    let header: string[];
 
-    if (error) throw error;
+    if (tableName == "tirePrice") {
+      header = [
+        "id",
+        "size",
+        "price",
+        "manufacturer",
+        "pattern",
+        "laborCostRank",
+      ];
+    } else if (tableName == "ServiceFees") {
+      header = [
+        "id",
+        "rank",
+        "laborFee",
+        "removalFee",
+        "tireDisposalFee",
+        "tireStorageFee",
+      ];
+    } else if (tableName == "CustomerTypePriceRate") {
+      header = [
+        "id",
+        "pattern",
+        "individual",
+        "corporate",
+        "wholesale",
+        "cost",
+      ];
+    } else {
+      header = [];
+    }
 
     // データをCSV形式に変換
-    const csv = Papa.unparse(data);
+    const csv = Papa.unparse({
+      fields: header,
+      data: [],
+    });
 
     // CSVファイルとしてダウンロード
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -30,4 +57,4 @@ export async function exportCSV(tableName: string) {
   } catch (error) {
     console.error("Error exporting CSV:", error);
   }
-}
+};

@@ -2,13 +2,13 @@ import React from "react";
 import { exportCSV } from "./exportCSV";
 
 interface ExportProps {
-  tableName: string;
+  children: string;
 }
 
-const ExportButton: React.FC<ExportProps> = ({ tableName }) => {
+const ExportButton: React.FC<ExportProps> = ({ children }) => {
   const handleExport = async () => {
     try {
-      await exportCSV(tableName);
+      await exportCSV(children);
     } catch (error) {
       console.error("Failed to export CSV:", error);
     }
@@ -18,7 +18,7 @@ const ExportButton: React.FC<ExportProps> = ({ tableName }) => {
       onClick={handleExport}
       className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
     >
-      CSVエクスポート
+      {children} テンプレート取得
     </button>
   );
 };

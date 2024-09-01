@@ -11,6 +11,7 @@ interface UploadButtonProps {
 const UploadButton: React.FC<UploadButtonProps> = ({ children, tableName }) => {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState<boolean>(false);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setFile(e.target.files[0]);
@@ -24,35 +25,38 @@ const UploadButton: React.FC<UploadButtonProps> = ({ children, tableName }) => {
     }
 
     setUploading(true);
-
-    Papa.parse(file, {
-      header: true,
-      complete: async function (results: { data: any; errors: any }) {
-        const { data, errors } = results;
-        if (errors.length) {
-          console.error(errors);
-          setUploading(false);
-          return;
-        }
-
-        // Supabaseのバルクインサート制限に注意しつつ、データを分割してアップロード
-        const chunkSize = 1000; // 一度にアップロードするレコード数を設定
-        for (let i = 0; i < data.length; i += chunkSize) {
-          const chunk = data.slice(i, i + chunkSize);
-
-          const { error } = await supabase.from(tableName).insert(chunk);
-
-          if (error) {
-            console.error(error);
+    try {
+      Papa.parse(file, {
+        header: true,
+        complete: async function (results: { data: any; errors: any }) {
+          const { data, errors } = results;
+          if (errors.length) {
+            console.error(errors);
             setUploading(false);
             return;
           }
-        }
 
-        alert("Upload complete!");
-        setUploading(false);
-      },
-    });
+          // Supabaseのバルクインサート制限に注意しつつ、データを分割してアップロード
+          const chunkSize = 1000; // 一度にアップロードするレコード数を設定
+          for (let i = 0; i < data.length; i += chunkSize) {
+            const chunk = data.slice(i, i + chunkSize);
+
+            const { error } = await supabase.from(tableName).insert(chunk);
+
+            if (error) {
+              console.error(error);
+              setUploading(false);
+              return;
+            }
+          }
+
+          alert("Upload complete!");
+          setUploading(false);
+        },
+      });
+    } catch (error) {
+      alert(error);
+    }
   };
 
   return (

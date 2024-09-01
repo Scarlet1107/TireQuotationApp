@@ -2,8 +2,7 @@
 import React from "react";
 import Header from "@/components/Header";
 import { deleteAllData } from "@/utils/supabaseFunctions";
-import AlertButton from "./AlertButton";
-import CSVUploader from "./CSVUploader";
+import ManualComponent from "./mannual";
 import TableManage from "./TableManage";
 
 const page = () => {
@@ -15,7 +14,7 @@ const page = () => {
     }
   };
   return (
-    <div>
+    <div className="overflow-y-auto">
       <Header />
 
       <div className="mt-10 flex place-content-center">
@@ -23,6 +22,7 @@ const page = () => {
           <TableManage handleClick={handleClick} />
         </div>
       </div>
+      <ManualComponent />
     </div>
   );
 };

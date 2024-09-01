@@ -3,13 +3,13 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 
 import AlertButton from "./AlertButton";
 import UploadButton from "./UploadButton";
+import ExportButton from "./ExportButton";
 
 interface Props {
   handleClick: (tableName: string) => void;
@@ -32,6 +32,7 @@ const TableManage: React.FC<Props> = ({ handleClick }) => {
           >
             tirePriceの消去
           </AlertButton>
+          <ExportButton>tirePrice</ExportButton>
         </CardContent>
       </Card>
 
@@ -49,6 +50,7 @@ const TableManage: React.FC<Props> = ({ handleClick }) => {
           >
             ServiceFeesの消去
           </AlertButton>
+          <ExportButton>ServiceFees</ExportButton>
         </CardContent>
       </Card>
 
@@ -69,6 +71,7 @@ const TableManage: React.FC<Props> = ({ handleClick }) => {
           >
             CustomerTypePriceRateの消去
           </AlertButton>
+          <ExportButton>CustomerTypePriceRate</ExportButton>
         </CardContent>
       </Card>
     </div>
