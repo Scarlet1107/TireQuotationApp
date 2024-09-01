@@ -7,6 +7,7 @@ import {
   CUSTOMER_TYPE,
   DEFAULT_PRINTDATA,
   DEFAULT_WHEEL,
+  MAX_EXTRAOPTIONS,
 } from "@/config/constants";
 import {
   CheckboxState,
@@ -105,6 +106,8 @@ const Main = () => {
   const [discountRate, setDiscountRate] = useState<DiscoundRate>(
     DEFAULT_DISCOUNT_RATE,
   );
+  const [totalExtraOptionPrice, setTotalExtraOptionPrice] = useState(0);
+
   const fetchPriceRates = async () => {
     const rates = await getCustomerTypePriceRates();
     setPriceRates(rates.data as any[]);
@@ -208,6 +211,10 @@ const Main = () => {
     return totalCost;
   };
 
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("ja-JP").format(Math.floor(price));
+  };
+
   // タイヤのパターンとお客さんのターゲットによって価格を検索する。割合で返す
   const searchMarkupRate = (pattern: string, target: string): number => {
     const rate = priceRates.find((item) => {
@@ -284,6 +291,14 @@ const Main = () => {
       quotationNumber: generateQuotationNumber(),
     });
 
+    // その他のオプションの合計金額を計算
+    setTotalExtraOptionPrice(
+      extraOptions.reduce(
+        (total, option) => total + option.price * option.quantity,
+        0,
+      ),
+    );
+
     const newResults = res.data.map((tire: any) => {
       const tirePrice = tire.price;
       const serviceFee = calculateLaborCost(tire.laborCostRank);
@@ -359,7 +374,7 @@ const Main = () => {
   };
 
   const addExtraOption = () => {
-    if (extraOptions.length >= 5) return;
+    if (extraOptions.length >= MAX_EXTRAOPTIONS) return;
     setExtraOptions([
       ...extraOptions,
       { id: uuidv4(), option: "", price: 100, quantity: 4 },
@@ -385,7 +400,8 @@ const Main = () => {
     const ids = [...printData.ids];
     const tires = [...printData.tires];
     const serviceFees = [...printData.serviceFees];
-    console.log("toggle関数内のserviceFees = ", serviceFees);
+    const wheels = [...printData.wheels];
+    console.log("toggle関数内のwheels = ", wheels);
 
     const idIndex = ids.indexOf(id);
 
@@ -393,6 +409,7 @@ const Main = () => {
       ids.splice(idIndex, 1);
       tires.splice(idIndex, 1);
       serviceFees.splice(idIndex, 1);
+      wheels.splice(idIndex, 1);
     } else {
       if (ids.length >= 3) {
         toast({
@@ -407,11 +424,12 @@ const Main = () => {
       if (tireToAdd) {
         tires.push(tireToAdd);
         serviceFees.push(tireToAdd.serviceFee);
+        wheels.push(tireToAdd.wheel);
       }
       console.log("tireToAdd = ", tireToAdd);
     }
 
-    setPrintData({ ...printData, ids, tires, serviceFees });
+    setPrintData({ ...printData, ids, tires, serviceFees, wheels });
   };
 
   const resetSelect = () => {
@@ -874,19 +892,7 @@ const Main = () => {
           >
             選択した内容をプリント
           </Button>
-          <div className="hidden">
-            <PrintContent
-              ref={componentRefs[0]}
-              printData={{
-                ...printData,
-                numberOfTires: selectedData.numberOfTires,
-                checkBoxState: checkedStates,
-                wheel: wheel,
-                discountRate: discountRate,
-                extraOptions: extraOptions,
-              }}
-            />
-          </div>
+          <div></div>
         </div>
         <p className="mt-8 flex justify-center text-3xl font-bold md:mt-0">
           見積り結果
@@ -910,12 +916,14 @@ const Main = () => {
                   {/* <p>id : {result.id}</p> */}
                   {/* <p>工賃ランク：{result.serviceFee.rank}</p> */}
                   <p>
-                    タイヤ :{result.tirePrice} × {result.priceRate} ×{" "}
-                    {result.numberOfTires}{" "}
+                    タイヤ: {formatPrice(result.tirePrice)} × {result.priceRate}{" "}
+                    × {result.numberOfTires} 円
                   </p>
                   {result.wheel.isIncluded ? (
                     <p>
-                      ホイール: {result.wheel.price * result.wheel.quantity}
+                      ホイール({result.wheel.name}, {result.wheel.size}):{" "}
+                      {formatPrice(result.wheel.price * result.wheel.quantity)}
+                      円
                     </p>
                   ) : (
                     ""
@@ -927,47 +935,43 @@ const Main = () => {
                     result.serviceFee.removalFee !== 0 ||
                     result.serviceFee.tireStorageFee !== 0 ? (
                       <span>
-                        工賃 :{" "}
-                        {(result.serviceFee.laborFee *
-                          (100 - result.discountRate.laborFee)) /
-                          100 +
-                          (result.serviceFee.removalFee *
-                            (100 - result.discountRate.removalFee)) /
+                        工賃:{" "}
+                        {formatPrice(
+                          (result.serviceFee.laborFee *
+                            (100 - result.discountRate.laborFee)) /
                             100 +
-                          result.serviceFee.tireDisposalFee +
-                          (result.serviceFee.tireStorageFee *
-                            (100 - result.discountRate.tireStorageFee)) /
-                            100}
+                            (result.serviceFee.removalFee *
+                              (100 - result.discountRate.removalFee)) /
+                              100 +
+                            result.serviceFee.tireDisposalFee +
+                            (result.serviceFee.tireStorageFee *
+                              (100 - result.discountRate.tireStorageFee)) /
+                              100,
+                        )}
                         円
                       </span>
                     ) : (
                       ""
                     )}{" "}
                   </p>
-
-                  {result.extraOptions.length > 0 && (
-                    <div>
-                      <ul>
-                        {result.extraOptions.map((option) => (
-                          <li key={option.id}>
-                            {option.option} : {option.price} × {option.quantity}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                  {totalExtraOptionPrice !== 0 ? (
+                    <p>
+                      その他のオプション合計:{" "}
+                      {formatPrice(totalExtraOptionPrice)}円
+                    </p>
+                  ) : null}
                 </CardContent>
                 <CardFooter>
                   <div className="flex flex-col">
                     <p>
-                      合計（税抜）： <span>{result.totalPrice}</span>円
+                      合計（税抜）:{" "}
+                      <span>{formatPrice(result.totalPrice)}</span>円
                     </p>
                     <p className="font-bold">
-                      税込{result.totalPriceWithTax}円
+                      税込: {formatPrice(result.totalPriceWithTax)}円
                     </p>
-                    <p>
-                      タイヤ利益(税抜)：{result.profit}
-                      <span>円</span>
+                    <p className="mt-2">
+                      タイヤ利益(税抜) : {formatPrice(result.profit)}円
                     </p>
                   </div>
                 </CardFooter>
@@ -975,8 +979,21 @@ const Main = () => {
             </div>
           ))}
         </div>
+        <div className="flex justify-center">
+          <div className="w-3/4">
+            <PrintContent
+              ref={componentRefs[0]}
+              printData={{
+                ...printData,
+                numberOfTires: selectedData.numberOfTires,
+                checkBoxState: checkedStates,
+                discountRate: discountRate,
+                extraOptions: extraOptions,
+              }}
+            />
+          </div>
+        </div>
       </div>
-
       <Toaster />
     </div>
   );
