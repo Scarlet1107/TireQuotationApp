@@ -25,12 +25,9 @@ const TableManage: React.FC<Props> = ({ handleClick }) => {
         </CardHeader>
 
         <CardContent>
-          <UploadButton tableName="tirePrice"> tirePrice </UploadButton>
-          <AlertButton
-            message="現在のデータを消去しても良いですか？"
-            onPush={() => handleClick("tirePrice")}
-          >
-            tirePriceの消去
+          <UploadButton tableName="tirePrice" />
+          <AlertButton onPush={() => handleClick("tirePrice")}>
+            tirePrice
           </AlertButton>
           <ExportButton>tirePrice</ExportButton>
         </CardContent>
@@ -43,12 +40,9 @@ const TableManage: React.FC<Props> = ({ handleClick }) => {
         </CardHeader>
 
         <CardContent>
-          <UploadButton tableName="ServiceFees"> ServiceFees</UploadButton>
-          <AlertButton
-            message="現在のデータを消去しても良いですか？"
-            onPush={() => handleClick("ServiceFees")}
-          >
-            ServiceFeesの消去
+          <UploadButton tableName="ServiceFees" />
+          <AlertButton onPush={() => handleClick("ServiceFees")}>
+            ServiceFees
           </AlertButton>
           <ExportButton>ServiceFees</ExportButton>
         </CardContent>
@@ -61,15 +55,9 @@ const TableManage: React.FC<Props> = ({ handleClick }) => {
         </CardHeader>
 
         <CardContent>
-          <UploadButton tableName="CustomerTypePriceRate">
-            {" "}
+          <UploadButton tableName="CustomerTypePriceRate" />
+          <AlertButton onPush={() => handleClick("CustomerTypePriceRate")}>
             CustomerTypePriceRate
-          </UploadButton>
-          <AlertButton
-            message="現在のデータを消去しても良いですか？"
-            onPush={() => handleClick("CustomerTypePriceRate")}
-          >
-            CustomerTypePriceRateの消去
           </AlertButton>
           <ExportButton>CustomerTypePriceRate</ExportButton>
         </CardContent>

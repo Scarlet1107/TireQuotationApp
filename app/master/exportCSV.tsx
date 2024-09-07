@@ -48,7 +48,7 @@ export const exportCSV = async (tableName: string) => {
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
       link.setAttribute("href", url);
-      link.setAttribute("download", `${tableName}_export.csv`);
+      link.setAttribute("download", `${tableName}_template.csv`);
       link.style.visibility = "hidden";
       document.body.appendChild(link);
       link.click();
