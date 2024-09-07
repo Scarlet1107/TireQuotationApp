@@ -4,7 +4,7 @@ import Main from "./main";
 
 export default function Home() {
   return (
-    <main>
+    <main className="print:hidden">
       <Header />
       <Main />
     </main>
