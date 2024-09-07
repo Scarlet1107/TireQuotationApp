@@ -39,12 +39,11 @@ export const searchTireByID = async (id: number) => {
 // For master page
 
 export const deleteAllData = async (name: string) => {
-  const { data, error } = await supabase.from(name).delete().neq("id", "0");
+  const { data, error } = await supabase.from(name).delete().gte("id", 0);
 
   if (error) {
     console.error(error);
   } else {
-    alert("テーブルのデータをすべて削除しました");
     console.log("All data deleted:", data);
   }
 };

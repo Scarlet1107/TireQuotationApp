@@ -1,32 +1,39 @@
 import Papa from "papaparse";
 import { supabase } from "@/utils/supabase";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Upload } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 interface UploadButtonProps {
-  children: React.ReactNode;
   tableName: string;
 }
 
-const UploadButton: React.FC<UploadButtonProps> = ({ children, tableName }) => {
-  const [file, setFile] = useState<File | null>(null);
+const UploadButton: React.FC<UploadButtonProps> = ({ tableName }) => {
+  const [fileName, setFile] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFile(e.target.files[0]);
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0].name);
     }
   };
 
   const handleUpload = async () => {
-    if (!file) {
-      alert("Please select a file.");
+    if (!fileInputRef.current?.files?.[0]) {
+      toast({
+        title: "失敗",
+        description: "ファイルを選択してください",
+        variant: "default",
+      });
       return;
     }
 
     setUploading(true);
     try {
-      Papa.parse(file, {
+      Papa.parse(fileInputRef.current.files[0], {
         header: true,
         complete: async function (results: { data: any; errors: any }) {
           const { data, errors } = results;
@@ -50,7 +57,11 @@ const UploadButton: React.FC<UploadButtonProps> = ({ children, tableName }) => {
             }
           }
 
-          alert("Upload complete!");
+          toast({
+            title: "成功",
+            description: `${fileName}をアップロードしました`,
+            variant: "default",
+          });
           setUploading(false);
         },
       });
@@ -64,10 +75,11 @@ const UploadButton: React.FC<UploadButtonProps> = ({ children, tableName }) => {
       <div className="relative">
         <input
           type="file"
-          id="file-upload"
+          id={`file-upload-${tableName}`}
           accept=".csv"
           onChange={handleFileChange}
           className="sr-only"
+          ref={fileInputRef}
         />
         <button
           className="rounded bg-green-500 px-4 py-2 font-bold text-white hover:bg-green-600"
@@ -77,7 +89,7 @@ const UploadButton: React.FC<UploadButtonProps> = ({ children, tableName }) => {
           {uploading ? "アップロード中..." : "アップロード開始"}
         </button>
         <label
-          htmlFor="file-upload"
+          htmlFor={`file-upload-${tableName}`}
           className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
           <svg
@@ -98,8 +110,9 @@ const UploadButton: React.FC<UploadButtonProps> = ({ children, tableName }) => {
         </label>
       </div>
       <p className="mt-2 text-sm text-gray-500">
-        {file ? file.name : "ファイルが選択されていません"}
+        {fileName ? fileName : "ファイルが選択されていません"}
       </p>
+      <Toaster />
     </div>
   );
 };
