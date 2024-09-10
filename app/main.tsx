@@ -142,10 +142,6 @@ const Main = () => {
     fetchTireSizes();
     fetchAllmanufacturer();
     fetchServiceFees();
-    setPrintData({
-      ...printData,
-      expiryDate: new Date(Date.now() + DEFAULT_EXPIRY_DATE),
-    });
   }, []);
 
   const handleCheckboxChange =
@@ -268,7 +264,7 @@ const Main = () => {
       return;
     }
 
-    const res = await searchTires(tireSize, manufacturer);
+    const res = await searchTires(tireSize, manufacturer); //データベースからタイヤ情報を検索
     if (!res.data || (Array.isArray(res.data) && res.data.length === 0)) {
       toast({
         variant: "destructive",
@@ -306,6 +302,7 @@ const Main = () => {
       const filteredOptions = extraOptions.filter(
         (extraOption) => extraOption.option !== "",
       );
+      // ここでお客さんのターゲットによって価格を変える
       const priceRate: number = searchMarkupRate(
         tire.pattern,
         selectedData.target,

@@ -48,7 +48,7 @@ export const DEFAULT_PRINTDATA = <PrintData>{
   customerName: "",
   carModel: "",
   quotationNumber: "",
-  expiryDate: new Date(DEFAULT_EXPIRY_DATE),
+  expiryDate: new Date(Date.now() + DEFAULT_EXPIRY_DATE),
   serviceFees: [],
   numberOfTires: 4,
   checkBoxState: DEFAULT_CHECKED_STATUS,
