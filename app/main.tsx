@@ -854,7 +854,7 @@ const Main = () => {
           className="w-min transform bg-green-500 hover:bg-green-600"
           onClick={handleEstimate}
         >
-          この内容で見積もる！
+          この内容で見積り！
         </Button>
       </div>
       <div className="flex w-full flex-col space-x-8 space-y-8">

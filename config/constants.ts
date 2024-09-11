@@ -22,7 +22,7 @@ export const CUSTOMER_TYPE = [
 export const DEFAULT_DISCOUNT_RATE = <DiscoundRate>{
   laborFee: 0,
   removalFee: 0,
-  tireStorageFee: 100,
+  tireStorageFee: 0,
 };
 
 // 工賃のチェックボックスの初期値
