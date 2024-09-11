@@ -25,6 +25,7 @@ import {
   searchTires,
   getAllmanufacturer,
   getServiceFees,
+  uploadPrintData,
 } from "@/utils/supabaseFunctions";
 import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -81,6 +82,7 @@ import { format } from "date-fns";
 import { Result } from "postcss";
 import Image from "next/image";
 import { ja } from "date-fns/locale";
+import { log } from "console";
 
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
@@ -281,9 +283,13 @@ const Main = () => {
 
     console.log(res.data);
 
-    // 見積もりナンバーを生成
+    // 見積もりナンバーを生成&その他変数をprintDataにセット
     setPrintData({
       ...printData,
+      numberOfTires: numberOfTires,
+      checkBoxState: checkedStates,
+      discountRate: discountRate,
+      extraOptions: extraOptions,
       quotationNumber: generateQuotationNumber(),
     });
 
@@ -460,7 +466,7 @@ const Main = () => {
     documentTitle: printData.customerName + "様-" + printData.quotationNumber,
   });
 
-  const handlePrintButtonClick = () => {
+  const handlePrintButtonClick = async () => {
     if (printData.ids.length === 0) {
       toast({
         title: "タイヤを選択してください",
@@ -481,6 +487,13 @@ const Main = () => {
     }
     if (componentRefs[0].current) {
       handlePrint();
+
+      // 履歴をSupabaseのprint_logsにアップロード
+      try {
+        await uploadPrintData(printData);
+      } catch (error) {
+        console.error("Failed to save print data to print_logs:", error);
+      }
     }
   };
 
@@ -978,16 +991,7 @@ const Main = () => {
         </div>
         <div className="flex justify-center">
           <div className="w-3/4">
-            <PrintContent
-              ref={componentRefs[0]}
-              printData={{
-                ...printData,
-                numberOfTires: selectedData.numberOfTires,
-                checkBoxState: checkedStates,
-                discountRate: discountRate,
-                extraOptions: extraOptions,
-              }}
-            />
+            <PrintContent ref={componentRefs[0]} printData={ printData } />
           </div>
         </div>
       </div>

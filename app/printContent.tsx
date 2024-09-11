@@ -1,7 +1,9 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
 import { PrintData, ServiceFee, DiscoundRate } from "@/utils/interface";
 import { TAX_RATE } from "@/config/constants";
 import Image from "next/image";
+import { uploadPrintData } from "@/utils/supabaseFunctions";
 
 interface Props {
   printData: PrintData;

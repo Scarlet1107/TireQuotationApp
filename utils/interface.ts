@@ -1,5 +1,3 @@
-import { ReactNode } from "react";
-
 export interface SelectData {
   target: string;
   numberOfTires: number;
