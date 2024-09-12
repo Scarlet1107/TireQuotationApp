@@ -423,13 +423,20 @@ const Main = () => {
 
       ids.push(id);
 
-      const tireToAdd = searchResults.find((result) => result.id === id);
-      if (tireToAdd) {
+      const dataToAdd = searchResults.find((result) => result.id === id);
+      if (dataToAdd) {
+        const tireToAdd = {
+          manufacturer: dataToAdd.manufacturer,
+          pattern: dataToAdd.pattern,
+          tireSize: dataToAdd.tireSize,
+          tirePrice: dataToAdd.tirePrice,
+          priceRate: dataToAdd.priceRate,
+        };
         tires.push(tireToAdd);
-        serviceFees.push(tireToAdd.serviceFee);
-        wheels.push(tireToAdd.wheel);
+        serviceFees.push(dataToAdd.serviceFee);
+        wheels.push(dataToAdd.wheel);
+        console.log("tireToAdd = ", tireToAdd);
       }
-      console.log("tireToAdd = ", tireToAdd);
     }
 
     setPrintData({ ...printData, ids, tires, serviceFees, wheels });
@@ -991,7 +998,7 @@ const Main = () => {
         </div>
         <div className="flex justify-center">
           <div className="w-3/4">
-            <PrintContent ref={componentRefs[0]} printData={ printData } />
+            <PrintContent ref={componentRefs[0]} printData={printData} />
           </div>
         </div>
       </div>
