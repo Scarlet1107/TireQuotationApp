@@ -120,7 +120,7 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
           <p>
             有効期限:{" "}
             <span className="font-semibold">
-              {printData.expiryDate.toLocaleDateString("ja-JP", {
+              {new Date(printData.expiryDate).toLocaleDateString("ja-JP", {
                 year: "numeric",
                 month: "long",
                 day: "numeric",

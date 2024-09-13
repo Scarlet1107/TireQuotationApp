@@ -26,6 +26,7 @@ import {
   getAllmanufacturer,
   getServiceFees,
   uploadPrintData,
+  getPrintDataHistory,
 } from "@/utils/supabaseFunctions";
 import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -82,7 +83,24 @@ import { format } from "date-fns";
 import { Result } from "postcss";
 import Image from "next/image";
 import { ja } from "date-fns/locale";
-import { log } from "console";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
@@ -94,7 +112,6 @@ const Main = () => {
   const [checkedStates, setCheckedStates] = useState<CheckboxState>(
     DEFAULT_CHECKED_STATUS,
   );
-
   const [selectedData, setSelectedData] = useState<SelectData>({
     target: "",
     numberOfTires: 4,
@@ -104,11 +121,11 @@ const Main = () => {
   const [extraOptions, setExtraOptions] = useState<ExtraOption[]>([]);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [printData, setPrintData] = useState<PrintData>(DEFAULT_PRINTDATA);
-
   const [discountRate, setDiscountRate] = useState<DiscoundRate>(
     DEFAULT_DISCOUNT_RATE,
   );
   const [totalExtraOptionPrice, setTotalExtraOptionPrice] = useState(0);
+  const [printHistory, setPrintHistory] = useState<PrintData[]>([]);
 
   const fetchPriceRates = async () => {
     const rates = await getCustomerTypePriceRates();
@@ -139,11 +156,38 @@ const Main = () => {
     setServiceFees(res as ServiceFee[]);
   };
 
+  const fetchPrintHistory = async () => {
+    const res = await getPrintDataHistory();
+    console.log(res);
+    setPrintHistory(res as PrintData[]);
+
+    //試しに最新のデータをセット
+    // const data = res[0];
+    // setPrintData({
+    //   ...printData,
+    //   ids: data.ids,
+    //   tires: data.tires,
+    //   serviceFees: data.service_fees,
+    //   customerName: data.customer_name,
+    //   staffName: data.staff_name,
+    //   carModel: data.car_model,
+    //   expiryDate: data.expiry_date,
+    //   quotationNumber: data.quotation_number,
+    //   numberOfTires: data.number_of_tires,
+    //   checkBoxState: data.check_box_state,
+    //   discountRate: data.discount_rate,
+    //   wheels: data.wheels,
+    //   extraOptions: data.extra_options,
+    // });
+    // setExtraOptions(data.extra_options);
+  };
+
   useEffect(() => {
     fetchPriceRates();
     fetchTireSizes();
     fetchAllmanufacturer();
     fetchServiceFees();
+    fetchPrintHistory();
   }, []);
 
   const handleCheckboxChange =
@@ -879,6 +923,39 @@ const Main = () => {
       </div>
       <div className="flex w-full flex-col space-x-8 space-y-8">
         <div className="mr-8 flex justify-end space-x-8">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button className="w-min transform bg-blue-500 hover:bg-blue-600">
+                履歴を表示
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>履歴を管理</SheetTitle>
+                <SheetDescription>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>見積り番号</TableHead>
+                        <TableHead>お客さん</TableHead>
+                        <TableHead>担当スタッフ</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {printHistory.map((history, index) => (
+                        <TableRow key={index} onClick={() => setPrintData(printHistory[index])}>
+                          <TableCell className="font-medium">{history.quotationNumber}</TableCell>
+                          <TableCell>{history.customerName}</TableCell>
+                          <TableCell>{history.staffName}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </SheetDescription>
+              </SheetHeader>
+            </SheetContent>
+          </Sheet>
+
           <Button
             className="relative w-max place-self-end font-medium"
             variant={"destructive"}
