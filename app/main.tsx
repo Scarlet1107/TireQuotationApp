@@ -85,8 +85,10 @@ import Image from "next/image";
 import { ja } from "date-fns/locale";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -929,7 +931,9 @@ const Main = () => {
             <SheetContent>
               <SheetHeader>
                 <SheetTitle>履歴を管理</SheetTitle>
-                <SheetDescription>
+              </SheetHeader>
+              <SheetDescription asChild>
+                <SheetClose>
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -953,8 +957,11 @@ const Main = () => {
                       ))}
                     </TableBody>
                   </Table>
-                </SheetDescription>
-              </SheetHeader>
+                </SheetClose>
+              </SheetDescription>
+              <SheetFooter>
+                ここにページネーション実装できるかも？
+              </SheetFooter>
             </SheetContent>
           </Sheet>
 
