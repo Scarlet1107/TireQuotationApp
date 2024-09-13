@@ -7,9 +7,17 @@ import { Toaster } from "@/components/ui/toaster";
 
 interface UploadButtonProps {
   tableName: string;
+  handleChange: () => void;
+  handleClick: () => void;
+  exist: boolean | null;
 }
 
-const UploadButton: React.FC<UploadButtonProps> = ({ tableName }) => {
+const UploadButton: React.FC<UploadButtonProps> = ({
+  tableName,
+  handleChange,
+  handleClick,
+  exist,
+}) => {
   const [fileName, setFile] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -30,8 +38,9 @@ const UploadButton: React.FC<UploadButtonProps> = ({ tableName }) => {
       });
       return;
     }
-
+    if (exist) handleClick();
     setUploading(true);
+
     try {
       Papa.parse(fileInputRef.current.files[0], {
         header: true,
@@ -63,6 +72,7 @@ const UploadButton: React.FC<UploadButtonProps> = ({ tableName }) => {
             variant: "default",
           });
           setUploading(false);
+          handleChange();
         },
       });
     } catch (error) {
@@ -72,7 +82,7 @@ const UploadButton: React.FC<UploadButtonProps> = ({ tableName }) => {
 
   return (
     <div className="rounded-lg bg-white p-6 shadow-md">
-      <div className="relative">
+      <div className="item-center relative justify-center">
         <input
           type="file"
           id={`file-upload-${tableName}`}
@@ -82,7 +92,7 @@ const UploadButton: React.FC<UploadButtonProps> = ({ tableName }) => {
           ref={fileInputRef}
         />
         <button
-          className="rounded bg-green-500 px-4 py-2 font-bold text-white hover:bg-green-600"
+          className="item-center justify-center rounded bg-green-500 px-4 py-2 font-bold text-white hover:bg-green-600"
           onClick={handleUpload}
           disabled={uploading}
         >
@@ -90,7 +100,7 @@ const UploadButton: React.FC<UploadButtonProps> = ({ tableName }) => {
         </button>
         <label
           htmlFor={`file-upload-${tableName}`}
-          className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="mt-1 flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
           <svg
             className="mr-2 h-6 w-6"

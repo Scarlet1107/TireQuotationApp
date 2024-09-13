@@ -47,3 +47,15 @@ export const deleteAllData = async (name: string) => {
     console.log("All data deleted:", data);
   }
 };
+
+export const ExistDB = async (name: string): Promise<boolean> => {
+  const { data, error } = await supabase.from(name).select("*").limit(1);
+  console.log(data);
+  if (data?.length == 0) {
+    return false;
+  }
+  if (data) {
+    return true;
+  }
+  return false;
+};

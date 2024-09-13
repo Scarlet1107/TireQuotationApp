@@ -1,5 +1,6 @@
 import React from "react";
 import { exportCSV } from "./exportCSV";
+import { Button } from "@/components/ui/button";
 
 interface ExportProps {
   children: string;
@@ -14,12 +15,12 @@ const ExportButton: React.FC<ExportProps> = ({ children }) => {
     }
   };
   return (
-    <button
+    <Button
       onClick={handleExport}
-      className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+      className="flex w-full justify-center rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
     >
-      {children} テンプレート取得
-    </button>
+      テンプレート取得
+    </Button>
   );
 };
 

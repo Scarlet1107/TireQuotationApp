@@ -22,11 +22,11 @@ const AlertButton: React.FC<AlertButtonProps> = ({ onPush, children }) => {
     onPush();
   };
   return (
-    <div className="mt-5">
+    <div className="m-1 mt-5 flex w-full justify-center">
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button className="rounded bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700">
-            {children}を削除
+          <Button className="w-full rounded bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700">
+            データを削除
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
