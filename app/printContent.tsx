@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+"use client";
+import React, { useEffect } from "react";
 import { PrintData, ServiceFee, DiscoundRate } from "@/utils/interface";
 import { TAX_RATE } from "@/config/constants";
 import Image from "next/image";
+import { uploadPrintData } from "@/utils/supabaseFunctions";
 
 interface Props {
   printData: PrintData;
@@ -84,7 +86,7 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   return (
     <div
       ref={ref}
-      className="m-8 font-sans text-sm print:text-xs print:leading-tight"
+      className="printable-component m-8 font-sans text-sm print:text-xs print:leading-tight"
     >
       <h1 className="mb-4 text-center text-2xl font-bold print:text-xl">
         御見積書

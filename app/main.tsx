@@ -25,6 +25,7 @@ import {
   searchTires,
   getAllmanufacturer,
   getServiceFees,
+  uploadPrintData,
 } from "@/utils/supabaseFunctions";
 import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -81,6 +82,7 @@ import { format } from "date-fns";
 import { Result } from "postcss";
 import Image from "next/image";
 import { ja } from "date-fns/locale";
+import { log } from "console";
 
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
@@ -142,10 +144,6 @@ const Main = () => {
     fetchTireSizes();
     fetchAllmanufacturer();
     fetchServiceFees();
-    setPrintData({
-      ...printData,
-      expiryDate: new Date(Date.now() + DEFAULT_EXPIRY_DATE),
-    });
   }, []);
 
   const handleCheckboxChange =
@@ -268,7 +266,7 @@ const Main = () => {
       return;
     }
 
-    const res = await searchTires(tireSize, manufacturer);
+    const res = await searchTires(tireSize, manufacturer); //データベースからタイヤ情報を検索
     if (!res.data || (Array.isArray(res.data) && res.data.length === 0)) {
       toast({
         variant: "destructive",
@@ -285,9 +283,13 @@ const Main = () => {
 
     console.log(res.data);
 
-    // 見積もりナンバーを生成
+    // 見積もりナンバーを生成&その他変数をprintDataにセット
     setPrintData({
       ...printData,
+      numberOfTires: numberOfTires,
+      checkBoxState: checkedStates,
+      discountRate: discountRate,
+      extraOptions: extraOptions,
       quotationNumber: generateQuotationNumber(),
     });
 
@@ -306,6 +308,7 @@ const Main = () => {
       const filteredOptions = extraOptions.filter(
         (extraOption) => extraOption.option !== "",
       );
+      // ここでお客さんのターゲットによって価格を変える
       const priceRate: number = searchMarkupRate(
         tire.pattern,
         selectedData.target,
@@ -420,13 +423,20 @@ const Main = () => {
 
       ids.push(id);
 
-      const tireToAdd = searchResults.find((result) => result.id === id);
-      if (tireToAdd) {
+      const dataToAdd = searchResults.find((result) => result.id === id);
+      if (dataToAdd) {
+        const tireToAdd = {
+          manufacturer: dataToAdd.manufacturer,
+          pattern: dataToAdd.pattern,
+          tireSize: dataToAdd.tireSize,
+          tirePrice: dataToAdd.tirePrice,
+          priceRate: dataToAdd.priceRate,
+        };
         tires.push(tireToAdd);
-        serviceFees.push(tireToAdd.serviceFee);
-        wheels.push(tireToAdd.wheel);
+        serviceFees.push(dataToAdd.serviceFee);
+        wheels.push(dataToAdd.wheel);
+        console.log("tireToAdd = ", tireToAdd);
       }
-      console.log("tireToAdd = ", tireToAdd);
     }
 
     setPrintData({ ...printData, ids, tires, serviceFees, wheels });
@@ -463,7 +473,7 @@ const Main = () => {
     documentTitle: printData.customerName + "様-" + printData.quotationNumber,
   });
 
-  const handlePrintButtonClick = () => {
+  const handlePrintButtonClick = async () => {
     if (printData.ids.length === 0) {
       toast({
         title: "タイヤを選択してください",
@@ -484,6 +494,13 @@ const Main = () => {
     }
     if (componentRefs[0].current) {
       handlePrint();
+
+      // 履歴をSupabaseのprint_logsにアップロード
+      try {
+        await uploadPrintData(printData);
+      } catch (error) {
+        console.error("Failed to save print data to print_logs:", error);
+      }
     }
   };
 
@@ -857,7 +874,7 @@ const Main = () => {
           className="w-min transform bg-green-500 hover:bg-green-600"
           onClick={handleEstimate}
         >
-          この内容で見積もる！
+          この内容で見積り！
         </Button>
       </div>
       <div className="flex w-full flex-col space-x-8 space-y-8">
@@ -981,16 +998,7 @@ const Main = () => {
         </div>
         <div className="flex justify-center">
           <div className="w-3/4">
-            <PrintContent
-              ref={componentRefs[0]}
-              printData={{
-                ...printData,
-                numberOfTires: selectedData.numberOfTires,
-                checkBoxState: checkedStates,
-                discountRate: discountRate,
-                extraOptions: extraOptions,
-              }}
-            />
+            <PrintContent ref={componentRefs[0]} printData={printData} />
           </div>
         </div>
       </div>
