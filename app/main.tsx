@@ -217,9 +217,7 @@ const Main = () => {
     setSelectedData((prev) => ({ ...prev, numberOfTires: value }));
   };
 
-  const [componentRefs, setComponentRefs] = useState<
-    React.RefObject<HTMLDivElement>[]
-  >([]);
+  const componentRef = useRef(null);
 
   // ここ冗長な書き方になってるので後々リファクタリングする
   // 名前がひどい
@@ -404,7 +402,6 @@ const Main = () => {
     console.log(newResults);
     // ここでSearchResult型に入れるのでインターフェイスと同じ形にする
     setSearchResults(newResults);
-    setComponentRefs(newResults.map(() => React.createRef<HTMLDivElement>()));
   };
 
   const calculateTotalServiceFee = (serviceFee: any) => {
@@ -513,7 +510,7 @@ const Main = () => {
   };
 
   const handlePrint = useReactToPrint({
-    content: () => componentRefs[0].current,
+    content: () => componentRef.current,
     documentTitle: printData.customerName + "様-" + printData.quotationNumber,
   });
 
@@ -536,7 +533,7 @@ const Main = () => {
       });
       return;
     }
-    if (componentRefs[0].current) {
+    if (componentRef.current) {
       handlePrint();
 
       // 履歴をSupabaseのprint_logsにアップロード
@@ -943,8 +940,13 @@ const Main = () => {
                     </TableHeader>
                     <TableBody>
                       {printHistory.map((history, index) => (
-                        <TableRow key={index} onClick={() => setPrintData(printHistory[index])}>
-                          <TableCell className="font-medium">{history.quotationNumber}</TableCell>
+                        <TableRow
+                          key={index}
+                          onClick={() => setPrintData(printHistory[index])}
+                        >
+                          <TableCell className="font-medium">
+                            {history.quotationNumber}
+                          </TableCell>
                           <TableCell>{history.customerName}</TableCell>
                           <TableCell>{history.staffName}</TableCell>
                         </TableRow>
@@ -1075,7 +1077,7 @@ const Main = () => {
         </div>
         <div className="flex justify-center">
           <div className="w-3/4">
-            <PrintContent ref={componentRefs[0]} printData={printData} />
+            <PrintContent ref={componentRef} printData={printData} />
           </div>
         </div>
       </div>
