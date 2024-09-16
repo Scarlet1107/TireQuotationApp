@@ -1,9 +1,8 @@
 "use client";
-import React, { useEffect } from "react";
-import { PrintData, ServiceFee, DiscoundRate } from "@/utils/interface";
+import React from "react";
+import { PrintData, ServiceFee, DiscountRate } from "@/utils/interface";
 import { TAX_RATE } from "@/config/constants";
 import Image from "next/image";
-import { uploadPrintData } from "@/utils/supabaseFunctions";
 
 interface Props {
   printData: PrintData;
@@ -24,7 +23,7 @@ const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   const calculateTotalPrice = (
     tire: any,
     fee: ServiceFee,
-    discountRate: DiscoundRate,
+    discountRate: DiscountRate,
   ) => {
     let total =
       Math.ceil((tire.tirePrice * tire.priceRate) / 10) *

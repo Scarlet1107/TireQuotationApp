@@ -19,7 +19,7 @@ export interface SearchResult {
   totalPrice: number;
   totalPriceWithTax: number;
   extraOptions: ExtraOption[];
-  discountRate: DiscoundRate;
+  discountRate: DiscountRate;
 }
 
 export interface Tire {
@@ -46,7 +46,7 @@ export interface PrintData {
   numberOfTires: number; //タイヤの数
 
   checkBoxState: CheckboxState; //工賃のチェックリスト(すべて同じ)
-  discountRate: DiscoundRate; // 工賃の割引率（すべて同じ）
+  discountRate: DiscountRate; // 工賃の割引率（すべて同じ）
 
   wheels: Wheel[];
   extraOptions: ExtraOption[];
@@ -66,7 +66,7 @@ export interface CheckboxState {
   tireDisposalFee: boolean;
 }
 
-export interface DiscoundRate {
+export interface DiscountRate {
   laborFee: number;
   removalFee: number;
   tireStorageFee: number;

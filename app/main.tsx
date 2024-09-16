@@ -1,6 +1,5 @@
 "use client";
 import {
-  DEFAULT_EXPIRY_DATE,
   TAX_RATE,
   DEFAULT_DISCOUNT_RATE,
   DEFAULT_CHECKED_STATUS,
@@ -12,7 +11,7 @@ import {
 } from "@/config/constants";
 import {
   CheckboxState,
-  DiscoundRate,
+  DiscountRate,
   ExtraOption,
   PrintData,
   SearchResult,
@@ -37,7 +36,6 @@ import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectLabel,
   SelectTrigger,
@@ -121,10 +119,9 @@ const Main = () => {
     manufacturer: "all",
     tireSize: "",
   });
-  const [extraOptions, setExtraOptions] = useState<ExtraOption[]>([]);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [printData, setPrintData] = useState<PrintData>(DEFAULT_PRINTDATA);
-  const [discountRate, setDiscountRate] = useState<DiscoundRate>(
+  const [discountRate, setDiscountRate] = useState<DiscountRate>(
     DEFAULT_DISCOUNT_RATE,
   );
   const [totalExtraOptionPrice, setTotalExtraOptionPrice] = useState(0);
@@ -329,19 +326,24 @@ const Main = () => {
 
     console.log(res.data);
 
+    // ここで空のオプションを取り除く
+    const filteredExtraOptions = printData.extraOptions.filter(
+      (option) => option.option !== "",
+    );
+
     // 見積もりナンバーを生成&その他変数をprintDataにセット
     setPrintData({
       ...printData,
       numberOfTires: numberOfTires,
       checkBoxState: checkedStates,
       discountRate: discountRate,
-      extraOptions: extraOptions,
+      extraOptions: filteredExtraOptions,
       quotationNumber: generateQuotationNumber(),
     });
 
     // その他のオプションの合計金額を計算
     setTotalExtraOptionPrice(
-      extraOptions.reduce(
+      filteredExtraOptions.reduce(
         (total, option) => total + option.price * option.quantity,
         0,
       ),
@@ -351,17 +353,12 @@ const Main = () => {
       const tirePrice = tire.price;
       const serviceFee = calculateLaborCost(tire.laborCostRank);
       const totalServiceFee = calculateTotalServiceFee(serviceFee);
-      const filteredOptions = extraOptions.filter(
-        (extraOption) => extraOption.option !== "",
-      );
       // ここでお客さんのターゲットによって価格を変える
       const priceRate: number = searchMarkupRate(
         tire.pattern,
         selectedData.target,
       );
-
       const sellingPrice = Math.ceil((tirePrice * Number(priceRate)) / 10) * 10;
-
       const profit = Math.ceil(
         (sellingPrice - tirePrice * searchMarkupRate(tire.pattern, "cost")) *
           numberOfTires,
@@ -372,7 +369,7 @@ const Main = () => {
         sellingPrice * numberOfTires +
           totalServiceFee +
           wheelPrice +
-          filteredOptions.reduce(
+          filteredExtraOptions.reduce(
             (acc, option) => acc + option.price * option.quantity,
             0,
           ),
@@ -399,7 +396,7 @@ const Main = () => {
         },
         totalPrice: totalPrice,
         totalPriceWithTax: totalPriceWithTax,
-        extraOptions: filteredOptions,
+        extraOptions: filteredExtraOptions,
         discountRate: discountRate,
       };
     });
@@ -422,26 +419,33 @@ const Main = () => {
   };
 
   const addExtraOption = () => {
-    if (extraOptions.length >= MAX_EXTRAOPTIONS) return;
-    setExtraOptions([
-      ...extraOptions,
-      { id: uuidv4(), option: "", price: 100, quantity: 4 },
-    ]);
+    if (printData.extraOptions.length >= MAX_EXTRAOPTIONS) return;
+    setPrintData((prevData) => ({
+      ...prevData,
+      extraOptions: [
+        ...printData.extraOptions,
+        { id: uuidv4(), option: "", price: 100, quantity: 4 },
+      ],
+    }));
   };
 
   const deleteExtraOption = (id: string) => {
-    setExtraOptions(extraOptions.filter((option) => option.id !== id));
+    setPrintData((prevData) => ({
+      ...prevData,
+      extraOptions: prevData.extraOptions.filter((option) => option.id !== id),
+    }));
   };
 
   const handleExtraOptionChange =
     (id: string, field: keyof ExtraOption) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
-      setExtraOptions(
-        extraOptions.map((option) =>
+      setPrintData((prevData) => ({
+        ...prevData,
+        extraOptions: prevData.extraOptions.map((option) =>
           option.id === id ? { ...option, [field]: newValue } : option,
         ),
-      );
+      }));
     };
 
   const toggleQuotationDataById = (id: number) => {
@@ -855,7 +859,7 @@ const Main = () => {
             +
           </Button>
           <div className="mt-4">
-            {extraOptions.map((extraOption, index) => (
+            {printData.extraOptions.map((extraOption, index) => (
               <div key={extraOption.id}>
                 <div className="mt-6 flex flex-col space-y-2 lg:flex-row lg:space-x-4 lg:space-y-0">
                   <div>

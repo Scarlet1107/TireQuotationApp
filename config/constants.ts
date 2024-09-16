@@ -2,7 +2,7 @@
 
 import {
   CheckboxState,
-  DiscoundRate,
+  DiscountRate,
   PrintData,
   Wheel,
 } from "@/utils/interface";
@@ -19,7 +19,7 @@ export const CUSTOMER_TYPE = [
 ];
 
 // 作業工賃、脱着工賃、タイヤ預かり料の割引率（%設定）
-export const DEFAULT_DISCOUNT_RATE = <DiscoundRate>{
+export const DEFAULT_DISCOUNT_RATE = <DiscountRate>{
   laborFee: 0,
   removalFee: 0,
   tireStorageFee: 0,
