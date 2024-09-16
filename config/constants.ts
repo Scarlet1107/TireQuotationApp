@@ -56,3 +56,6 @@ export const DEFAULT_PRINTDATA = <PrintData>{
   discountRate: DEFAULT_DISCOUNT_RATE,
   extraOptions: [],
 };
+
+// 履歴部分の1ページあたりの表示数。現在はスマホサイズに合わせて8に設定
+export const ITEMS_PER_PAGE = 8;

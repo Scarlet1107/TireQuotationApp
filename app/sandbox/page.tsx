@@ -23,7 +23,7 @@ const App = () => {
               Print this out!
             </button>
           )}
-          
+
           content={() => componentRef.current}
         />
       </div>

@@ -8,6 +8,7 @@ import {
   DEFAULT_PRINTDATA,
   DEFAULT_WHEEL,
   MAX_EXTRAOPTIONS,
+  ITEMS_PER_PAGE,
 } from "@/config/constants";
 import {
   CheckboxState,
@@ -127,7 +128,10 @@ const Main = () => {
     DEFAULT_DISCOUNT_RATE,
   );
   const [totalExtraOptionPrice, setTotalExtraOptionPrice] = useState(0);
+
   const [printHistory, setPrintHistory] = useState<PrintData[]>([]);
+  const [currentPage, setCurrentPage] = useState(1); // 履歴の現在のページ
+  const [totalPages, setTotalPages] = useState(1); // 履歴の総ページ数
 
   const fetchPriceRates = async () => {
     const rates = await getCustomerTypePriceRates();
@@ -162,26 +166,7 @@ const Main = () => {
     const res = await getPrintDataHistory();
     console.log(res);
     setPrintHistory(res as PrintData[]);
-
-    //試しに最新のデータをセット
-    // const data = res[0];
-    // setPrintData({
-    //   ...printData,
-    //   ids: data.ids,
-    //   tires: data.tires,
-    //   serviceFees: data.service_fees,
-    //   customerName: data.customer_name,
-    //   staffName: data.staff_name,
-    //   carModel: data.car_model,
-    //   expiryDate: data.expiry_date,
-    //   quotationNumber: data.quotation_number,
-    //   numberOfTires: data.number_of_tires,
-    //   checkBoxState: data.check_box_state,
-    //   discountRate: data.discount_rate,
-    //   wheels: data.wheels,
-    //   extraOptions: data.extra_options,
-    // });
-    // setExtraOptions(data.extra_options);
+    setTotalPages(Math.ceil(res.length / ITEMS_PER_PAGE));
   };
 
   useEffect(() => {
@@ -191,6 +176,23 @@ const Main = () => {
     fetchServiceFees();
     fetchPrintHistory();
   }, []);
+
+  // 履歴のページを変更する関数
+  const getCurrentPageData = () => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return printHistory.slice(startIndex, endIndex);
+  };
+
+  // 履歴機能において、次のページに進む
+  const nextPage = () => {
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
+  };
+
+  // 履歴機能において、前のページに戻る
+  const prevPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
+  };
 
   const handleCheckboxChange =
     (key: keyof CheckboxState) => (checked: boolean) => {
@@ -939,28 +941,43 @@ const Main = () => {
                       <TableRow>
                         <TableHead>見積り番号</TableHead>
                         <TableHead>お客さん</TableHead>
-                        <TableHead>担当スタッフ</TableHead>
+                        <TableHead className="hidden md:block">
+                          担当スタッフ
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {printHistory.map((history, index) => (
+                      {getCurrentPageData().map((history, index) => (
                         <TableRow
                           key={index}
-                          onClick={() => setPrintData(printHistory[index])}
+                          onClick={() => setPrintData(history)}
                         >
                           <TableCell className="font-medium">
                             {history.quotationNumber}
                           </TableCell>
                           <TableCell>{history.customerName}</TableCell>
-                          <TableCell>{history.staffName}</TableCell>
+                          <TableCell className="hidden sm:block">
+                            {history.staffName}
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
                 </SheetClose>
               </SheetDescription>
-              <SheetFooter>
-                ここにページネーション実装できるかも？
+              <SheetFooter className="items-center">
+                <Button onClick={prevPage} disabled={currentPage === 1}>
+                  前へ
+                </Button>
+                <span className="md:">
+                  ページ {currentPage} / {totalPages}
+                </span>
+                <Button
+                  onClick={nextPage}
+                  disabled={currentPage === totalPages}
+                >
+                  次へ
+                </Button>
               </SheetFooter>
             </SheetContent>
           </Sheet>

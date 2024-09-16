@@ -39,25 +39,23 @@ export const searchTireByID = async (id: number) => {
 
 // Print History
 export const uploadPrintData = async (printData: PrintData) => {
-  const { data, error } = await supabase
-    .from("print_logs") // 新しいテーブル名
-    .insert([
-      {
-        ids: printData.ids,
-        tires: printData.tires,
-        serviceFees: printData.serviceFees,
-        customerName: printData.customerName,
-        staffName: printData.staffName,
-        carModel: printData.carModel,
-        expiryDate: printData.expiryDate,
-        quotationNumber: printData.quotationNumber,
-        numberOfTires: printData.numberOfTires,
-        checkBoxState: printData.checkBoxState,
-        discountRate: printData.discountRate,
-        wheels: printData.wheels,
-        extraOptions: printData.extraOptions,
-      },
-    ]);
+  const { data, error } = await supabase.from("print_logs").insert([
+    {
+      ids: printData.ids,
+      tires: printData.tires,
+      serviceFees: printData.serviceFees,
+      customerName: printData.customerName,
+      staffName: printData.staffName,
+      carModel: printData.carModel,
+      expiryDate: printData.expiryDate,
+      quotationNumber: printData.quotationNumber,
+      numberOfTires: printData.numberOfTires,
+      checkBoxState: printData.checkBoxState,
+      discountRate: printData.discountRate,
+      wheels: printData.wheels,
+      extraOptions: printData.extraOptions,
+    },
+  ]);
 
   if (error) {
     console.error("Error uploading print data to print_logs: ", error);
@@ -70,10 +68,10 @@ export const uploadPrintData = async (printData: PrintData) => {
 
 export const getPrintDataHistory = async () => {
   const { data, error } = await supabase
-    .from("print_logs") // 新しいテーブル名
+    .from("print_logs")
     .select("*")
     .order("id", { ascending: false }) // 最新のデータを取得
-    .limit(20); // 過去20件
+    .limit(200); // 履歴の取得最大数
 
   if (error) {
     console.error("Error fetching print data history from print_logs: ", error);
