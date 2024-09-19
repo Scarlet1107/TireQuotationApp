@@ -14,8 +14,7 @@ import { DEFAULT_WHEEL } from "@/config/constants";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { toast, useToast } from "@/components/ui/use-toast";
-import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ManualTireInputDialogProps {
   printData: PrintData;
