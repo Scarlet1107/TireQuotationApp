@@ -451,7 +451,7 @@ const Main = () => {
     if (printData.ids.length === 0) return;
     if (window.confirm("選択したタイヤをリセットしますか？")) {
       const reset = () => {
-        setPrintData({ ...printData, ids: [], serviceFees: [], tires: [] });
+        setPrintData({ ...printData, ids: [], serviceFees: [], tires: [], wheels: [] });
       };
       reset();
       toast({
@@ -817,7 +817,7 @@ const Main = () => {
       </div>
       <div className="flex w-full flex-col space-x-8 space-y-8">
         <div className="mr-8 flex flex-col justify-end space-x-8 md:flex-row">
-          <ManualTireInputDialog />
+          <ManualTireInputDialog printData={printData} setPrintData={setPrintData} />
           <PrintHistorySheet setPrintData={setPrintData} />
           <Button
             className="relative w-max place-self-end font-medium"
