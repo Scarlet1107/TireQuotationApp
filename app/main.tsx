@@ -1,17 +1,13 @@
 "use client";
 import {
   TAX_RATE,
-  DEFAULT_DISCOUNT_RATE,
-  DEFAULT_CHECKED_STATUS,
   CUSTOMER_TYPE,
   DEFAULT_PRINTDATA,
   DEFAULT_WHEEL,
   MAX_EXTRAOPTIONS,
-  ITEMS_PER_PAGE,
 } from "@/config/constants";
 import {
   CheckboxState,
-  DiscountRate,
   ExtraOption,
   PrintData,
   SearchResult,
@@ -26,7 +22,6 @@ import {
   getAllmanufacturer,
   getServiceFees,
   uploadPrintData,
-  getPrintDataHistory,
 } from "@/utils/supabaseFunctions";
 import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -37,17 +32,11 @@ import {
   Select,
   SelectContent,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/toaster";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 
 import {
   Card,
@@ -58,19 +47,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import ReactToPrint, { useReactToPrint } from "react-to-print";
+import { useReactToPrint } from "react-to-print";
 import PrintContent from "./printContent";
-import { set, setWeek } from "date-fns";
-
-import {
-  AlarmCheck,
-  Calendar as CalendarIcon,
-  ChevronsDown,
-  ChevronsDownUp,
-  ChevronsUpDown,
-  Minus,
-  Plus,
-} from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -79,12 +58,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { Result } from "postcss";
-import Image from "next/image";
 import { ja } from "date-fns/locale";
-
-import { Separator } from "@/components/ui/separator";
-
 import ManualTireInputDialog from "./components/ManualTireInputDialog";
 import PrintHistorySheet from "./components/PrintHistorySheet";
 import WheelInputCollapsible from "./components/WheelInputCollapsible";
@@ -96,9 +70,6 @@ const Main = () => {
   const [serviceFees, setServiceFees] = useState<ServiceFee[]>([]);
   const [wheel, setWheel] = useState<Wheel>(DEFAULT_WHEEL);
   const { toast } = useToast();
-  const [checkedStates, setCheckedStates] = useState<CheckboxState>(
-    DEFAULT_CHECKED_STATUS,
-  );
   const [selectedData, setSelectedData] = useState<SelectData>({
     target: "",
     numberOfTires: 4,
@@ -107,9 +78,6 @@ const Main = () => {
   });
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [printData, setPrintData] = useState<PrintData>(DEFAULT_PRINTDATA);
-  const [discountRate, setDiscountRate] = useState<DiscountRate>(
-    DEFAULT_DISCOUNT_RATE,
-  );
   const [totalExtraOptionPrice, setTotalExtraOptionPrice] = useState(0);
 
   const fetchPriceRates = async () => {
@@ -150,9 +118,12 @@ const Main = () => {
 
   const handleCheckboxChange =
     (key: keyof CheckboxState) => (checked: boolean) => {
-      setCheckedStates((prevState) => ({
-        ...prevState,
-        [key]: checked,
+      setPrintData((prev) => ({
+        ...prev,
+        checkBoxState: {
+          ...prev.checkBoxState,
+          [key]: checked,
+        },
       }));
     };
 
@@ -190,11 +161,12 @@ const Main = () => {
 
     serviceFees.find((fee) => {
       if (fee.rank === rank) {
-        if (checkedStates.laborFee) totalCost.laborFee = fee.laborFee;
-        if (checkedStates.removalFee) totalCost.removalFee = fee.removalFee;
-        if (checkedStates.tireStorageFee)
+        if (printData.checkBoxState.laborFee) totalCost.laborFee = fee.laborFee;
+        if (printData.checkBoxState.removalFee)
+          totalCost.removalFee = fee.removalFee;
+        if (printData.checkBoxState.tireStorageFee)
           totalCost.tireStorageFee = fee.tireStorageFee;
-        if (checkedStates.tireDisposalFee)
+        if (printData.checkBoxState.tireDisposalFee)
           totalCost.tireDisposalFee = fee.tireDisposalFee;
         totalCost.total =
           totalCost.laborFee +
@@ -292,8 +264,6 @@ const Main = () => {
     setPrintData({
       ...printData,
       numberOfTires: numberOfTires,
-      checkBoxState: checkedStates,
-      discountRate: discountRate,
       extraOptions: filteredExtraOptions,
       quotationNumber: generateQuotationNumber(),
     });
@@ -354,7 +324,7 @@ const Main = () => {
         totalPrice: totalPrice,
         totalPriceWithTax: totalPriceWithTax,
         extraOptions: filteredExtraOptions,
-        discountRate: discountRate,
+        discountRate: printData.discountRate,
       };
     });
     console.log(newResults);
@@ -364,14 +334,20 @@ const Main = () => {
 
   const calculateTotalServiceFee = (serviceFee: any) => {
     let total = 0;
-    if (checkedStates.laborFee)
-      total += (serviceFee.laborFee * (100 - discountRate.laborFee)) / 100;
-    if (checkedStates.removalFee)
-      total += (serviceFee.removalFee * (100 - discountRate.removalFee)) / 100;
-    if (checkedStates.tireStorageFee)
+    if (printData.checkBoxState.laborFee)
       total +=
-        (serviceFee.tireStorageFee * (100 - discountRate.tireStorageFee)) / 100;
-    if (checkedStates.tireDisposalFee) total += serviceFee.tireDisposalFee;
+        (serviceFee.laborFee * (100 - printData.discountRate.laborFee)) / 100;
+    if (printData.checkBoxState.removalFee)
+      total +=
+        (serviceFee.removalFee * (100 - printData.discountRate.removalFee)) /
+        100;
+    if (printData.checkBoxState.tireStorageFee)
+      total +=
+        (serviceFee.tireStorageFee *
+          (100 - printData.discountRate.tireStorageFee)) /
+        100;
+    if (printData.checkBoxState.tireDisposalFee)
+      total += serviceFee.tireDisposalFee;
     return total;
   };
 
@@ -451,7 +427,13 @@ const Main = () => {
     if (printData.ids.length === 0) return;
     if (window.confirm("選択したタイヤをリセットしますか？")) {
       const reset = () => {
-        setPrintData({ ...printData, ids: [], serviceFees: [], tires: [], wheels: [] });
+        setPrintData({
+          ...printData,
+          ids: [],
+          serviceFees: [],
+          tires: [],
+          wheels: [],
+        });
       };
       reset();
       toast({
@@ -655,7 +637,7 @@ const Main = () => {
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="laborFee"
-                checked={checkedStates.laborFee}
+                checked={printData.checkBoxState.laborFee}
                 onCheckedChange={handleCheckboxChange("laborFee")}
               />
               <Label className="pr-4 text-sm font-medium" htmlFor="laborFee">
@@ -663,15 +645,18 @@ const Main = () => {
               </Label>
               <Input
                 className="h-8 w-20"
-                value={discountRate.laborFee}
+                value={printData.discountRate.laborFee}
                 type="number"
                 min={0}
                 max={100}
                 step={50}
                 onChange={(e) =>
-                  setDiscountRate({
-                    ...discountRate,
-                    laborFee: Number(e.target.value),
+                  setPrintData({
+                    ...printData,
+                    discountRate: {
+                      ...printData.discountRate,
+                      laborFee: Number(e.target.value),
+                    },
                   })
                 }
               />
@@ -680,7 +665,7 @@ const Main = () => {
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="removalFee"
-                checked={checkedStates.removalFee}
+                checked={printData.checkBoxState.removalFee}
                 onCheckedChange={handleCheckboxChange("removalFee")}
               />
               <Label className="pr-4 text-sm font-medium" htmlFor="removalFee">
@@ -688,15 +673,18 @@ const Main = () => {
               </Label>
               <Input
                 className="h-8 w-20"
-                value={discountRate.removalFee}
+                value={printData.discountRate.removalFee}
                 type="number"
                 min={0}
                 max={100}
                 step={50}
                 onChange={(e) =>
-                  setDiscountRate({
-                    ...discountRate,
-                    removalFee: Number(e.target.value),
+                  setPrintData({
+                    ...printData,
+                    discountRate: {
+                      ...printData.discountRate,
+                      removalFee: Number(e.target.value),
+                    },
                   })
                 }
               />
@@ -706,7 +694,7 @@ const Main = () => {
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="tireStorageFee"
-                checked={checkedStates.tireStorageFee}
+                checked={printData.checkBoxState.tireStorageFee}
                 onCheckedChange={handleCheckboxChange("tireStorageFee")}
               />
               <Label className="text-sm font-medium" htmlFor="tireStorageFee">
@@ -714,15 +702,18 @@ const Main = () => {
               </Label>
               <Input
                 className="h-8 w-20"
-                value={discountRate.tireStorageFee}
+                value={printData.discountRate.tireStorageFee}
                 type="number"
                 min={0}
                 max={100}
                 step={50}
                 onChange={(e) =>
-                  setDiscountRate({
-                    ...discountRate,
-                    tireStorageFee: Number(e.target.value),
+                  setPrintData({
+                    ...printData,
+                    discountRate: {
+                      ...printData.discountRate,
+                      tireStorageFee: Number(e.target.value),
+                    },
                   })
                 }
               />
@@ -732,7 +723,7 @@ const Main = () => {
             <div className="items-top flex space-x-2">
               <Checkbox
                 id="tireDisposalFee"
-                checked={checkedStates.tireDisposalFee}
+                checked={printData.checkBoxState.tireDisposalFee}
                 onCheckedChange={handleCheckboxChange("tireDisposalFee")}
               />
               <Label className="text-sm font-medium" htmlFor="tireDisposalFee">
@@ -817,7 +808,10 @@ const Main = () => {
       </div>
       <div className="flex w-full flex-col space-x-8 space-y-8">
         <div className="mr-8 flex flex-col justify-end space-x-8 md:flex-row">
-          <ManualTireInputDialog printData={printData} setPrintData={setPrintData} />
+          <ManualTireInputDialog
+            printData={printData}
+            setPrintData={setPrintData}
+          />
           <PrintHistorySheet setPrintData={setPrintData} />
           <Button
             className="relative w-max place-self-end font-medium"
@@ -870,8 +864,6 @@ const Main = () => {
                   <CardDescription>パターン : {result.pattern}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {/* <p>id : {result.id}</p> */}
-                  {/* <p>工賃ランク：{result.serviceFee.rank}</p> */}
                   <p>
                     タイヤ: {formatPrice(result.tirePrice)} × {result.priceRate}{" "}
                     × {result.numberOfTires} 円
