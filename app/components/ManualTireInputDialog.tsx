@@ -193,6 +193,7 @@ const ManualTireInputDialog = ({
             <Input
               id="laborFee"
               type="number"
+              step={100}
               min={0}
               onChange={(e) =>
                 setServiceFee({
@@ -209,6 +210,7 @@ const ManualTireInputDialog = ({
             <Input
               id="removalFee"
               type="number"
+              step={100}
               min={0}
               onChange={(e) =>
                 setServiceFee({
@@ -225,6 +227,7 @@ const ManualTireInputDialog = ({
             <Input
               id="tireStorageFee"
               type="number"
+              step={100}
               min={0}
               onChange={(e) =>
                 setServiceFee({
@@ -241,6 +244,7 @@ const ManualTireInputDialog = ({
             <Input
               id="tireDisposalFee"
               type="number"
+              step={100}
               min={0}
               onChange={(e) =>
                 setServiceFee({
