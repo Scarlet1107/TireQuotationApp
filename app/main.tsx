@@ -5,6 +5,7 @@ import {
   DEFAULT_PRINTDATA,
   DEFAULT_WHEEL,
   MAX_EXTRAOPTIONS,
+  DEFAULT_TIRE_SEARCH_FILTERS,
 } from "@/config/constants";
 import {
   CheckboxState,
@@ -73,12 +74,9 @@ const Main = () => {
   const [serviceFees, setServiceFees] = useState<ServiceFee[]>([]);
   const [wheel, setWheel] = useState<Wheel>(DEFAULT_WHEEL);
   const { toast } = useToast();
-  const [selectedData, setSelectedData] = useState<SelectData>({
-    target: "",
-    numberOfTires: 4,
-    manufacturer: "all",
-    tireSize: "",
-  });
+  const [tireSearchFilters, setTireSearchFilters] = useState<SelectData>(
+    DEFAULT_TIRE_SEARCH_FILTERS,
+  );
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [printData, setPrintData] = useState<PrintData>(DEFAULT_PRINTDATA);
   const [totalExtraOptionPrice, setTotalExtraOptionPrice] = useState(0);
@@ -131,22 +129,15 @@ const Main = () => {
     };
 
   const handleCustomerTypeChange = (value: string) => {
-    setSelectedData((prev) => ({ ...prev, target: value }));
+    setTireSearchFilters((prev) => ({ ...prev, target: value }));
   };
 
   const handleTireSizeChange = (size: string) => {
-    setSelectedData((prev) => ({ ...prev, tireSize: size }));
+    setTireSearchFilters((prev) => ({ ...prev, tireSize: size }));
   };
 
   const handleManufacturerChange = (manufacturer: string) => {
-    setSelectedData((prev) => ({ ...prev, manufacturer: manufacturer }));
-  };
-
-  const handleNumberOfTiresChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const value = Number(e.target.value);
-    setSelectedData((prev) => ({ ...prev, numberOfTires: value }));
+    setTireSearchFilters((prev) => ({ ...prev, manufacturer: manufacturer }));
   };
 
   const componentRef = useRef(null);
@@ -206,9 +197,8 @@ const Main = () => {
 
   // 計算がわかりにくいのでリファクタリングする
   const handleEstimate = async () => {
-    const { tireSize, manufacturer, numberOfTires } = selectedData;
 
-    if (!tireSize) {
+    if (!tireSearchFilters.tireSize) {
       toast({
         variant: "destructive",
         title: "タイヤサイズが選択されていません。",
@@ -217,7 +207,7 @@ const Main = () => {
     }
 
     // ここがうまく動いてるかチェック
-    if (selectedData.target === "") {
+    if (tireSearchFilters.target === "") {
       toast({
         variant: "destructive",
         title: "お客さんが選択されていません。",
@@ -225,7 +215,7 @@ const Main = () => {
       return;
     }
 
-    if (numberOfTires === 0) {
+    if (printData.numberOfTires === 0) {
       toast({
         variant: "destructive",
         title: "タイヤの数量が選択されていません。",
@@ -241,7 +231,7 @@ const Main = () => {
       return;
     }
 
-    const res = await searchTires(tireSize, manufacturer); //データベースからタイヤ情報を検索
+    const res = await searchTires(tireSearchFilters.tireSize, tireSearchFilters.manufacturer); //データベースからタイヤ情報を検索
     if (!res.data || (Array.isArray(res.data) && res.data.length === 0)) {
       toast({
         variant: "destructive",
@@ -250,7 +240,7 @@ const Main = () => {
       return;
     }
 
-    if (manufacturer === "all") {
+    if (tireSearchFilters.manufacturer === "all") {
       toast({
         title: "すべてのメーカーで検索しました",
       });
@@ -266,7 +256,6 @@ const Main = () => {
     // 見積もりナンバーを生成&その他変数をprintDataにセット
     setPrintData({
       ...printData,
-      numberOfTires: numberOfTires,
       extraOptions: filteredExtraOptions,
       quotationNumber: generateQuotationNumber(),
     });
@@ -286,17 +275,17 @@ const Main = () => {
       // ここでお客さんのターゲットによって価格を変える
       const priceRate: number = searchMarkupRate(
         tire.pattern,
-        selectedData.target,
+        tireSearchFilters.target,
       );
       const sellingPrice = Math.ceil((tirePrice * Number(priceRate)) / 10) * 10;
       const profit = Math.ceil(
         (sellingPrice - tirePrice * searchMarkupRate(tire.pattern, "cost")) *
-          numberOfTires,
+          printData.numberOfTires,
       );
       const wheelPrice = wheel.isIncluded ? wheel.price * wheel.quantity : 0;
 
       const totalPrice = Math.floor(
-        sellingPrice * numberOfTires +
+        sellingPrice * printData.numberOfTires +
           totalServiceFee +
           wheelPrice +
           filteredExtraOptions.reduce(
@@ -311,9 +300,9 @@ const Main = () => {
         id: tire.id,
         manufacturer: tire.manufacturer,
         pattern: tire.pattern,
-        tireSize: selectedData.tireSize,
+        tireSize: tireSearchFilters.tireSize,
         tirePrice: tirePrice,
-        numberOfTires: numberOfTires,
+        numberOfTires: printData.numberOfTires,
         priceRate: priceRate,
         profit: profit,
         wheel: wheel,
@@ -425,8 +414,6 @@ const Main = () => {
 
     setPrintData({ ...printData, ids, tires, serviceFees, wheels });
   };
-
-
 
   // 見積もりナンバーを日時から生成する関数
   const generateQuotationNumber = (): string => {
@@ -609,13 +596,18 @@ const Main = () => {
 
         <div className="flex flex-col space-y-4 md:space-x-8 xl:flex-row">
           <div className="space-x-4">
-            <Label htmlFor="number">数量</Label>
+            <Label htmlFor="number">本数</Label>
             <Input
               id="number"
               type="number"
               min={1}
-              onChange={handleNumberOfTiresChange}
-              value={selectedData.numberOfTires}
+              onChange={(e) =>
+                setPrintData({
+                  ...printData,
+                  numberOfTires: Number(e.target.value),
+                })
+              }
+              value={printData.numberOfTires}
               className="w-min"
             />
           </div>
@@ -801,9 +793,10 @@ const Main = () => {
           />
           <PrintDataEditor printData={printData} setPrintData={setPrintData} />
 
-
-         <ResetButton setPrintData={setPrintData} printDataLength={printData.ids.length}/>
-
+          <ResetButton
+            setPrintData={setPrintData}
+            printDataLength={printData.ids.length}
+          />
 
           <Button
             className="w-min transform bg-green-500 font-bold transition-all duration-100 hover:scale-95 hover:bg-green-600"

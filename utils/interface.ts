@@ -1,6 +1,5 @@
 export interface SelectData {
   target: string;
-  numberOfTires: number;
   manufacturer: string;
   tireSize: string;
 }

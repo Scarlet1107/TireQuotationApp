@@ -47,7 +47,6 @@ const PrintDataEditor = ({ printData, setPrintData }: PrintDataSheetProps) => {
   const [manufacturer, setManufacturer] = useState<string>("");
   const [pattern, setPattern] = useState<string>("");
   const [tireSize, setTireSize] = useState<string>("");
-  const [numberOfTires, setNumberOfTires] = useState<number>(4);
   const [tirePrice, setTirePrice] = useState<number>(0);
 
   const [serviceFee, setServiceFee] = useState<ServiceFee>(() => ({
@@ -64,7 +63,6 @@ const PrintDataEditor = ({ printData, setPrintData }: PrintDataSheetProps) => {
     setPattern(tires[index].pattern);
     setTireSize(tires[index].tireSize);
     setTirePrice(tires[index].tirePrice);
-    setNumberOfTires(printData.numberOfTires);
     setServiceFee(serviceFees[index]);
     setWheel(wheels[index]);
   };
@@ -87,7 +85,6 @@ const PrintDataEditor = ({ printData, setPrintData }: PrintDataSheetProps) => {
 
     setPrintData({
       ...printData,
-      numberOfTires: numberOfTires,
       tires: newTires,
       serviceFees: newServiceFees,
       wheels: newWheels,
@@ -136,8 +133,12 @@ const PrintDataEditor = ({ printData, setPrintData }: PrintDataSheetProps) => {
                     >
                       削除
                     </Button> */}
-                    <CardTitle className="text-left">メーカー: {tire.manufacturer}</CardTitle>
-                    <CardDescription className="text-left">パターン: {tire.pattern}</CardDescription>
+                    <CardTitle className="text-left">
+                      メーカー: {tire.manufacturer}
+                    </CardTitle>
+                    <CardDescription className="text-left">
+                      パターン: {tire.pattern}
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="text-left">
                     <p>タイヤサイズ: {tire.tireSize}</p>
@@ -185,17 +186,6 @@ const PrintDataEditor = ({ printData, setPrintData }: PrintDataSheetProps) => {
                       className="w-min"
                     />
                   </div>
-                  {/* 混乱を避けるために掛け率を表示 */}
-                  <div>
-                  <Label htmlFor="priceRate">掛け率</Label>
-                    <Input
-                      id="priceRate"
-                      type="number"
-                      value={tire.priceRate}
-                      className="w-min"
-                      disabled
-                    />
-                  </div>
                   <div>
                     <Label htmlFor="tirePrice">タイヤ価格</Label>
                     <Input
@@ -208,15 +198,15 @@ const PrintDataEditor = ({ printData, setPrintData }: PrintDataSheetProps) => {
                       className="w-min"
                     />
                   </div>
+                  {/* 混乱を避けるために掛け率を表示 */}
                   <div>
-                    <Label htmlFor="numberOfTires">数量</Label>
+                    <Label htmlFor="priceRate">掛け率</Label>
                     <Input
-                      id="numberOfTires"
+                      id="priceRate"
                       type="number"
-                      min={1}
-                      onChange={(e) => setNumberOfTires(Number(e.target.value))}
-                      value={numberOfTires}
+                      value={tire.priceRate}
                       className="w-min"
+                      disabled
                     />
                   </div>
                 </div>

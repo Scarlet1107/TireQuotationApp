@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import WheelInputCollapsible from "./WheelInputCollapsible";
 import { PrintData, ServiceFee, Wheel } from "@/utils/interface";
 import { DEFAULT_WHEEL } from "@/config/constants";
@@ -31,7 +31,6 @@ const ManualTireInputDialog = ({
   const [manufacturer, setManufacturer] = useState<string>("");
   const [pattern, setPattern] = useState<string>("");
   const [tireSize, setTireSize] = useState<string>("");
-  const [numberOfTires, setNumberOfTires] = useState<number>(4);
   const [tirePrice, setTirePrice] = useState<number>(0);
 
   const [serviceFee, setServiceFee] = useState<ServiceFee>(() => ({
@@ -79,9 +78,8 @@ const ManualTireInputDialog = ({
       manufacturer,
       pattern,
       tireSize,
-      numberOfTires,
       tirePrice,
-      priceRate: 1, // 価格レートは1で固定
+      priceRate: 1, // 特化価格タイヤを想定しているため、掛け率は1で固定
     };
 
     setPrintData({
@@ -96,7 +94,6 @@ const ManualTireInputDialog = ({
     setManufacturer("");
     setPattern("");
     setTireSize("");
-    setNumberOfTires(4);
     setTirePrice(0);
     setServiceFee({
       rank: "Z",
@@ -156,8 +153,6 @@ const ManualTireInputDialog = ({
               className="w-min"
             />
           </div>
-          {/* gridでのデザインを整えるために空のdivタグを追加 */}
-          <div></div>
           <div>
             <Label htmlFor="tirePrice">タイヤ価格</Label>
             <Input
@@ -170,17 +165,7 @@ const ManualTireInputDialog = ({
               className="w-min"
             />
           </div>
-          <div>
-            <Label htmlFor="numberOfTires">数量</Label>
-            <Input
-              id="numberOfTires"
-              type="number"
-              min={1}
-              onChange={(e) => setNumberOfTires(Number(e.target.value))}
-              value={numberOfTires}
-              className="w-min"
-            />
-          </div>
+
         </div>
         <Separator />
         <div className="grid grid-cols-2 gap-y-4">

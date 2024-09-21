@@ -11,6 +11,12 @@ export const TAX_RATE = 1.1; // 消費税率。2024年8月時点で10%
 export const DEFAULT_EXPIRY_DATE = 14 * 24 * 60 * 60 * 1000; // 見積もりの有効期限。デフォルトは14日
 export const MAX_EXTRAOPTIONS = 5; // 追加オプションの最大数
 
+export const DEFAULT_TIRE_SEARCH_FILTERS = {
+  target: "",
+  manufacturer: "all",
+  tireSize: "",
+};
+
 // 変数と表示名の対応を配列として宣言
 export const CUSTOMER_TYPE = [
   { value: "individual", label: "個人" },
