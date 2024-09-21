@@ -65,8 +65,19 @@ const PrintHistorySheet = ({ setPrintData }: PrintHistorySheetProps) => {
           履歴を表示
         </Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent side={"left"}>
         <SheetHeader>
+        <div className="items-center flex justify-center space-x-4">
+          <Button onClick={prevPage} disabled={currentPage === 1}>
+              前へ
+            </Button>
+            <span className="md:">
+              ページ {currentPage} / {totalPages}
+            </span>
+            <Button onClick={nextPage} disabled={currentPage === totalPages}>
+              次へ
+            </Button>
+        </div>
           <SheetTitle>履歴を管理</SheetTitle>
         </SheetHeader>
         <SheetDescription asChild>
@@ -75,10 +86,8 @@ const PrintHistorySheet = ({ setPrintData }: PrintHistorySheetProps) => {
               <TableHeader>
                 <TableRow>
                   <TableHead>見積り番号</TableHead>
-                  <TableHead>お客さん</TableHead>
-                  <TableHead className="hidden md:block">
-                    担当スタッフ
-                  </TableHead>
+                  <TableHead>お客様</TableHead>
+                  <TableHead className="hidden md:table-cell">担当</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -97,17 +106,7 @@ const PrintHistorySheet = ({ setPrintData }: PrintHistorySheetProps) => {
             </Table>
           </SheetClose>
         </SheetDescription>
-        <SheetFooter className="items-center">
-          <Button onClick={prevPage} disabled={currentPage === 1}>
-            前へ
-          </Button>
-          <span className="md:">
-            ページ {currentPage} / {totalPages}
-          </span>
-          <Button onClick={nextPage} disabled={currentPage === totalPages}>
-            次へ
-          </Button>
-        </SheetFooter>
+
       </SheetContent>
     </Sheet>
   );

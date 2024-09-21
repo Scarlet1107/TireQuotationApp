@@ -57,5 +57,5 @@ export const DEFAULT_PRINTDATA = <PrintData>{
   extraOptions: [],
 };
 
-// 履歴部分の1ページあたりの表示数。現在はスマホサイズに合わせて8に設定
-export const ITEMS_PER_PAGE = 8;
+// 履歴部分の1ページあたりの表示数。現在はスマホサイズに合わせて6に設定
+export const ITEMS_PER_PAGE = 6;

@@ -62,6 +62,8 @@ import { ja } from "date-fns/locale";
 import ManualTireInputDialog from "./components/ManualTireInputDialog";
 import PrintHistorySheet from "./components/PrintHistorySheet";
 import WheelInputCollapsible from "./components/WheelInputCollapsible";
+import PrintDataSheet from "./components/PrintDataEditor";
+import PrintDataEditor from "./components/PrintDataEditor";
 
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
@@ -808,11 +810,12 @@ const Main = () => {
       </div>
       <div className="flex w-full flex-col space-x-8 space-y-8">
         <div className="mr-8 flex flex-col justify-end space-x-8 md:flex-row">
+          <PrintHistorySheet setPrintData={setPrintData} />
           <ManualTireInputDialog
             printData={printData}
             setPrintData={setPrintData}
           />
-          <PrintHistorySheet setPrintData={setPrintData} />
+          <PrintDataEditor printData={printData} setPrintData={setPrintData} />
           <Button
             className="relative w-max place-self-end font-medium"
             variant={"destructive"}
