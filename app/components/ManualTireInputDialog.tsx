@@ -112,10 +112,6 @@ const ManualTireInputDialog = ({
     });
   };
 
-  useEffect(() => {
-    console.log("🚀 ~ addTireToprintData ~ printData=>", printData);
-  }, [printData]);
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
