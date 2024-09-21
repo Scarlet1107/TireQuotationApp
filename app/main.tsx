@@ -64,6 +64,7 @@ import PrintHistorySheet from "./components/PrintHistorySheet";
 import WheelInputCollapsible from "./components/WheelInputCollapsible";
 import PrintDataSheet from "./components/PrintDataEditor";
 import PrintDataEditor from "./components/PrintDataEditor";
+import ResetButton from "./components/ResetButton";
 
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
@@ -425,24 +426,7 @@ const Main = () => {
     setPrintData({ ...printData, ids, tires, serviceFees, wheels });
   };
 
-  const resetSelect = () => {
-    if (printData.ids.length === 0) return;
-    if (window.confirm("選択したタイヤをリセットしますか？")) {
-      const reset = () => {
-        setPrintData({
-          ...printData,
-          ids: [],
-          serviceFees: [],
-          tires: [],
-          wheels: [],
-        });
-      };
-      reset();
-      toast({
-        title: "リセットしました",
-      });
-    }
-  };
+
 
   // 見積もりナンバーを日時から生成する関数
   const generateQuotationNumber = (): string => {
@@ -816,30 +800,11 @@ const Main = () => {
             setPrintData={setPrintData}
           />
           <PrintDataEditor printData={printData} setPrintData={setPrintData} />
-          <Button
-            className="relative w-max place-self-end font-medium"
-            variant={"destructive"}
-            onClick={() => resetSelect()}
-            id="resetButton"
-          >
-            リセット
-            {printData.ids.length >= 0 ? (
-              <Label
-                htmlFor="resetButton"
-                className={`absolute -right-3 -top-3 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-red-600 text-center font-bold text-black ${
-                  printData.ids.length === 1
-                    ? "bg-white"
-                    : printData.ids.length === 2
-                      ? "bg-orange-100"
-                      : printData.ids.length === 3
-                        ? "bg-red-300"
-                        : "bg-white"
-                }`}
-              >
-                {printData.ids.length}
-              </Label>
-            ) : null}
-          </Button>
+
+
+         <ResetButton setPrintData={setPrintData} printDataLength={printData.ids.length}/>
+
+
           <Button
             className="w-min transform bg-green-500 font-bold transition-all duration-100 hover:scale-95 hover:bg-green-600"
             onClick={() => handlePrintButtonClick()}
