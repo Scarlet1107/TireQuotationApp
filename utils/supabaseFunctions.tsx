@@ -1,3 +1,4 @@
+import { MAX_PRINT_LOG_HISTORY } from "@/config/constants";
 import { supabase } from "../utils/supabase";
 import { PrintData } from "./interface";
 
@@ -71,7 +72,7 @@ export const getPrintDataHistory = async () => {
     .from("print_logs")
     .select("*")
     .order("id", { ascending: false }) // 最新のデータを取得
-    .limit(200); // 履歴の取得最大数
+    .limit(MAX_PRINT_LOG_HISTORY); // 履歴の取得最大数
 
   if (error) {
     console.error("Error fetching print data history from print_logs: ", error);
