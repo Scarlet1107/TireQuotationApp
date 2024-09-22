@@ -39,9 +39,10 @@ import { DEFAULT_WHEEL } from "@/config/constants";
 interface PrintDataSheetProps {
   printData: PrintData;
   setPrintData: (data: PrintData) => void;
+  generateQuotationNumber: () => string;
 }
 
-const PrintDataEditor = ({ printData, setPrintData }: PrintDataSheetProps) => {
+const PrintDataEditor = ({ printData, setPrintData, generateQuotationNumber }: PrintDataSheetProps) => {
   const [wheel, setWheel] = useState<Wheel>(DEFAULT_WHEEL);
 
   const [manufacturer, setManufacturer] = useState<string>("");
@@ -88,6 +89,7 @@ const PrintDataEditor = ({ printData, setPrintData }: PrintDataSheetProps) => {
       tires: newTires,
       serviceFees: newServiceFees,
       wheels: newWheels,
+      quotationNumber: generateQuotationNumber(),
     });
   };
 

@@ -23,6 +23,7 @@ import {
   getAllmanufacturer,
   getServiceFees,
   uploadPrintData,
+  getPrintDataHistory,
 } from "@/utils/supabaseFunctions";
 import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -197,7 +198,6 @@ const Main = () => {
 
   // 計算がわかりにくいのでリファクタリングする
   const handleEstimate = async () => {
-
     if (!tireSearchFilters.tireSize) {
       toast({
         variant: "destructive",
@@ -231,7 +231,10 @@ const Main = () => {
       return;
     }
 
-    const res = await searchTires(tireSearchFilters.tireSize, tireSearchFilters.manufacturer); //データベースからタイヤ情報を検索
+    const res = await searchTires(
+      tireSearchFilters.tireSize,
+      tireSearchFilters.manufacturer,
+    ); //データベースからタイヤ情報を検索
     if (!res.data || (Array.isArray(res.data) && res.data.length === 0)) {
       toast({
         variant: "destructive",
@@ -253,11 +256,10 @@ const Main = () => {
       (option) => option.option !== "",
     );
 
-    // 見積もりナンバーを生成&その他変数をprintDataにセット
+    // その他変数をprintDataにセット
     setPrintData({
       ...printData,
       extraOptions: filteredExtraOptions,
-      quotationNumber: generateQuotationNumber(),
     });
 
     // その他のオプションの合計金額を計算
@@ -412,7 +414,14 @@ const Main = () => {
       }
     }
 
-    setPrintData({ ...printData, ids, tires, serviceFees, wheels });
+    setPrintData({
+      ...printData,
+      ids,
+      tires,
+      serviceFees,
+      wheels,
+      quotationNumber: generateQuotationNumber(), // 見積もりナンバーを更新
+    });
   };
 
   // 見積もりナンバーを日時から生成する関数
@@ -452,16 +461,16 @@ const Main = () => {
       });
       return;
     }
-    if (componentRef.current) {
-      handlePrint();
-
-      // 履歴をSupabaseのprint_logsにアップロード
+    // すでに同じ見積もりを複数回保存しないようにする
+    const printDataHistory = await getPrintDataHistory();
+    if (printDataHistory[0].quotationNumber !== printData.quotationNumber) {
       try {
         await uploadPrintData(printData);
       } catch (error) {
         console.error("Failed to save print data to print_logs:", error);
       }
     }
+    if (componentRef.current) handlePrint();
   };
 
   return (
@@ -790,8 +799,13 @@ const Main = () => {
           <ManualTireInputDialog
             printData={printData}
             setPrintData={setPrintData}
+            generateQuotationNumber={generateQuotationNumber}
           />
-          <PrintDataEditor printData={printData} setPrintData={setPrintData} />
+          <PrintDataEditor
+            printData={printData}
+            setPrintData={setPrintData}
+            generateQuotationNumber={generateQuotationNumber}
+          />
 
           <ResetButton
             setPrintData={setPrintData}

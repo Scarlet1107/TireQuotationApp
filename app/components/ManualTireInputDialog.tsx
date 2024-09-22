@@ -19,11 +19,13 @@ import { useToast } from "@/components/ui/use-toast";
 interface ManualTireInputDialogProps {
   printData: PrintData;
   setPrintData: (printData: PrintData) => void;
+  generateQuotationNumber: () => string;
 }
 
 const ManualTireInputDialog = ({
   printData,
   setPrintData,
+  generateQuotationNumber,
 }: ManualTireInputDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [wheel, setWheel] = useState<Wheel>(DEFAULT_WHEEL);
@@ -88,6 +90,7 @@ const ManualTireInputDialog = ({
       tires: [...printData.tires, newTire],
       serviceFees: [...printData.serviceFees, serviceFee],
       wheels: [...printData.wheels, wheel],
+      quotationNumber: generateQuotationNumber()
     });
 
     setIsConfirmed(false);
