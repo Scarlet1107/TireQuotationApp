@@ -466,9 +466,15 @@ const Main = () => {
     if (printDataHistory[0].quotationNumber !== printData.quotationNumber) {
       try {
         await uploadPrintData(printData);
+        
       } catch (error) {
         console.error("Failed to save print data to print_logs:", error);
       }
+    }
+    else{
+      toast({
+        title: "すでに同じ見積もりが保存されていたため、履歴を保存しませんでした",
+      });
     }
     if (componentRef.current) handlePrint();
   };

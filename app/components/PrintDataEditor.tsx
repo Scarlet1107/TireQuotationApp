@@ -4,10 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -27,7 +25,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -42,7 +39,11 @@ interface PrintDataSheetProps {
   generateQuotationNumber: () => string;
 }
 
-const PrintDataEditor = ({ printData, setPrintData, generateQuotationNumber }: PrintDataSheetProps) => {
+const PrintDataEditor = ({
+  printData,
+  setPrintData,
+  generateQuotationNumber,
+}: PrintDataSheetProps) => {
   const [wheel, setWheel] = useState<Wheel>(DEFAULT_WHEEL);
 
   const [manufacturer, setManufacturer] = useState<string>("");
@@ -51,7 +52,7 @@ const PrintDataEditor = ({ printData, setPrintData, generateQuotationNumber }: P
   const [tirePrice, setTirePrice] = useState<number>(0);
 
   const [serviceFee, setServiceFee] = useState<ServiceFee>(() => ({
-    rank: "Z",
+    rank: "Z", //手打ち入力されたタイヤのランクはZ
     laborFee: 0,
     removalFee: 0,
     tireStorageFee: 0,
@@ -93,6 +94,22 @@ const PrintDataEditor = ({ printData, setPrintData, generateQuotationNumber }: P
     });
   };
 
+  const deletePrintData = (index: number, e: React.MouseEvent) => {
+    e.stopPropagation(); // ダイアログが表示されるのを防ぐ
+    const newTires = printData.tires.filter((_, i) => i !== index);
+    const newServiceFees = printData.serviceFees.filter((_, i) => i !== index);
+    const newWheels = printData.wheels.filter((_, i) => i !== index);
+    const newIds = printData.ids.filter((_, i) => i !== index);
+    setPrintData({
+      ...printData,
+      tires: newTires,
+      serviceFees: newServiceFees,
+      wheels: newWheels,
+      ids: newIds,
+      quotationNumber: generateQuotationNumber(),
+    });
+  };
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -108,33 +125,18 @@ const PrintDataEditor = ({ printData, setPrintData, generateQuotationNumber }: P
         <div className="mt-4 flex flex-col space-y-6">
           {printData.tires.map((tire, index) => (
             <AlertDialog key={index}>
-              <AlertDialogTrigger onClick={() => setEditData(index)}>
+              <AlertDialogTrigger onClick={() => setEditData(index)} asChild>
                 <Card className="cursor-pointer hover:bg-gray-100">
-                  <CardHeader>
+                  <CardHeader className="relative">
                     {/* ここに削除ボタンを実装したい。現在の実装だとidsの削除が行われておらず、複数のカードが表示されているときに削除ボタンを押すとダイアログが表示されてしまうなどの不具合がある。 */}
-                    {/* <Button
+                    {/* また手打ち入力したタイヤはidがすべて0であるため、削除のロジックに注意。idで消すと複数一気に消える可能性あり。 */}
+                    <Button
                       variant="destructive"
-                      className="ml-auto"
-                      onClick={() => {
-                        const newTires = printData.tires.filter(
-                          (_, i) => i !== index,
-                        );
-                        const newServiceFees = printData.serviceFees.filter(
-                          (_, i) => i !== index,
-                        );
-                        const newWheels = printData.wheels.filter(
-                          (_, i) => i !== index,
-                        );
-                        setPrintData({
-                          ...printData,
-                          tires: newTires,
-                          serviceFees: newServiceFees,
-                          wheels: newWheels,
-                        });
-                      }}
+                      className="ml-auto absolute top-2 right-2"
+                      onClick={(e) => deletePrintData(index, e)}
                     >
                       削除
-                    </Button> */}
+                    </Button>
                     <CardTitle className="text-left">
                       メーカー: {tire.manufacturer}
                     </CardTitle>
