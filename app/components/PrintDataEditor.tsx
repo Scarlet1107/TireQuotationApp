@@ -96,6 +96,13 @@ const PrintDataEditor = ({
 
   const deletePrintData = (index: number, e: React.MouseEvent) => {
     e.stopPropagation(); // ダイアログが表示されるのを防ぐ
+
+    if (printData.ids[index] === 0) {
+      if (!window.confirm("本当に削除しますか？")) {
+        return;
+      }
+    }
+
     const newTires = printData.tires.filter((_, i) => i !== index);
     const newServiceFees = printData.serviceFees.filter((_, i) => i !== index);
     const newWheels = printData.wheels.filter((_, i) => i !== index);
@@ -132,7 +139,7 @@ const PrintDataEditor = ({
                     {/* また手打ち入力したタイヤはidがすべて0であるため、削除のロジックに注意。idで消すと複数一気に消える可能性あり。 */}
                     <Button
                       variant="destructive"
-                      className="ml-auto absolute top-2 right-2"
+                      className="absolute right-2 top-2 ml-auto"
                       onClick={(e) => deletePrintData(index, e)}
                     >
                       削除
