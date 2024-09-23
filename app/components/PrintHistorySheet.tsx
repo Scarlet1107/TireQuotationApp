@@ -61,14 +61,16 @@ const PrintHistorySheet = ({ setPrintData }: PrintHistorySheetProps) => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button className="w-min transform bg-blue-500 hover:bg-blue-600">
+        <Button
+          className="w-min transform bg-blue-500 text-white hover:bg-blue-600"
+        >
           履歴を表示
         </Button>
       </SheetTrigger>
       <SheetContent side={"left"}>
         <SheetHeader>
-        <div className="items-center flex justify-center space-x-4">
-          <Button onClick={prevPage} disabled={currentPage === 1}>
+          <div className="flex items-center justify-center space-x-4">
+            <Button onClick={prevPage} disabled={currentPage === 1}>
               前へ
             </Button>
             <span className="md:">
@@ -77,7 +79,7 @@ const PrintHistorySheet = ({ setPrintData }: PrintHistorySheetProps) => {
             <Button onClick={nextPage} disabled={currentPage === totalPages}>
               次へ
             </Button>
-        </div>
+          </div>
           <SheetTitle>履歴を管理</SheetTitle>
         </SheetHeader>
         <SheetDescription asChild>
@@ -106,7 +108,6 @@ const PrintHistorySheet = ({ setPrintData }: PrintHistorySheetProps) => {
             </Table>
           </SheetClose>
         </SheetDescription>
-
       </SheetContent>
     </Sheet>
   );

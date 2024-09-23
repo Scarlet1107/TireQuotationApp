@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { v4 as uuidv4 } from "uuid";
 import { MAX_EXTRAOPTIONS } from "@/config/constants";
+import PrintHistorySheet from "./PrintHistorySheet";
 
 interface GlobalQuotationInputsProps {
   printData: PrintData;
@@ -69,9 +70,9 @@ const GlobalQuotationInputs = ({
 
   return (
     <div className="flex w-max flex-col space-y-8">
-      <Label>
-        有効期限
-        <div className="mt-2">
+      <div className="flex flex-col sm:flex-row w-max space-y-4 sm:space-y-0 sm:space-x-8">
+        <div className="flex flex-col">
+          <Label className="mb-2">有効期限</Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -103,10 +104,12 @@ const GlobalQuotationInputs = ({
             </PopoverContent>
           </Popover>
         </div>
-      </Label>
-
-      <div className="flex flex-col space-y-8 md:flex-row md:space-y-4 md:space-x-8">
-        <div className="grid w-max h-max grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="place-self-start sm:place-self-end">
+          <PrintHistorySheet setPrintData={setPrintData} />
+        </div>
+      </div>
+      <div className="flex flex-col space-y-8 md:flex-row md:space-x-8 md:space-y-4">
+        <div className="grid h-max w-max grid-cols-1 gap-4 sm:grid-cols-2">
           <Label>
             担当者
             <div className="mt-2 flex space-x-2">
@@ -284,70 +287,64 @@ const GlobalQuotationInputs = ({
           </div>
         </div>
       </div>
-          <div>
-            <Label className="mr-2 text-lg">その他のオプション</Label>
-            <Button className="text-xl" onClick={addExtraOption}>
-              +
-            </Button>
-            <div className="mt-4">
-              {printData.extraOptions.map((extraOption, index) => (
-                <div key={extraOption.id}>
-                  <div className="mt-6 flex w-max flex-col space-y-2 md:flex-row md:space-x-4 md:space-y-0">
-                    <div>
-                      <Label>
-                        項目<span className="font-bold">{index + 1}</span>
-                      </Label>
-                      <Input
-                        name="option"
-                        type="text"
-                        onChange={handleExtraOptionChange(
-                          extraOption.id,
-                          "option",
-                        )}
-                        value={extraOption.option}
-                        placeholder="オプション名"
-                      />
-                    </div>
-                    <div>
-                      <Label>金額</Label>
-                      <Input
-                        name="price"
-                        type="number"
-                        step={100}
-                        onChange={handleExtraOptionChange(
-                          extraOption.id,
-                          "price",
-                        )}
-                        value={extraOption.price}
-                        placeholder="金額"
-                      />
-                    </div>
-                    <div>
-                      <Label>数量</Label>
-                      <Input
-                        name="quantity"
-                        type="number"
-                        min={1}
-                        onChange={handleExtraOptionChange(
-                          extraOption.id,
-                          "quantity",
-                        )}
-                        value={extraOption.quantity}
-                        placeholder="数量"
-                      />
-                    </div>
-                    <Button
-                      className="w-min place-self-end"
-                      variant={"destructive"}
-                      onClick={() => deleteExtraOption(extraOption.id)}
-                    >
-                      消
-                    </Button>
-                  </div>
+      <div>
+        <Label className="mr-2 text-lg">その他のオプション</Label>
+        <Button className="text-xl" onClick={addExtraOption}>
+          +
+        </Button>
+        <div className="mt-4">
+          {printData.extraOptions.map((extraOption, index) => (
+            <div key={extraOption.id}>
+              <div className="mt-6 flex w-max flex-col space-y-2 md:flex-row md:space-x-4 md:space-y-0">
+                <div>
+                  <Label>
+                    項目<span className="font-bold">{index + 1}</span>
+                  </Label>
+                  <Input
+                    name="option"
+                    type="text"
+                    onChange={handleExtraOptionChange(extraOption.id, "option")}
+                    value={extraOption.option}
+                    placeholder="オプション名"
+                  />
                 </div>
-              ))}
+                <div>
+                  <Label>金額</Label>
+                  <Input
+                    name="price"
+                    type="number"
+                    step={100}
+                    onChange={handleExtraOptionChange(extraOption.id, "price")}
+                    value={extraOption.price}
+                    placeholder="金額"
+                  />
+                </div>
+                <div>
+                  <Label>数量</Label>
+                  <Input
+                    name="quantity"
+                    type="number"
+                    min={1}
+                    onChange={handleExtraOptionChange(
+                      extraOption.id,
+                      "quantity",
+                    )}
+                    value={extraOption.quantity}
+                    placeholder="数量"
+                  />
+                </div>
+                <Button
+                  className="w-min place-self-end"
+                  variant={"destructive"}
+                  onClick={() => deleteExtraOption(extraOption.id)}
+                >
+                  消
+                </Button>
+              </div>
             </div>
-          </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

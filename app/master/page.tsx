@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import Header from "@/components/Header";
+import Header from "@/app/components/Header";
 import { deleteAllData } from "@/utils/supabaseFunctions";
 import ManualComponent from "./mannual";
 import { useToast } from "@/components/ui/use-toast";

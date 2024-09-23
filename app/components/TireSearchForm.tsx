@@ -340,7 +340,7 @@ const TireSearchForm = ({
         className="w-min transform bg-green-500 hover:bg-green-600"
         onClick={handleEstimate}
       >
-        この内容で見積り！
+        この内容で検索
       </Button>
     </div>
   );

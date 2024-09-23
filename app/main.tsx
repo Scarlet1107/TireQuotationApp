@@ -187,7 +187,7 @@ const Main = () => {
   };
 
   return (
-    <div className="ml-8 mt-8 flex w-full flex-col md:flex-row">
+    <div className="ml-12 mt-8 flex w-full flex-col md:flex-row">
       <div>
         <GlobalQuotationInputs
           printData={printData}
@@ -201,7 +201,6 @@ const Main = () => {
       </div>
       <div className="flex w-full flex-col space-x-8 space-y-8">
         <div className="mr-8 flex flex-col justify-end space-x-8 md:flex-row">
-          <PrintHistorySheet setPrintData={setPrintData} />
           <ManualTireInputDialog
             printData={printData}
             setPrintData={setPrintData}
