@@ -26,7 +26,6 @@ import {
   getPrintDataHistory,
 } from "@/utils/supabaseFunctions";
 import React, { useEffect, useRef, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -51,22 +50,14 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { useReactToPrint } from "react-to-print";
 import PrintContent from "./printContent";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
-import { ja } from "date-fns/locale";
+
 import ManualTireInputDialog from "./components/ManualTireInputDialog";
 import PrintHistorySheet from "./components/PrintHistorySheet";
 import WheelInputCollapsible from "./components/WheelInputCollapsible";
 import PrintDataSheet from "./components/PrintDataEditor";
 import PrintDataEditor from "./components/PrintDataEditor";
 import ResetButton from "./components/ResetButton";
+import GlobalQuotationInputs from "./components/GlobalQuotationInputs";
 
 const Main = () => {
   const [priceRates, setPriceRates] = useState<any[]>([]);
@@ -345,35 +336,9 @@ const Main = () => {
     return total;
   };
 
-  const addExtraOption = () => {
-    if (printData.extraOptions.length >= MAX_EXTRAOPTIONS) return;
-    setPrintData((prevData) => ({
-      ...prevData,
-      extraOptions: [
-        ...printData.extraOptions,
-        { id: uuidv4(), option: "", price: 100, quantity: 4 },
-      ],
-    }));
-  };
 
-  const deleteExtraOption = (id: string) => {
-    setPrintData((prevData) => ({
-      ...prevData,
-      extraOptions: prevData.extraOptions.filter((option) => option.id !== id),
-    }));
-  };
 
-  const handleExtraOptionChange =
-    (id: string, field: keyof ExtraOption) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = e.target.value;
-      setPrintData((prevData) => ({
-        ...prevData,
-        extraOptions: prevData.extraOptions.map((option) =>
-          option.id === id ? { ...option, [field]: newValue } : option,
-        ),
-      }));
-    };
+
 
   const toggleQuotationDataById = (id: number) => {
     const ids = [...printData.ids];
@@ -461,112 +426,40 @@ const Main = () => {
       });
       return;
     }
+
+    // 空のオプションを取り除く
+    const filteredExtraOptions = printData.extraOptions.filter(
+      (option) => option.option !== null && option.option !== "",
+    );
+    setPrintData((prevData) => ({
+      ...prevData,
+      extraOptions: filteredExtraOptions,
+    }));
+
     // すでに同じ見積もりを複数回保存しないようにする
     const printDataHistory = await getPrintDataHistory();
     if (printDataHistory[0].quotationNumber !== printData.quotationNumber) {
       try {
         await uploadPrintData(printData);
-        
       } catch (error) {
         console.error("Failed to save print data to print_logs:", error);
       }
-    }
-    else{
+    } else {
       toast({
-        title: "すでに同じ見積もりが保存されていたため、履歴を保存しませんでした",
+        title:
+          "すでに同じ見積もりが保存されていたため、履歴を保存しませんでした",
       });
     }
     if (componentRef.current) handlePrint();
   };
 
   return (
-    <div className="mt-8 flex w-full flex-col md:flex-row">
-      <div className="ml-12 flex w-max flex-col space-y-8">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              className={cn(
-                "w-[280px] justify-start text-left font-normal",
-                !printData.expiryDate && "text-muted-foreground",
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {printData.expiryDate ? (
-                format(printData.expiryDate, "PPP", { locale: ja }) // 日本語ロケールを指定
-              ) : (
-                <span>有効期限を選択</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              selected={printData.expiryDate}
-              onSelect={(date) => {
-                if (date) {
-                  setPrintData({ ...printData, expiryDate: date });
-                }
-              }}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-        <Label>
-          担当者
-          <div className="mt-2 flex space-x-2">
-            <Input
-              type="string"
-              className="w-min"
-              value={printData.staffName}
-              onChange={(e) =>
-                setPrintData({
-                  ...printData,
-                  staffName: e.target.value,
-                })
-              }
-            />
-          </div>
-        </Label>
-
-        <div className="flex justify-around">
-          <div className="flex">
-            <Label>
-              お客様名
-              <div className="mt-2 flex space-x-2">
-                <Input
-                  placeholder="タケウチ パーツ"
-                  type="string"
-                  className="w-min"
-                  value={printData.customerName}
-                  onChange={(e) =>
-                    setPrintData({
-                      ...printData,
-                      customerName: e.target.value,
-                    })
-                  }
-                />
-                <span className="place-content-center text-xl">様</span>
-              </div>
-            </Label>
-          </div>
-          <div className="flex">
-            <Label>
-              車種
-              <div className="mt-2 flex space-x-2">
-                <Input
-                  type="string"
-                  className="w-min"
-                  value={printData.carModel}
-                  onChange={(e) =>
-                    setPrintData({ ...printData, carModel: e.target.value })
-                  }
-                />
-              </div>
-            </Label>
-          </div>
-        </div>
-
+    <div className="mt-8 ml-8 flex w-full flex-col md:flex-row">
+      <div>
+        <GlobalQuotationInputs
+          printData={printData}
+          setPrintData={setPrintData}
+        />
         <div className="flex flex-col space-y-3 xl:flex-row xl:space-x-4 xl:space-y-0">
           <Select onValueChange={(value) => handleCustomerTypeChange(value)}>
             <SelectTrigger className="w-[180px]">
@@ -608,189 +501,8 @@ const Main = () => {
             </SelectContent>
           </Select>
         </div>
-
-        <div className="flex flex-col space-y-4 md:space-x-8 xl:flex-row">
-          <div className="space-x-4">
-            <Label htmlFor="number">本数</Label>
-            <Input
-              id="number"
-              type="number"
-              min={1}
-              onChange={(e) =>
-                setPrintData({
-                  ...printData,
-                  numberOfTires: Number(e.target.value),
-                })
-              }
-              value={printData.numberOfTires}
-              className="w-min"
-            />
-          </div>
-          <div className="flex flex-col space-y-4">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="laborFee"
-                checked={printData.checkBoxState.laborFee}
-                onCheckedChange={handleCheckboxChange("laborFee")}
-              />
-              <Label className="pr-4 text-sm font-medium" htmlFor="laborFee">
-                作業工賃
-              </Label>
-              <Input
-                className="h-8 w-20"
-                value={printData.discountRate.laborFee}
-                type="number"
-                min={0}
-                max={100}
-                step={50}
-                onChange={(e) =>
-                  setPrintData({
-                    ...printData,
-                    discountRate: {
-                      ...printData.discountRate,
-                      laborFee: Number(e.target.value),
-                    },
-                  })
-                }
-              />
-              <span>%割引</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="removalFee"
-                checked={printData.checkBoxState.removalFee}
-                onCheckedChange={handleCheckboxChange("removalFee")}
-              />
-              <Label className="pr-4 text-sm font-medium" htmlFor="removalFee">
-                脱着料
-              </Label>
-              <Input
-                className="h-8 w-20"
-                value={printData.discountRate.removalFee}
-                type="number"
-                min={0}
-                max={100}
-                step={50}
-                onChange={(e) =>
-                  setPrintData({
-                    ...printData,
-                    discountRate: {
-                      ...printData.discountRate,
-                      removalFee: Number(e.target.value),
-                    },
-                  })
-                }
-              />
-              <span>%割引</span>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="tireStorageFee"
-                checked={printData.checkBoxState.tireStorageFee}
-                onCheckedChange={handleCheckboxChange("tireStorageFee")}
-              />
-              <Label className="text-sm font-medium" htmlFor="tireStorageFee">
-                タイヤ預かり料
-              </Label>
-              <Input
-                className="h-8 w-20"
-                value={printData.discountRate.tireStorageFee}
-                type="number"
-                min={0}
-                max={100}
-                step={50}
-                onChange={(e) =>
-                  setPrintData({
-                    ...printData,
-                    discountRate: {
-                      ...printData.discountRate,
-                      tireStorageFee: Number(e.target.value),
-                    },
-                  })
-                }
-              />
-              <span>%割引</span>
-            </div>
-
-            <div className="items-top flex space-x-2">
-              <Checkbox
-                id="tireDisposalFee"
-                checked={printData.checkBoxState.tireDisposalFee}
-                onCheckedChange={handleCheckboxChange("tireDisposalFee")}
-              />
-              <Label className="text-sm font-medium" htmlFor="tireDisposalFee">
-                廃タイヤ処分
-              </Label>
-            </div>
-          </div>
-        </div>
         <WheelInputCollapsible wheel={wheel} setWheel={setWheel} />
-        <div>
-          <Label className="mr-2 text-lg">その他のオプション</Label>
-          <Button className="text-xl" onClick={addExtraOption}>
-            +
-          </Button>
-          <div className="mt-4">
-            {printData.extraOptions.map((extraOption, index) => (
-              <div key={extraOption.id}>
-                <div className="mt-6 flex flex-col space-y-2 lg:flex-row lg:space-x-4 lg:space-y-0">
-                  <div>
-                    <Label>
-                      項目<span className="font-bold">{index + 1}</span>
-                    </Label>
-                    <Input
-                      name="option"
-                      type="text"
-                      onChange={handleExtraOptionChange(
-                        extraOption.id,
-                        "option",
-                      )}
-                      value={extraOption.option}
-                      placeholder="オプション名"
-                    />
-                  </div>
-                  <div>
-                    <Label>金額</Label>
-                    <Input
-                      name="price"
-                      type="number"
-                      step={100}
-                      onChange={handleExtraOptionChange(
-                        extraOption.id,
-                        "price",
-                      )}
-                      value={extraOption.price}
-                      placeholder="金額"
-                    />
-                  </div>
-                  <div>
-                    <Label>数量</Label>
-                    <Input
-                      name="quantity"
-                      type="number"
-                      min={1}
-                      onChange={handleExtraOptionChange(
-                        extraOption.id,
-                        "quantity",
-                      )}
-                      value={extraOption.quantity}
-                      placeholder="数量"
-                    />
-                  </div>
-
-                  <Button
-                    className="w-min place-self-end"
-                    variant={"destructive"}
-                    onClick={() => deleteExtraOption(extraOption.id)}
-                  >
-                    消
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        
 
         <Button
           className="w-min transform bg-green-500 hover:bg-green-600"
