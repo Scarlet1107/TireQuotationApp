@@ -29,13 +29,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -58,287 +52,26 @@ import PrintDataSheet from "./components/PrintDataEditor";
 import PrintDataEditor from "./components/PrintDataEditor";
 import ResetButton from "./components/ResetButton";
 import GlobalQuotationInputs from "./components/GlobalQuotationInputs";
+import TireSearchForm from "./components/TireSearchForm";
 
 const Main = () => {
-  const [priceRates, setPriceRates] = useState<any[]>([]);
-  const [tireSizes, setTireSizes] = useState<string[]>([]);
-  const [manufacturer, setmanufacturer] = useState<string[]>([]);
-  const [serviceFees, setServiceFees] = useState<ServiceFee[]>([]);
-  const [wheel, setWheel] = useState<Wheel>(DEFAULT_WHEEL);
   const { toast } = useToast();
-  const [tireSearchFilters, setTireSearchFilters] = useState<SelectData>(
-    DEFAULT_TIRE_SEARCH_FILTERS,
-  );
+
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [printData, setPrintData] = useState<PrintData>(DEFAULT_PRINTDATA);
-  const [totalExtraOptionPrice, setTotalExtraOptionPrice] = useState(0);
-
-  const fetchPriceRates = async () => {
-    const rates = await getCustomerTypePriceRates();
-    setPriceRates(rates.data as any[]);
-  };
-  const fetchTireSizes = async () => {
-    const sizes = await getAllTireSizes();
-    if (sizes.data) {
-      const uniqueSizes = Array.from(
-        new Set(sizes.data.map((item) => item.size)),
-      );
-      setTireSizes(uniqueSizes);
-    }
-  };
-
-  const fetchAllmanufacturer = async () => {
-    const names = await getAllmanufacturer();
-    if (names.data) {
-      const uniquemanufacturer = Array.from(
-        new Set(names.data.map((item) => item.manufacturer)),
-      );
-      setmanufacturer(uniquemanufacturer);
-    }
-  };
-
-  const fetchServiceFees = async () => {
-    const res = await getServiceFees();
-    setServiceFees(res as ServiceFee[]);
-  };
-
-  useEffect(() => {
-    fetchPriceRates();
-    fetchTireSizes();
-    fetchAllmanufacturer();
-    fetchServiceFees();
-  }, []);
-
-  const handleCheckboxChange =
-    (key: keyof CheckboxState) => (checked: boolean) => {
-      setPrintData((prev) => ({
-        ...prev,
-        checkBoxState: {
-          ...prev.checkBoxState,
-          [key]: checked,
-        },
-      }));
-    };
-
-  const handleCustomerTypeChange = (value: string) => {
-    setTireSearchFilters((prev) => ({ ...prev, target: value }));
-  };
-
-  const handleTireSizeChange = (size: string) => {
-    setTireSearchFilters((prev) => ({ ...prev, tireSize: size }));
-  };
-
-  const handleManufacturerChange = (manufacturer: string) => {
-    setTireSearchFilters((prev) => ({ ...prev, manufacturer: manufacturer }));
-  };
 
   const componentRef = useRef(null);
 
-  // ここ冗長な書き方になってるので後々リファクタリングする
-  // 名前がひどい
-  const calculateLaborCost = (rank: string) => {
-    let totalCost = {
-      laborFee: 0,
-      removalFee: 0,
-      tireStorageFee: 0,
-      tireDisposalFee: 0,
-      total: 0,
-    };
-
-    serviceFees.find((fee) => {
-      if (fee.rank === rank) {
-        if (printData.checkBoxState.laborFee) totalCost.laborFee = fee.laborFee;
-        if (printData.checkBoxState.removalFee)
-          totalCost.removalFee = fee.removalFee;
-        if (printData.checkBoxState.tireStorageFee)
-          totalCost.tireStorageFee = fee.tireStorageFee;
-        if (printData.checkBoxState.tireDisposalFee)
-          totalCost.tireDisposalFee = fee.tireDisposalFee;
-        totalCost.total =
-          totalCost.laborFee +
-          totalCost.removalFee +
-          totalCost.tireStorageFee +
-          totalCost.tireDisposalFee;
-        return true;
-      }
-      return false;
-    });
-
-    return totalCost;
+  const calculateExtraOptionsTotal = () => {
+    return printData.extraOptions.reduce(
+      (total, option) => total + option.price * option.quantity,
+      0,
+    );
   };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ja-JP").format(Math.floor(price));
   };
-
-  // タイヤのパターンとお客さんのターゲットによって価格を検索する。割合で返す
-  const searchMarkupRate = (pattern: string, target: string): number => {
-    const rate = priceRates.find((item) => {
-      return pattern === item.pattern;
-    });
-
-    if (!rate) {
-      toast({
-        variant: "destructive",
-        title:
-          "該当するパターンが見つかりません。テーブルデータが間違って入力されている可能性があります。",
-      });
-    }
-    return rate[target] / 100;
-  };
-
-  // 計算がわかりにくいのでリファクタリングする
-  const handleEstimate = async () => {
-    if (!tireSearchFilters.tireSize) {
-      toast({
-        variant: "destructive",
-        title: "タイヤサイズが選択されていません。",
-      });
-      return;
-    }
-
-    // ここがうまく動いてるかチェック
-    if (tireSearchFilters.target === "") {
-      toast({
-        variant: "destructive",
-        title: "お客さんが選択されていません。",
-      });
-      return;
-    }
-
-    if (printData.numberOfTires === 0) {
-      toast({
-        variant: "destructive",
-        title: "タイヤの数量が選択されていません。",
-      });
-      return;
-    }
-
-    if (wheel.isIncluded && (wheel.name === "" || wheel.size === "")) {
-      toast({
-        variant: "destructive",
-        title: "ホイールの名前とサイズを入力してください。",
-      });
-      return;
-    }
-
-    const res = await searchTires(
-      tireSearchFilters.tireSize,
-      tireSearchFilters.manufacturer,
-    ); //データベースからタイヤ情報を検索
-    if (!res.data || (Array.isArray(res.data) && res.data.length === 0)) {
-      toast({
-        variant: "destructive",
-        title: "タイヤ情報が見つかりませんでした。",
-      });
-      return;
-    }
-
-    if (tireSearchFilters.manufacturer === "all") {
-      toast({
-        title: "すべてのメーカーで検索しました",
-      });
-    }
-
-    console.log(res.data);
-
-    // ここで空のオプションを取り除く
-    const filteredExtraOptions = printData.extraOptions.filter(
-      (option) => option.option !== "",
-    );
-
-    // その他変数をprintDataにセット
-    setPrintData({
-      ...printData,
-      extraOptions: filteredExtraOptions,
-    });
-
-    // その他のオプションの合計金額を計算
-    setTotalExtraOptionPrice(
-      filteredExtraOptions.reduce(
-        (total, option) => total + option.price * option.quantity,
-        0,
-      ),
-    );
-
-    const newResults = res.data.map((tire: any) => {
-      const tirePrice = tire.price;
-      const serviceFee = calculateLaborCost(tire.laborCostRank);
-      const totalServiceFee = calculateTotalServiceFee(serviceFee);
-      // ここでお客さんのターゲットによって価格を変える
-      const priceRate: number = searchMarkupRate(
-        tire.pattern,
-        tireSearchFilters.target,
-      );
-      const sellingPrice = Math.ceil((tirePrice * Number(priceRate)) / 10) * 10;
-      const profit = Math.ceil(
-        (sellingPrice - tirePrice * searchMarkupRate(tire.pattern, "cost")) *
-          printData.numberOfTires,
-      );
-      const wheelPrice = wheel.isIncluded ? wheel.price * wheel.quantity : 0;
-
-      const totalPrice = Math.floor(
-        sellingPrice * printData.numberOfTires +
-          totalServiceFee +
-          wheelPrice +
-          filteredExtraOptions.reduce(
-            (acc, option) => acc + option.price * option.quantity,
-            0,
-          ),
-      );
-
-      const totalPriceWithTax = Math.floor(totalPrice * TAX_RATE);
-
-      return {
-        id: tire.id,
-        manufacturer: tire.manufacturer,
-        pattern: tire.pattern,
-        tireSize: tireSearchFilters.tireSize,
-        tirePrice: tirePrice,
-        numberOfTires: printData.numberOfTires,
-        priceRate: priceRate,
-        profit: profit,
-        wheel: wheel,
-        serviceFee: {
-          rank: tire.laborCostRank,
-          laborFee: serviceFee.laborFee,
-          removalFee: serviceFee.removalFee,
-          tireStorageFee: serviceFee.tireStorageFee,
-          tireDisposalFee: serviceFee.tireDisposalFee,
-        },
-        totalPrice: totalPrice,
-        totalPriceWithTax: totalPriceWithTax,
-        extraOptions: filteredExtraOptions,
-        discountRate: printData.discountRate,
-      };
-    });
-    console.log(newResults);
-    // ここでSearchResult型に入れるのでインターフェイスと同じ形にする
-    setSearchResults(newResults);
-  };
-
-  const calculateTotalServiceFee = (serviceFee: any) => {
-    let total = 0;
-    if (printData.checkBoxState.laborFee)
-      total +=
-        (serviceFee.laborFee * (100 - printData.discountRate.laborFee)) / 100;
-    if (printData.checkBoxState.removalFee)
-      total +=
-        (serviceFee.removalFee * (100 - printData.discountRate.removalFee)) /
-        100;
-    if (printData.checkBoxState.tireStorageFee)
-      total +=
-        (serviceFee.tireStorageFee *
-          (100 - printData.discountRate.tireStorageFee)) /
-        100;
-    if (printData.checkBoxState.tireDisposalFee)
-      total += serviceFee.tireDisposalFee;
-    return total;
-  };
-
-
-
-
 
   const toggleQuotationDataById = (id: number) => {
     const ids = [...printData.ids];
@@ -454,62 +187,17 @@ const Main = () => {
   };
 
   return (
-    <div className="mt-8 ml-8 flex w-full flex-col md:flex-row">
+    <div className="ml-8 mt-8 flex w-full flex-col md:flex-row">
       <div>
         <GlobalQuotationInputs
           printData={printData}
           setPrintData={setPrintData}
         />
-        <div className="flex flex-col space-y-3 xl:flex-row xl:space-x-4 xl:space-y-0">
-          <Select onValueChange={(value) => handleCustomerTypeChange(value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="お客さんを選択" />
-            </SelectTrigger>
-            <SelectContent>
-              {CUSTOMER_TYPE.map((type, index) => (
-                <SelectItem key={index} value={type.value}>
-                  {type.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select onValueChange={(Value) => handleTireSizeChange(Value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="タイヤサイズを選択" />
-            </SelectTrigger>
-            <SelectContent>
-              {tireSizes.map((size) => (
-                <SelectItem key={size} value={size}>
-                  {size}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select onValueChange={(Value) => handleManufacturerChange(Value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="メーカーを選択" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem key="All" value="all">
-                すべて
-              </SelectItem>
-              {manufacturer.map((name, index) => (
-                <SelectItem key={index} value={name}>
-                  {name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <WheelInputCollapsible wheel={wheel} setWheel={setWheel} />
-        
-
-        <Button
-          className="w-min transform bg-green-500 hover:bg-green-600"
-          onClick={handleEstimate}
-        >
-          この内容で見積り！
-        </Button>
+        <TireSearchForm
+          printData={printData}
+          setPrintData={setPrintData}
+          setSearchResults={setSearchResults}
+        />
       </div>
       <div className="flex w-full flex-col space-x-8 space-y-8">
         <div className="mr-8 flex flex-col justify-end space-x-8 md:flex-row">
@@ -538,6 +226,7 @@ const Main = () => {
           </Button>
           <div></div>
         </div>
+        {/* 検索結果の表示 */}
         <p className="mt-8 flex justify-center text-3xl font-bold md:mt-0">
           見積り結果
         </p>
@@ -596,10 +285,10 @@ const Main = () => {
                       ""
                     )}{" "}
                   </p>
-                  {totalExtraOptionPrice !== 0 ? (
+                  {calculateExtraOptionsTotal() !== 0 ? (
                     <p>
                       その他のオプション合計:{" "}
-                      {formatPrice(totalExtraOptionPrice)}円
+                      {formatPrice(calculateExtraOptionsTotal())}円
                     </p>
                   ) : null}
                 </CardContent>
