@@ -85,9 +85,11 @@ const TireSearchResultCards = ({
 
   return (
     <div>
-      <p className="mt-8 flex justify-center p-2 text-2xl font-bold md:mt-0">
-        検索結果
-      </p>
+      {searchResults.length > 0 && (
+        <p className="mt-8 flex justify-center p-2 text-2xl font-bold md:mt-0">
+          検索結果
+        </p>
+      )}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
         {searchResults.map((result, index) => (
           <div key={index}>

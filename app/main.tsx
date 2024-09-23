@@ -29,23 +29,22 @@ import React, { useEffect, useRef, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/toaster";
 
 import { useToast } from "@/components/ui/use-toast";
+
 import { useReactToPrint } from "react-to-print";
+
 import PrintContent from "./printContent";
 
-import ManualTireInputDialog from "./components/ManualTireInputDialog";
-import PrintHistorySheet from "./components/PrintHistorySheet";
-import WheelInputCollapsible from "./components/WheelInputCollapsible";
-import PrintDataSheet from "./components/PrintDataEditor";
 import PrintDataEditor from "./components/PrintDataEditor";
 import ResetButton from "./components/ResetButton";
 import GlobalQuotationInputs from "./components/GlobalQuotationInputs";
 import TireSearchForm from "./components/TireSearchForm";
 import TireSearchResultCards from "./components/TireSearchResultCards";
+import ManualTireInput from "./components/ManualTireInput";
 
 const Main = () => {
   const { toast } = useToast();
@@ -54,8 +53,6 @@ const Main = () => {
   const [printData, setPrintData] = useState<PrintData>(DEFAULT_PRINTDATA);
 
   const componentRef = useRef(null);
-
-
 
   // 見積もりナンバーを日時から生成する関数
   const generateQuotationNumber = (): string => {
@@ -128,25 +125,39 @@ const Main = () => {
           printData={printData}
           setPrintData={setPrintData}
         />
-        <TireSearchForm
-          printData={printData}
-          setPrintData={setPrintData}
-          setSearchResults={setSearchResults}
-        />
-        <TireSearchResultCards
-          printData={printData}
-          searchResults={searchResults}
-          setPrintData={setPrintData}
-          generateQuotationNumber={generateQuotationNumber}
-        />
+        <Tabs defaultValue="search-tires" className="w-full border-2 rounded p-4">
+          <TabsList>
+            <TabsTrigger value="search-tires" className="px-4">
+              タイヤを検索
+            </TabsTrigger>
+            <TabsTrigger value="manual-entry" className="px-4">
+              手打ち入力
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="search-tires">
+            <TireSearchForm
+              printData={printData}
+              setPrintData={setPrintData}
+              setSearchResults={setSearchResults}
+            />
+            <TireSearchResultCards
+              printData={printData}
+              searchResults={searchResults}
+              setPrintData={setPrintData}
+              generateQuotationNumber={generateQuotationNumber}
+            />
+          </TabsContent>
+          <TabsContent value="manual-entry">
+            <ManualTireInput
+              printData={printData}
+              setPrintData={setPrintData}
+              generateQuotationNumber={generateQuotationNumber}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
       <div className="flex w-full flex-col space-x-8 space-y-8">
         <div className="mr-8 flex flex-col justify-end space-x-8 md:flex-row">
-          <ManualTireInputDialog
-            printData={printData}
-            setPrintData={setPrintData}
-            generateQuotationNumber={generateQuotationNumber}
-          />
           <PrintDataEditor
             printData={printData}
             setPrintData={setPrintData}

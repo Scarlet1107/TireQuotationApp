@@ -290,8 +290,7 @@ const TireSearchForm = ({
   };
 
   return (
-    <div className="mt-8">
-      <h2 className="text-xl font-semibold">タイヤを検索</h2>
+    <>
       <div className="mt-4 flex flex-col space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
         <Select onValueChange={(value) => handleCustomerTypeChange(value)}>
           <SelectTrigger className="w-[180px]">
@@ -342,7 +341,7 @@ const TireSearchForm = ({
       >
         この内容で検索
       </Button>
-    </div>
+    </>
   );
 };
 
