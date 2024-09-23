@@ -105,174 +105,185 @@ const GlobalQuotationInputs = ({
         </div>
       </Label>
 
-      <div className="grid w-max grid-cols-2 gap-4">
-        <Label>
-          担当者
-          <div className="mt-2 flex space-x-2">
-            <Input
-              type="string"
-              className="w-min"
-              value={printData.staffName}
-              onChange={(e) =>
-                setPrintData({
-                  ...printData,
-                  staffName: e.target.value,
-                })
-              }
-            />
-          </div>
-        </Label>
-        <Label>
-          お客様名
-          <div className="mt-2 flex -space-x-8">
-            <Input
-              placeholder="タケウチ パーツ"
-              type="string"
-              className="w-min"
-              value={printData.customerName}
-              onChange={(e) =>
-                setPrintData({
-                  ...printData,
-                  customerName: e.target.value,
-                })
-              }
-            />
-            <span className="place-content-center text-xl">様</span>
-          </div>
-        </Label>
-
-        <div className="flex">
+      <div className="flex flex-col space-y-8 md:flex-row md:space-y-4 md:space-x-8">
+        <div className="grid w-max h-max grid-cols-1 gap-4 sm:grid-cols-2">
           <Label>
-            車種
+            担当者
             <div className="mt-2 flex space-x-2">
               <Input
                 type="string"
                 className="w-min"
-                value={printData.carModel}
+                value={printData.staffName}
                 onChange={(e) =>
-                  setPrintData({ ...printData, carModel: e.target.value })
+                  setPrintData({
+                    ...printData,
+                    staffName: e.target.value,
+                  })
                 }
               />
             </div>
           </Label>
-        </div>
-
-        <div className="flex flex-col space-y-4 md:space-x-8 xl:flex-row">
-          <div>
-            <Label htmlFor="number">本数</Label>
-            <Input
-              id="number"
-              type="number"
-              min={1}
-              onChange={(e) =>
-                setPrintData({
-                  ...printData,
-                  numberOfTires: Number(e.target.value),
-                })
-              }
-              value={printData.numberOfTires}
-              className="w-min"
-            />
+          <Label>
+            お客様名
+            <div className="mt-2 flex -space-x-8">
+              <Input
+                placeholder="タケウチ パーツ"
+                type="string"
+                className="w-min"
+                value={printData.customerName}
+                onChange={(e) =>
+                  setPrintData({
+                    ...printData,
+                    customerName: e.target.value,
+                  })
+                }
+              />
+              <span className="place-content-center text-xl">様</span>
+            </div>
+          </Label>
+          <div className="flex">
+            <Label>
+              車種
+              <div className="mt-2 flex space-x-2">
+                <Input
+                  type="string"
+                  className="w-min"
+                  value={printData.carModel}
+                  onChange={(e) =>
+                    setPrintData({ ...printData, carModel: e.target.value })
+                  }
+                />
+              </div>
+            </Label>
+          </div>
+          <div className="flex flex-col space-y-4 md:space-x-8 xl:flex-row">
+            <div>
+              <Label htmlFor="number">本数</Label>
+              <Input
+                id="number"
+                type="number"
+                min={1}
+                onChange={(e) =>
+                  setPrintData({
+                    ...printData,
+                    numberOfTires: Number(e.target.value),
+                  })
+                }
+                value={printData.numberOfTires}
+                className="w-min"
+              />
+            </div>
           </div>
         </div>
-
         <div className="flex flex-col space-y-4">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="laborFee"
-              checked={printData.checkBoxState.laborFee}
-              onCheckedChange={handleCheckboxChange("laborFee")}
-            />
-            <Label className="pr-4 text-sm font-medium" htmlFor="laborFee">
-              作業工賃
-            </Label>
-            <Input
-              className="h-8 w-20"
-              value={printData.discountRate.laborFee}
-              type="number"
-              min={0}
-              max={100}
-              step={50}
-              onChange={(e) =>
-                setPrintData({
-                  ...printData,
-                  discountRate: {
-                    ...printData.discountRate,
-                    laborFee: Number(e.target.value),
-                  },
-                })
-              }
-            />
-            %割引
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="laborFee"
+                checked={printData.checkBoxState.laborFee}
+                onCheckedChange={handleCheckboxChange("laborFee")}
+                className="place-self-center"
+              />
+              <Label
+                className="text-centertext-sm font-medium"
+                htmlFor="laborFee"
+              >
+                作業工賃
+              </Label>
+            </div>
+            <div className="flex items-center">
+              <Input
+                className="h-8 w-20"
+                value={printData.discountRate.laborFee}
+                type="number"
+                min={0}
+                max={100}
+                step={50}
+                onChange={(e) =>
+                  setPrintData({
+                    ...printData,
+                    discountRate: {
+                      ...printData.discountRate,
+                      laborFee: Number(e.target.value),
+                    },
+                  })
+                }
+              />
+              <span>%割引</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="removalFee"
+                checked={printData.checkBoxState.removalFee}
+                onCheckedChange={handleCheckboxChange("removalFee")}
+              />
+              <Label className="pr-4 text-sm font-medium" htmlFor="removalFee">
+                脱着料
+              </Label>
+            </div>
+            <div className="flex items-center">
+              <Input
+                className="h-8 w-20"
+                value={printData.discountRate.removalFee}
+                type="number"
+                min={0}
+                max={100}
+                step={50}
+                onChange={(e) =>
+                  setPrintData({
+                    ...printData,
+                    discountRate: {
+                      ...printData.discountRate,
+                      removalFee: Number(e.target.value),
+                    },
+                  })
+                }
+              />
+              <span>%割引</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="tireStorageFee"
+                checked={printData.checkBoxState.tireStorageFee}
+                onCheckedChange={handleCheckboxChange("tireStorageFee")}
+              />
+              <Label className="text-sm font-medium" htmlFor="tireStorageFee">
+                タイヤ預かり料
+              </Label>
+            </div>
+            <div className="flex items-center">
+              <Input
+                className="h-8 w-20"
+                value={printData.discountRate.tireStorageFee}
+                type="number"
+                min={0}
+                max={100}
+                step={50}
+                onChange={(e) =>
+                  setPrintData({
+                    ...printData,
+                    discountRate: {
+                      ...printData.discountRate,
+                      tireStorageFee: Number(e.target.value),
+                    },
+                  })
+                }
+              />
+              <span>%割引</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="tireDisposalFee"
+                checked={printData.checkBoxState.tireDisposalFee}
+                onCheckedChange={handleCheckboxChange("tireDisposalFee")}
+              />
+              <Label className="text-sm font-medium" htmlFor="tireDisposalFee">
+                廃タイヤ処分
+              </Label>
+            </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="removalFee"
-              checked={printData.checkBoxState.removalFee}
-              onCheckedChange={handleCheckboxChange("removalFee")}
-            />
-            <Label className="pr-4 text-sm font-medium" htmlFor="removalFee">
-              脱着料
-            </Label>
-            <Input
-              className="h-8 w-20"
-              value={printData.discountRate.removalFee}
-              type="number"
-              min={0}
-              max={100}
-              step={50}
-              onChange={(e) =>
-                setPrintData({
-                  ...printData,
-                  discountRate: {
-                    ...printData.discountRate,
-                    removalFee: Number(e.target.value),
-                  },
-                })
-              }
-            />
-            <span>%割引</span>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="tireStorageFee"
-              checked={printData.checkBoxState.tireStorageFee}
-              onCheckedChange={handleCheckboxChange("tireStorageFee")}
-            />
-            <Label className="text-sm font-medium" htmlFor="tireStorageFee">
-              タイヤ預かり料
-            </Label>
-            <Input
-              className="h-8 w-20"
-              value={printData.discountRate.tireStorageFee}
-              type="number"
-              min={0}
-              max={100}
-              step={50}
-              onChange={(e) =>
-                setPrintData({
-                  ...printData,
-                  discountRate: {
-                    ...printData.discountRate,
-                    tireStorageFee: Number(e.target.value),
-                  },
-                })
-              }
-            />
-            <span>%割引</span>
-          </div>
-
-          <div className="items-top flex space-x-2">
-            <Checkbox
-              id="tireDisposalFee"
-              checked={printData.checkBoxState.tireDisposalFee}
-              onCheckedChange={handleCheckboxChange("tireDisposalFee")}
-            />
-            <Label className="text-sm font-medium" htmlFor="tireDisposalFee">
-              廃タイヤ処分
-            </Label>
-          </div>
+        </div>
+      </div>
           <div>
             <Label className="mr-2 text-lg">その他のオプション</Label>
             <Button className="text-xl" onClick={addExtraOption}>
@@ -281,7 +292,7 @@ const GlobalQuotationInputs = ({
             <div className="mt-4">
               {printData.extraOptions.map((extraOption, index) => (
                 <div key={extraOption.id}>
-                  <div className="mt-6 flex flex-col space-y-2 lg:flex-row lg:space-x-4 lg:space-y-0">
+                  <div className="mt-6 flex w-max flex-col space-y-2 md:flex-row md:space-x-4 md:space-y-0">
                     <div>
                       <Label>
                         項目<span className="font-bold">{index + 1}</span>
@@ -325,7 +336,6 @@ const GlobalQuotationInputs = ({
                         placeholder="数量"
                       />
                     </div>
-
                     <Button
                       className="w-min place-self-end"
                       variant={"destructive"}
@@ -338,8 +348,6 @@ const GlobalQuotationInputs = ({
               ))}
             </div>
           </div>
-        </div>
-      </div>
     </div>
   );
 };
