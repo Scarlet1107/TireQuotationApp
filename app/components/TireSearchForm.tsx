@@ -55,7 +55,7 @@ const TireSearchForm = ({
     fetchPriceRates();
     fetchAllmanufacturer();
     fetchServiceFees();
-  });
+  }, []);
 
   const fetchTireSizes = async () => {
     const sizes = await getAllTireSizes();
@@ -100,6 +100,7 @@ const TireSearchForm = ({
   };
 
   // 計算がわかりにくいのでリファクタリングする
+  // 関数名もわかりにくい
   const handleEstimate = async () => {
     if (!tireSearchFilters.tireSize) {
       toast({
