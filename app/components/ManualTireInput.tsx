@@ -73,7 +73,7 @@ const ManualTireInput = ({
         variant: "destructive",
       });
       return;
-    };
+    }
 
     if (!isConfirmed) {
       if (window.confirm("この内容でタイヤを追加しますか？")) {
@@ -120,12 +120,12 @@ const ManualTireInput = ({
   };
 
   return (
-    <div className="w-max">
-      <h2 className="my-2">
+    <div className="w-screen pr-8 md:w-max">
+      <h2 className="my-4 flex flex-wrap mr-20">
         特化タイヤなどのデータベースに存在しないタイヤを手動で入力できます
       </h2>
       <Separator />
-      <div className="grid grid-cols-2 gap-y-4">
+      <div className="grid grid-cols-1 gap-y-4 md:grid-cols-2">
         <div>
           <Label htmlFor="manufacturer">メーカー</Label>
           <Input
@@ -170,7 +170,7 @@ const ManualTireInput = ({
         </div>
       </div>
       <Separator className="my-4" />
-      <div className="grid grid-cols-2 gap-y-4">
+      <div className="grid grid-cols-1 gap-y-4 md:grid-cols-2">
         <div>
           <Label htmlFor="laborFee">作業工賃</Label>
           <Input

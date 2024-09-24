@@ -45,6 +45,7 @@ import GlobalQuotationInputs from "./components/GlobalQuotationInputs";
 import TireSearchForm from "./components/TireSearchForm";
 import TireSearchResultCards from "./components/TireSearchResultCards";
 import ManualTireInput from "./components/ManualTireInput";
+import { Separator } from "@/components/ui/separator";
 
 const Main = () => {
   const { toast } = useToast();
@@ -119,13 +120,17 @@ const Main = () => {
   };
 
   return (
-    <div className="ml-12 mt-8 flex w-full flex-col md:flex-row">
-      <div className="w-full">
+    <div className="ml-12 mt-8 flex w-full flex-col xl:flex-row">
+      <div className="order-2 w-full xl:order-1">
         <GlobalQuotationInputs
           printData={printData}
           setPrintData={setPrintData}
         />
-        <Tabs defaultValue="search-tires" className="w-full border-2 rounded p-4">
+        <Separator className="hidden md:flex" />
+        <Tabs
+          defaultValue="search-tires"
+          className="w-mix mt-8 rounded p-4 md:w-full xl:border-2"
+        >
           <TabsList>
             <TabsTrigger value="search-tires" className="px-4">
               タイヤを検索
@@ -156,8 +161,8 @@ const Main = () => {
           </TabsContent>
         </Tabs>
       </div>
-      <div className="flex w-full flex-col space-x-8 space-y-8">
-        <div className="mr-8 flex flex-col justify-end space-x-8 md:flex-row">
+      <div className="order-1 flex w-full flex-col space-x-8 space-y-8 xl:order-2">
+        <div className="mr-8 flex flex-row justify-start xl:justify-end mb-6 xl:mb-0 space-x-8">
           <PrintDataEditor
             printData={printData}
             setPrintData={setPrintData}
@@ -173,13 +178,12 @@ const Main = () => {
             className="w-min transform bg-green-500 font-bold transition-all duration-100 hover:scale-95 hover:bg-green-600"
             onClick={() => handlePrintButtonClick()}
           >
-            選択した内容をプリント
+            印刷
           </Button>
           {/* なにこの空のdivタグ？ */}
           <div></div>
         </div>
-
-        <div className="justify-center">
+        <div className="hidden justify-center xl:flex">
           <div className="w-3/4">
             <PrintContent ref={componentRef} printData={printData} />
           </div>
