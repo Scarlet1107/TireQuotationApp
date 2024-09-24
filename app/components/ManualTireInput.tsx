@@ -67,6 +67,13 @@ const ManualTireInput = ({
       });
       return;
     }
+    if (printData.ids.length >= 3) {
+      toast({
+        title: "最大３つまでしか追加できません",
+        variant: "destructive",
+      });
+      return;
+    };
 
     if (!isConfirmed) {
       if (window.confirm("この内容でタイヤを追加しますか？")) {
@@ -114,7 +121,9 @@ const ManualTireInput = ({
 
   return (
     <div className="w-max">
-      <h2 className="my-2">特化タイヤなどのデータベースに存在しないタイヤを手動で入力できます</h2>
+      <h2 className="my-2">
+        特化タイヤなどのデータベースに存在しないタイヤを手動で入力できます
+      </h2>
       <Separator />
       <div className="grid grid-cols-2 gap-y-4">
         <div>
@@ -160,7 +169,7 @@ const ManualTireInput = ({
           />
         </div>
       </div>
-      <Separator className="my-4"/>
+      <Separator className="my-4" />
       <div className="grid grid-cols-2 gap-y-4">
         <div>
           <Label htmlFor="laborFee">作業工賃</Label>
@@ -231,7 +240,7 @@ const ManualTireInput = ({
           />
         </div>
       </div>
-      <Separator className="my-4"/>
+      <Separator className="my-4" />
       <WheelInputCollapsible wheel={wheel} setWheel={setWheel} />
       <Button className="my-4" onClick={() => addTireToprintData()}>
         この内容でタイヤを追加する

@@ -179,7 +179,7 @@ const Main = () => {
           <div></div>
         </div>
 
-        <div className="hidden justify-center">
+        <div className="justify-center">
           <div className="w-3/4">
             <PrintContent ref={componentRef} printData={printData} />
           </div>
