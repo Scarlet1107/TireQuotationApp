@@ -110,7 +110,7 @@ const TireSearchForm = ({
       return;
     }
 
-    // ここがうまく動いてるかチェック
+    // 選択されてるかのチェック
     if (tireSearchFilters.target === "") {
       toast({
         variant: "destructive",

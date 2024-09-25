@@ -110,7 +110,7 @@ const Main = () => {
           {/* デフォルトではタブを切り替えるたびにコンポーネントが再レンダリングされてしまうため、TabsContentのclassNameにて表示/非表示の切り替えを行っている。 */}
           <Tabs
             defaultValue="search-tires"
-            className="w-max mt-8 rounded p-4 md:w-max xl:border-2"
+            className="w-max mt-8 rounded md:p-4 md:w-max xl:border-2"
           >
             <TabsList>
               <TabsTrigger value="search-tires" className="px-4">
