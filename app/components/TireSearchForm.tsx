@@ -153,8 +153,6 @@ const TireSearchForm = ({
       });
     }
 
-    console.log(res.data);
-
     const newResults = res.data.map((tire: any) => {
       const tirePrice = tire.price;
       const serviceFee = calculateLaborCost(tire.laborCostRank);
@@ -206,7 +204,6 @@ const TireSearchForm = ({
         discountRate: printData.discountRate,
       };
     });
-    console.log(newResults);
     // ここでSearchResult型に入れるのでインターフェイスと同じ形にする
     setSearchResults(newResults);
   };

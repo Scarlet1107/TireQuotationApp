@@ -69,7 +69,6 @@ const TireSearchResultCards = ({
         tires.push(tireToAdd);
         serviceFees.push(dataToAdd.serviceFee);
         wheels.push(dataToAdd.wheel);
-        console.log("tireToAdd = ", tireToAdd);
       }
     }
 

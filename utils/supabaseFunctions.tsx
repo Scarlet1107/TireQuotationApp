@@ -63,7 +63,6 @@ export const uploadPrintData = async (printData: PrintData) => {
     throw new Error("Failed to upload print data.");
   }
 
-  console.log("Print data uploaded successfully to print_logs:", data);
   return data;
 };
 

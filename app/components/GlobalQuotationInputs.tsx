@@ -122,7 +122,7 @@ const GlobalQuotationInputs = ({
           <PrintHistorySheet setPrintData={setPrintData} />
         </div>
       </div>
-      <div className="flex flex-col space-y-8 md:flex-row md:space-x-8 md:space-y-4">
+      <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-8 lg:space-y-4">
         <div className="grid h-max w-max grid-cols-1 gap-4 sm:grid-cols-2">
           <Label>
             担当者

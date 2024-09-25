@@ -35,7 +35,6 @@ const PrintHistorySheet = ({ setPrintData }: PrintHistorySheetProps) => {
   useEffect(() => {
     const fetchPrintHistory = async () => {
       const res = await getPrintDataHistory();
-      console.log(res);
       setPrintHistory(res as PrintData[]);
       setTotalPages(Math.ceil(res.length / ITEMS_PER_PAGE));
     };
