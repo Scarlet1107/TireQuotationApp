@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import WheelInputCollapsible from "./WheelInputCollapsible";
 import { PrintData, ServiceFee, Wheel } from "@/utils/interface";
 import { DEFAULT_WHEEL } from "@/config/constants";
@@ -27,16 +27,13 @@ const ManualTireInput = ({
   setPrintData,
   generateQuotationNumber,
 }: ManualTireInputProps) => {
-  const [isOpen, setIsOpen] = useState(false);
   const [wheel, setWheel] = useState<Wheel>(DEFAULT_WHEEL);
-
   const [manufacturer, setManufacturer] = useState<string>("");
   const [pattern, setPattern] = useState<string>("");
   const [tireSize, setTireSize] = useState<string>("");
   const [tirePrice, setTirePrice] = useState<number>(0);
-
   const [serviceFee, setServiceFee] = useState<ServiceFee>(() => ({
-    rank: "Z",
+    rank: "Z", // 特価価格タイヤのランクはZで固定
     laborFee: 0,
     removalFee: 0,
     tireStorageFee: 0,
@@ -44,6 +41,18 @@ const ManualTireInput = ({
   }));
   const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
   const { toast } = useToast();
+
+  // クリックしたとき数値入力欄を自動選択
+  const tirePriceInputRef = useRef<HTMLInputElement>(null);
+  const laborFeeInputRef = useRef<HTMLInputElement>(null);
+  const removalFeeInputRef = useRef<HTMLInputElement>(null);
+  const tireStorageFeeInputRef = useRef<HTMLInputElement>(null);
+  const tireDisposalFeeInputRef = useRef<HTMLInputElement>(null);
+  const selectTextOnClick = (inputRef: React.RefObject<HTMLInputElement>) => {
+    if (inputRef.current) {
+      inputRef.current.select(); // クリック時に全選択
+    }
+  };
 
   const addTireToprintData = () => {
     // バリデーションチェック
@@ -113,7 +122,6 @@ const ManualTireInput = ({
       tireDisposalFee: 0,
     });
     setWheel(DEFAULT_WHEEL);
-    setIsOpen(false);
     toast({
       title: "追加が完了しました",
     });
@@ -121,7 +129,7 @@ const ManualTireInput = ({
 
   return (
     <div className="w-screen pr-8 md:w-max">
-      <h2 className="my-4 flex flex-wrap mr-20">
+      <h2 className="my-4 mr-20 flex flex-wrap">
         特化タイヤなどのデータベースに存在しないタイヤを手動で入力できます
       </h2>
       <Separator />
@@ -166,10 +174,14 @@ const ManualTireInput = ({
             onChange={(e) => setTirePrice(Number(e.target.value))}
             value={tirePrice}
             className="w-min"
+            ref={tirePriceInputRef} // 追加: ref
+            onClick={() => selectTextOnClick(tirePriceInputRef)} // 追加: onClick
           />
         </div>
       </div>
+
       <Separator className="my-4" />
+
       <div className="grid grid-cols-1 gap-y-4 md:grid-cols-2">
         <div>
           <Label htmlFor="laborFee">作業工賃</Label>
@@ -186,6 +198,8 @@ const ManualTireInput = ({
             }
             value={serviceFee.laborFee}
             className="w-min"
+            ref={laborFeeInputRef} // 追加: ref
+            onClick={() => selectTextOnClick(laborFeeInputRef)} // 追加: onClick
           />
         </div>
         <div>
@@ -203,6 +217,8 @@ const ManualTireInput = ({
             }
             value={serviceFee.removalFee}
             className="w-min"
+            ref={removalFeeInputRef} // 追加: ref
+            onClick={() => selectTextOnClick(removalFeeInputRef)} // 追加: onClick
           />
         </div>
         <div>
@@ -220,6 +236,8 @@ const ManualTireInput = ({
             }
             value={serviceFee.tireStorageFee}
             className="w-min"
+            ref={tireStorageFeeInputRef} // 追加: ref
+            onClick={() => selectTextOnClick(tireStorageFeeInputRef)} // 追加: onClick
           />
         </div>
         <div>
@@ -237,6 +255,8 @@ const ManualTireInput = ({
             }
             value={serviceFee.tireDisposalFee}
             className="w-min"
+            ref={tireDisposalFeeInputRef} // 追加: ref
+            onClick={() => selectTextOnClick(tireDisposalFeeInputRef)} // 追加: onClick
           />
         </div>
       </div>

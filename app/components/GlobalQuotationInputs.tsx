@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,20 @@ const GlobalQuotationInputs = ({
   printData,
   setPrintData,
 }: GlobalQuotationInputsProps) => {
+  // クリックしたとき数値入力欄を自動選択
+  const tireQuantityInputRef = useRef<HTMLInputElement>(null);
+  const laborFeeInputRef = useRef<HTMLInputElement>(null);
+  const removalFeeInputRef = useRef<HTMLInputElement>(null);
+  const tireStorageFeeInputRef = useRef<HTMLInputElement>(null);
+  const extraOptionPriceInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const extraOptionQuantityInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const selectTextOnClick = (inputRef: React.RefObject<HTMLInputElement>) => {
+    if (inputRef.current) {
+      inputRef.current.select(); // クリック時に全選択
+    }
+  };
+
   const handleCheckboxChange =
     (key: keyof CheckboxState) => (checked: boolean) => {
       setPrintData({
@@ -70,7 +84,7 @@ const GlobalQuotationInputs = ({
 
   return (
     <div className="flex w-max flex-col space-y-8">
-      <div className="flex flex-col sm:flex-row w-max space-y-4 sm:space-y-0 sm:space-x-8">
+      <div className="flex w-max flex-col space-y-4 sm:flex-row sm:space-x-8 sm:space-y-0">
         <div className="flex flex-col">
           <Label className="mb-2">有効期限</Label>
           <Popover>
@@ -165,6 +179,8 @@ const GlobalQuotationInputs = ({
               <Input
                 id="number"
                 type="number"
+                ref={tireQuantityInputRef}
+                onClick={() => selectTextOnClick(tireQuantityInputRef)}
                 min={1}
                 onChange={(e) =>
                   setPrintData({
@@ -199,6 +215,8 @@ const GlobalQuotationInputs = ({
                 className="h-8 w-20"
                 value={printData.discountRate.laborFee}
                 type="number"
+                ref={laborFeeInputRef}
+                onClick={() => selectTextOnClick(laborFeeInputRef)}
                 min={0}
                 max={100}
                 step={50}
@@ -229,6 +247,8 @@ const GlobalQuotationInputs = ({
                 className="h-8 w-20"
                 value={printData.discountRate.removalFee}
                 type="number"
+                ref={removalFeeInputRef}
+                onClick={() => selectTextOnClick(removalFeeInputRef)}
                 min={0}
                 max={100}
                 step={50}
@@ -262,6 +282,8 @@ const GlobalQuotationInputs = ({
                 min={0}
                 max={100}
                 step={50}
+                ref={tireStorageFeeInputRef}
+                onClick={() => selectTextOnClick(tireStorageFeeInputRef)}
                 onChange={(e) =>
                   setPrintData({
                     ...printData,
@@ -314,6 +336,15 @@ const GlobalQuotationInputs = ({
                     name="price"
                     type="number"
                     step={100}
+                    ref={(el) => {
+                      extraOptionPriceInputRefs.current[index] = el;
+                    }}
+                    onClick={() => {
+                      const inputRef = extraOptionPriceInputRefs.current[index];
+                      if (inputRef) {
+                        selectTextOnClick({ current: inputRef });
+                      }
+                    }}
                     onChange={handleExtraOptionChange(extraOption.id, "price")}
                     value={extraOption.price}
                     placeholder="金額"
@@ -324,6 +355,16 @@ const GlobalQuotationInputs = ({
                   <Input
                     name="quantity"
                     type="number"
+                    ref={(el) => {
+                      extraOptionQuantityInputRefs.current[index] = el;
+                    }}
+                    onClick={() => {
+                      const inputRef =
+                        extraOptionQuantityInputRefs.current[index];
+                      if (inputRef) {
+                        selectTextOnClick({ current: inputRef });
+                      }
+                    }}
                     min={1}
                     onChange={handleExtraOptionChange(
                       extraOption.id,

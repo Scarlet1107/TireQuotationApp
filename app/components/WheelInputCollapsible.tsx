@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -14,7 +14,19 @@ interface WheelInputCollapsibleProps {
   setWheel: (wheel: Wheel) => void;
 }
 
-const WheelInputCollapsible = ({ wheel, setWheel }: WheelInputCollapsibleProps) => {
+const WheelInputCollapsible = ({
+  wheel,
+  setWheel,
+}: WheelInputCollapsibleProps) => {
+  const wheelPriceInputRef = useRef<HTMLInputElement>(null);
+  const wheelQuantityInputRef = useRef<HTMLInputElement>(null);
+
+  const handleClick = (ref: React.RefObject<HTMLInputElement>) => {
+    if (ref.current) {
+      ref.current.select();
+    }
+  };
+
   return (
     <Collapsible
       open={wheel.isIncluded}
@@ -53,6 +65,8 @@ const WheelInputCollapsible = ({ wheel, setWheel }: WheelInputCollapsibleProps) 
               <Input
                 name="price"
                 type="number"
+                ref={wheelPriceInputRef}
+                onClick={() => handleClick(wheelPriceInputRef)}
                 step={100}
                 onChange={(e) =>
                   setWheel({ ...wheel, price: Number(e.target.value) })
@@ -67,6 +81,8 @@ const WheelInputCollapsible = ({ wheel, setWheel }: WheelInputCollapsibleProps) 
               <Input
                 name="quantity"
                 type="number"
+                ref={wheelQuantityInputRef}
+                onClick={() => handleClick(wheelQuantityInputRef)}
                 min={1}
                 onChange={(e) =>
                   setWheel({ ...wheel, quantity: Number(e.target.value) })

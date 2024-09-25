@@ -155,17 +155,6 @@ const TireSearchForm = ({
 
     console.log(res.data);
 
-    // ここで空のオプションを取り除く
-    const filteredExtraOptions = printData.extraOptions.filter(
-      (option) => option.option !== "",
-    );
-
-    // その他変数をprintDataにセット
-    setPrintData({
-      ...printData,
-      extraOptions: filteredExtraOptions,
-    });
-
     const newResults = res.data.map((tire: any) => {
       const tirePrice = tire.price;
       const serviceFee = calculateLaborCost(tire.laborCostRank);
@@ -186,7 +175,7 @@ const TireSearchForm = ({
         sellingPrice * printData.numberOfTires +
           totalServiceFee +
           wheelPrice +
-          filteredExtraOptions.reduce(
+          printData.extraOptions.reduce(
             (acc, option) => acc + option.price * option.quantity,
             0,
           ),
@@ -213,7 +202,7 @@ const TireSearchForm = ({
         },
         totalPrice: totalPrice,
         totalPriceWithTax: totalPriceWithTax,
-        extraOptions: filteredExtraOptions,
+        extraOptions: printData.extraOptions,
         discountRate: printData.discountRate,
       };
     });
