@@ -1,28 +1,24 @@
 "use client";
+import React, { useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
 import { DEFAULT_PRINTDATA } from "@/config/constants";
 import { PrintData, SearchResult } from "@/utils/interface";
 import {
   uploadPrintData,
   getPrintDataHistory,
 } from "@/utils/supabaseFunctions";
-import React, { useRef, useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toaster";
-
-import { useToast } from "@/components/ui/use-toast";
-
-import { useReactToPrint } from "react-to-print";
-
+import { Separator } from "@/components/ui/separator";
 import PrintContent from "./printContent";
-
 import PrintDataEditor from "./components/PrintDataEditor";
 import ResetButton from "./components/ResetButton";
 import GlobalQuotationInputs from "./components/GlobalQuotationInputs";
 import TireSearchForm from "./components/TireSearchForm";
 import TireSearchResultCards from "./components/TireSearchResultCards";
 import ManualTireInput from "./components/ManualTireInput";
-import { Separator } from "@/components/ui/separator";
 import Header from "./components/Header";
 
 const Main = () => {
@@ -98,9 +94,9 @@ const Main = () => {
   };
 
   return (
-    <main className="print:hidden w-screen">
+    <main className="w-screen print:hidden">
       <Header />
-      <div className="mt-8 px-12 flex w-screen flex-col xl:flex-row">
+      <div className="mt-8 flex w-screen flex-col px-12 xl:flex-row">
         <div className="order-2 w-max xl:order-1">
           <GlobalQuotationInputs
             printData={printData}
@@ -110,7 +106,7 @@ const Main = () => {
           {/* デフォルトではタブを切り替えるたびにコンポーネントが再レンダリングされてしまうため、TabsContentのclassNameにて表示/非表示の切り替えを行っている。 */}
           <Tabs
             defaultValue="search-tires"
-            className="w-max mt-8 rounded md:p-4 md:w-max xl:border-2"
+            className="mt-8 w-max rounded md:w-max md:p-4 xl:border-2"
           >
             <TabsList>
               <TabsTrigger value="search-tires" className="px-4">
@@ -150,7 +146,7 @@ const Main = () => {
             </TabsContent>
           </Tabs>
         </div>
-        <div className="order-1 w-full flex flex-col space-x-8 space-y-8 xl:order-2">
+        <div className="order-1 flex w-full flex-col space-x-8 space-y-8 xl:order-2">
           <div className="mb-6 flex flex-row justify-start space-x-8 xl:mb-0 xl:justify-end">
             <PrintDataEditor
               printData={printData}

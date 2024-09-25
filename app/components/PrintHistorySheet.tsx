@@ -60,9 +60,7 @@ const PrintHistorySheet = ({ setPrintData }: PrintHistorySheetProps) => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button
-          className="w-min transform bg-blue-500 text-white hover:bg-blue-600"
-        >
+        <Button className="w-min transform bg-blue-500 text-white hover:bg-blue-600">
           履歴を表示
         </Button>
       </SheetTrigger>
@@ -72,7 +70,7 @@ const PrintHistorySheet = ({ setPrintData }: PrintHistorySheetProps) => {
             <Button onClick={prevPage} disabled={currentPage === 1}>
               前へ
             </Button>
-            <span className="md:">
+            <span>
               ページ {currentPage} / {totalPages}
             </span>
             <Button onClick={nextPage} disabled={currentPage === totalPages}>
@@ -88,19 +86,21 @@ const PrintHistorySheet = ({ setPrintData }: PrintHistorySheetProps) => {
                 <TableRow>
                   <TableHead>見積り番号</TableHead>
                   <TableHead>お客様</TableHead>
-                  <TableHead className="hidden md:table-cell">担当</TableHead>
+                  {/* デザインが崩れるため非表示。必要に応じて表示 */}
+                  {/* <TableHead className="hidden md:table-cell">担当</TableHead> */}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {getCurrentPageData().map((history, index) => (
                   <TableRow key={index} onClick={() => setPrintData(history)}>
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium text-left">
                       {history.quotationNumber}
                     </TableCell>
-                    <TableCell>{history.customerName}</TableCell>
-                    <TableCell className="hidden sm:block">
+                    <TableCell className="text-left">{history.customerName}</TableCell>
+                    {/* デザインが崩れるため非表示。必要に応じて表示 */}
+                    {/* <TableCell className="hidden sm:table-cell">
                       {history.staffName}
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 ))}
               </TableBody>

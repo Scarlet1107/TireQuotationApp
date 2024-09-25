@@ -44,7 +44,7 @@ const WheelInputCollapsible = ({
       </CollapsibleTrigger>
       <CollapsibleContent>
         <div className="mt-6 flex flex-col space-y-4">
-          <div className="flex w-max space-x-4">
+          <div className="flex w-max flex-col space-x-0 space-y-2 md:flex-row md:space-x-4 md:space-y-0">
             <Input
               name="option"
               type="text"
@@ -60,7 +60,7 @@ const WheelInputCollapsible = ({
               placeholder="ホイールサイズ"
             />
           </div>
-          <div className="flex items-center">
+          <div className="flex w-max flex-col justify-start space-y-2 md:flex-row md:space-y-0">
             <div className="flex items-end">
               <Input
                 name="price"
@@ -76,7 +76,7 @@ const WheelInputCollapsible = ({
               />
               <span className="text-xl">円</span>
             </div>
-            <span className="mx-2 text-xl">✕</span>
+            <span className="mx-2 hidden text-xl md:flex">✕</span>
             <div className="flex items-end">
               <Input
                 name="quantity"

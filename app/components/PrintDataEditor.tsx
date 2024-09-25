@@ -122,31 +122,28 @@ const PrintDataEditor = ({
       <SheetTrigger asChild>
         <Button disabled={printData.tires.length === 0}>編集</Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className="max-h-[180vh] w-full max-w-xs overflow-y-auto sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>見積内容の編集</SheetTitle>
-          <SheetDescription>
-            追加したタイヤデータの編集、削除ができます。
-          </SheetDescription>
         </SheetHeader>
         <div className="mt-4 flex flex-col space-y-6">
           {printData.tires.map((tire, index) => (
             <AlertDialog key={index}>
               <AlertDialogTrigger onClick={() => setEditData(index)} asChild>
                 <Card className="cursor-pointer hover:bg-gray-100">
-                  <CardHeader className="relative">
-                    {/* ここに削除ボタンを実装したい。現在の実装だとidsの削除が行われておらず、複数のカードが表示されているときに削除ボタンを押すとダイアログが表示されてしまうなどの不具合がある。 */}
-                    {/* また手打ち入力したタイヤはidがすべて0であるため、削除のロジックに注意。idで消すと複数一気に消える可能性あり。 */}
-                    <Button
-                      variant="destructive"
-                      className="absolute right-2 top-2 ml-auto"
-                      onClick={(e) => deletePrintData(index, e)}
-                    >
-                      削除
-                    </Button>
-                    <CardTitle className="text-left">
-                      メーカー: {tire.manufacturer}
-                    </CardTitle>
+                  <CardHeader>
+                    <div className="flex flex-col sm:justify-between sm:flex-row">
+                      <Button
+                        variant="destructive"
+                        className="order-1 w-max md:order-2 place-self-end mb-4 md:mb-0"
+                        onClick={(e) => deletePrintData(index, e)}
+                      >
+                        削除
+                      </Button>
+                      <CardTitle className="order-2 text-left md:order-1">
+                        メーカー: {tire.manufacturer}
+                      </CardTitle>
+                    </div>
                     <CardDescription className="text-left">
                       パターン: {tire.pattern}
                     </CardDescription>
@@ -157,7 +154,7 @@ const PrintDataEditor = ({
                 </Card>
               </AlertDialogTrigger>
 
-              <AlertDialogContent>
+              <AlertDialogContent className="max-h-[90vh] w-full max-w-xs overflow-y-auto sm:max-w-lg">
                 <AlertDialogHeader>
                   <AlertDialogTitle>編集</AlertDialogTitle>
                   <AlertDialogDescription>
@@ -166,7 +163,7 @@ const PrintDataEditor = ({
                 </AlertDialogHeader>
 
                 <Separator />
-                <div className="grid grid-cols-2 gap-y-4">
+                <div className="grid grid-cols-1 gap-y-4 md:grid-cols-2">
                   <div>
                     <Label htmlFor="manufacturer">メーカー</Label>
                     <Input
@@ -222,7 +219,7 @@ const PrintDataEditor = ({
                   </div>
                 </div>
                 <Separator />
-                <div className="grid grid-cols-2 gap-y-4">
+                <div className="grid grid-cols-1 gap-y-4 md:grid-cols-2">
                   <div>
                     <Label htmlFor="laborFee">作業工賃</Label>
                     <Input
