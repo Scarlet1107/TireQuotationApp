@@ -18,6 +18,7 @@ const ResetButton = ({ setPrintData, printDataLength }: ResetButtonProps) => {
       toast({
         title: "リセットしました",
       });
+      localStorage.clear();
     }
   };
 

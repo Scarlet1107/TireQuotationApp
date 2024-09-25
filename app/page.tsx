@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { DEFAULT_PRINTDATA } from "@/config/constants";
 import { PrintData, SearchResult } from "@/utils/interface";
@@ -28,6 +28,34 @@ const Main = () => {
   const [printData, setPrintData] = useState<PrintData>(DEFAULT_PRINTDATA);
 
   const componentRef = useRef(null);
+  const isMounted = useRef(false);
+
+  // ページ読み込み時LocalStorageからデータを読み込む
+  useEffect(() => {
+    if (!isMounted.current) {
+      const savedData = loadPrintData();
+      if (savedData) {
+        setPrintData(savedData);
+      }
+      isMounted.current = true;
+    }
+  }, []);
+
+  const loadPrintData = (): PrintData | null => {
+    const storedData = localStorage.getItem("printData");
+    return storedData ? JSON.parse(storedData) : null;
+  };
+
+  // printData が変更されたときに localStorage に保存
+  useEffect(() => {
+    if (isMounted.current) {
+      savePrintData(printData);
+    }
+  }, [printData]);
+
+  const savePrintData = (printData: PrintData) => {
+    localStorage.setItem("printData", JSON.stringify(printData));
+  };
 
   // 見積もりナンバーを日時から生成する関数
   const generateQuotationNumber = (): string => {

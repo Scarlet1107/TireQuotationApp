@@ -93,10 +93,12 @@ const PrintHistorySheet = ({ setPrintData }: PrintHistorySheetProps) => {
               <TableBody>
                 {getCurrentPageData().map((history, index) => (
                   <TableRow key={index} onClick={() => setPrintData(history)}>
-                    <TableCell className="font-medium text-left">
+                    <TableCell className="text-left font-medium">
                       {history.quotationNumber}
                     </TableCell>
-                    <TableCell className="text-left">{history.customerName}</TableCell>
+                    <TableCell className="text-left">
+                      {history.customerName}
+                    </TableCell>
                     {/* デザインが崩れるため非表示。必要に応じて表示 */}
                     {/* <TableCell className="hidden sm:table-cell">
                       {history.staffName}
