@@ -34,6 +34,7 @@ const TireSearchResultCards = ({
     );
   };
 
+  // カードをクリックした際にprintDataにタイヤ情報を追加/削除する関数
   const toggleQuotationDataById = (id: number) => {
     const ids = [...printData.ids];
     const tires = [...printData.tires];
@@ -101,13 +102,13 @@ const TireSearchResultCards = ({
               onClick={() => toggleQuotationDataById(result.id)}
             >
               <CardHeader>
-                <CardTitle>メーカー : {result.manufacturer}</CardTitle>
-                <CardDescription>パターン : {result.pattern}</CardDescription>
+                <CardTitle>メーカー: {result.manufacturer}</CardTitle>
+                <CardDescription>パターン: {result.pattern}</CardDescription>
               </CardHeader>
               <CardContent>
                 <p>
                   タイヤ: {formatPrice(result.tirePrice)} × {result.priceRate} ×{" "}
-                  {result.numberOfTires} 円
+                  {printData.numberOfTires} 円
                 </p>
                 {result.wheel.isIncluded ? (
                   <p>

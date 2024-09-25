@@ -84,6 +84,7 @@ const ManualTireInput = ({
       }
     }
 
+    // タイヤの追加処理
     const newTire = {
       manufacturer,
       pattern,
@@ -94,13 +95,14 @@ const ManualTireInput = ({
 
     setPrintData({
       ...printData,
-      ids: [...printData.ids, 0],
+      ids: [...printData.ids, 0], // 特化価格タイヤのIDは0で固定
       tires: [...printData.tires, newTire],
       serviceFees: [...printData.serviceFees, serviceFee],
       wheels: [...printData.wheels, wheel],
       quotationNumber: generateQuotationNumber(),
     });
 
+    // 入力欄をリセット
     setIsConfirmed(false);
     setManufacturer("");
     setPattern("");

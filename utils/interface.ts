@@ -10,14 +10,12 @@ export interface SearchResult {
   pattern: string;
   tireSize: string;
   tirePrice: number;
-  numberOfTires: number;
   priceRate: number;
   profit: number;
   wheel: Wheel;
   serviceFee: ServiceFee;
   totalPrice: number;
   totalPriceWithTax: number;
-  extraOptions: ExtraOption[];
   discountRate: DiscountRate;
 }
 

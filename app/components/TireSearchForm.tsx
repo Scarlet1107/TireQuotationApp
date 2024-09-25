@@ -101,7 +101,7 @@ const TireSearchForm = ({
 
   // 計算がわかりにくいのでリファクタリングする
   // 関数名もわかりにくい
-  const handleEstimate = async () => {
+  const handleSearch = async () => {
     if (!tireSearchFilters.tireSize) {
       toast({
         variant: "destructive",
@@ -182,12 +182,12 @@ const TireSearchForm = ({
       const totalPriceWithTax = Math.floor(totalPrice * TAX_RATE);
 
       return {
-        id: tire.id,
+        id: tire.id, //使ってる
         manufacturer: tire.manufacturer,
         pattern: tire.pattern,
         tireSize: tireSearchFilters.tireSize,
         tirePrice: tirePrice,
-        numberOfTires: printData.numberOfTires,
+        // numberOfTires: printData.numberOfTires, //いらない
         priceRate: priceRate,
         profit: profit,
         wheel: wheel,
@@ -200,7 +200,7 @@ const TireSearchForm = ({
         },
         totalPrice: totalPrice,
         totalPriceWithTax: totalPriceWithTax,
-        extraOptions: printData.extraOptions,
+        // extraOptions: printData.extraOptions, // いらない
         discountRate: printData.discountRate,
       };
     });
@@ -324,7 +324,7 @@ const TireSearchForm = ({
       </div>
       <Button
         className="w-min transform bg-green-500 hover:bg-green-600"
-        onClick={handleEstimate}
+        onClick={handleSearch}
       >
         この内容で検索
       </Button>
