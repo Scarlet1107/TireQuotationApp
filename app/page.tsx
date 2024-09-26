@@ -40,6 +40,7 @@ const Main = () => {
       }
       isMounted.current = true;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadPrintData = (): PrintData | null => {

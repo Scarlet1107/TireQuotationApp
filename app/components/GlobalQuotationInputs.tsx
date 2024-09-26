@@ -56,16 +56,27 @@ const GlobalQuotationInputs = () => {
   };
 
   const handleExtraOptionChange =
-    (id: string, field: keyof ExtraOption) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = e.target.value;
-      setPrintData({
-        ...printData,
-        extraOptions: printData.extraOptions.map((option: ExtraOption) =>
-          option.id === id ? { ...option, [field]: newValue } : option,
-        ),
-      });
-    };
+  (id: string, field: keyof ExtraOption) =>
+  (e: React.ChangeEvent<HTMLInputElement>) => {
+    let newValue: string | number = e.target.value;
+
+    // fieldが'price'または'quantity'の場合は整数型に変換
+    if (field === 'price' || field === 'quantity') {
+      newValue = parseInt(e.target.value, 10);
+      // 文字を入力した場合は0を入力
+      if (isNaN(newValue)) {
+        newValue = 0;  // もしくは適切な初期値を設定
+      }
+    }
+
+    setPrintData(({
+      ...printData,
+      extraOptions: printData.extraOptions.map((option: ExtraOption) =>
+        option.id === id ? { ...option, [field]: newValue } : option
+      ),
+    }));
+  };
+
 
   const addExtraOption = () => {
     if (printData.extraOptions.length >= MAX_EXTRAOPTIONS) return;
