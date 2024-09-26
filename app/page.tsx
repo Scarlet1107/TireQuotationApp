@@ -173,9 +173,24 @@ const Main = () => {
             >
               印刷
             </Button>
-            <Link className="flex xl:hidden" href={"/print"}>
-              <Button className="bg-green-500 hover:bg-green-600">スマホ専用印刷ボタン</Button>
-            </Link>
+            {printData.ids.length === 0 ? (
+              <Button
+                className="bg-green-300 hover:bg-green-400"
+                onClick={() =>
+                  toast({
+                    title: "タイヤを追加してください",
+                  })
+                }
+              >
+                スマホ専用印刷ボタン
+              </Button>
+            ) : (
+              <Link className="flex xl:hidden" href={"/print"}>
+                <Button className="bg-green-500 hover:bg-green-600">
+                  スマホ専用印刷ボタン
+                </Button>
+              </Link>
+            )}
           </div>
           <div className="hidden justify-center xl:flex">
             <div className="">

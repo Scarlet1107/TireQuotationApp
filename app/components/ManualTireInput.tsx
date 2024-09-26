@@ -123,7 +123,7 @@ const ManualTireInput = ({ generateQuotationNumber }: ManualTireInputProps) => {
         特化タイヤなどのデータベースに存在しないタイヤを手動で入力できます
       </h2>
       <Separator />
-      <div className="grid grid-cols-1 gap-y-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2">
         <div>
           <Label htmlFor="manufacturer">メーカー</Label>
           <Input
@@ -172,7 +172,7 @@ const ManualTireInput = ({ generateQuotationNumber }: ManualTireInputProps) => {
 
       <Separator className="my-4" />
 
-      <div className="grid grid-cols-1 gap-y-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2">
         <div>
           <Label htmlFor="laborFee">作業工賃</Label>
           <Input
