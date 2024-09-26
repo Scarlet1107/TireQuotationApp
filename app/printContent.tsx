@@ -1,16 +1,13 @@
 "use client";
 import React from "react";
-import { PrintData, ServiceFee, DiscountRate } from "@/utils/interface";
+import { ServiceFee, DiscountRate } from "@/utils/interface";
 import { TAX_RATE } from "@/config/constants";
 import Image from "next/image";
+import { usePrintData } from "./printDataContext";
 
-interface Props {
-  printData: PrintData;
-}
-
-const PrintContent = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
+const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
   PrintContent.displayName = "PrintContent";
-  const { printData } = props;
+  const { printData } = usePrintData();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ja-JP").format(Math.floor(price));

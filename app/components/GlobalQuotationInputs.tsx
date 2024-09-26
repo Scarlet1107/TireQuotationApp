@@ -17,17 +17,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { v4 as uuidv4 } from "uuid";
 import { MAX_EXTRAOPTIONS } from "@/config/constants";
 import PrintHistorySheet from "./PrintHistorySheet";
+import { usePrintData } from "../printDataContext";
 
-interface GlobalQuotationInputsProps {
-  printData: PrintData;
-  setPrintData: (printData: PrintData) => void;
-}
-
-const GlobalQuotationInputs = ({
-  printData,
-  setPrintData,
-}: GlobalQuotationInputsProps) => {
+const GlobalQuotationInputs = () => {
   // クリックしたとき数値入力欄を自動選択
+  const { printData, setPrintData } = usePrintData();
   const tireQuantityInputRef = useRef<HTMLInputElement>(null);
   const laborFeeInputRef = useRef<HTMLInputElement>(null);
   const removalFeeInputRef = useRef<HTMLInputElement>(null);
@@ -55,7 +49,9 @@ const GlobalQuotationInputs = ({
   const deleteExtraOption = (id: string) => {
     setPrintData({
       ...printData,
-      extraOptions: printData.extraOptions.filter((option) => option.id !== id),
+      extraOptions: printData.extraOptions.filter(
+        (option: { id: string }) => option.id !== id,
+      ),
     });
   };
 
@@ -65,7 +61,7 @@ const GlobalQuotationInputs = ({
       const newValue = e.target.value;
       setPrintData({
         ...printData,
-        extraOptions: printData.extraOptions.map((option) =>
+        extraOptions: printData.extraOptions.map((option: ExtraOption) =>
           option.id === id ? { ...option, [field]: newValue } : option,
         ),
       });

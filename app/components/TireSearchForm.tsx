@@ -29,18 +29,14 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import WheelInputCollapsible from "./WheelInputCollapsible";
 import { Button } from "@/components/ui/button";
+import { usePrintData } from "../printDataContext";
 
 interface TireSearchFormProps {
-  printData: PrintData;
-  setPrintData: (printData: PrintData) => void;
   setSearchResults: (results: SearchResult[]) => void;
 }
 
-const TireSearchForm = ({
-  printData,
-  setPrintData,
-  setSearchResults,
-}: TireSearchFormProps) => {
+const TireSearchForm = ({ setSearchResults }: TireSearchFormProps) => {
+  const { printData } = usePrintData();
   const [tireSizes, setTireSizes] = useState<string[]>([]);
   const [tireSearchFilters, setTireSearchFilters] = useState<SelectData>(
     DEFAULT_TIRE_SEARCH_FILTERS,

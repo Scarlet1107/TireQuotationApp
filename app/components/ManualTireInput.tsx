@@ -7,18 +7,14 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
+import { usePrintData } from "../printDataContext";
 
 interface ManualTireInputProps {
-  printData: PrintData;
-  setPrintData: (printData: PrintData) => void;
   generateQuotationNumber: () => string;
 }
 
-const ManualTireInput = ({
-  printData,
-  setPrintData,
-  generateQuotationNumber,
-}: ManualTireInputProps) => {
+const ManualTireInput = ({ generateQuotationNumber }: ManualTireInputProps) => {
+  const { printData, setPrintData } = usePrintData();
   const [wheel, setWheel] = useState<Wheel>(DEFAULT_WHEEL);
   const [manufacturer, setManufacturer] = useState<string>("");
   const [pattern, setPattern] = useState<string>("");

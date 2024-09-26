@@ -9,20 +9,18 @@ import {
 } from "@/components/ui/card";
 import { PrintData, SearchResult } from "@/utils/interface";
 import { toast } from "@/components/ui/use-toast";
+import { usePrintData } from "../printDataContext";
 
 interface TireSearchResultCardsProps {
-  printData: PrintData;
   searchResults: SearchResult[];
-  setPrintData: (data: PrintData) => void;
   generateQuotationNumber: () => string;
 }
 
 const TireSearchResultCards = ({
-  printData,
   searchResults,
-  setPrintData,
   generateQuotationNumber,
 }: TireSearchResultCardsProps) => {
+  const { printData, setPrintData } = usePrintData();
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ja-JP").format(Math.floor(price));
   };
@@ -102,7 +100,7 @@ const TireSearchResultCards = ({
               onClick={() => toggleQuotationDataById(result.id)}
             >
               <CardHeader>
-                <CardTitle>メーカー: {result.manufacturer}</CardTitle>
+                <CardTitle className="text-xl 2xl:text-2xl">メーカー: {result.manufacturer}</CardTitle>
                 <CardDescription>パターン: {result.pattern}</CardDescription>
               </CardHeader>
               <CardContent>
@@ -112,7 +110,7 @@ const TireSearchResultCards = ({
                 </p>
                 {result.wheel.isIncluded ? (
                   <p>
-                    ホイール({result.wheel.name}, {result.wheel.size}):{" "}
+                    ホイール:{" "}
                     {formatPrice(result.wheel.price * result.wheel.quantity)}円
                   </p>
                 ) : (
@@ -146,8 +144,8 @@ const TireSearchResultCards = ({
                 </p>
                 {calculateExtraOptionsTotal() !== 0 ? (
                   <p>
-                    その他のオプション合計:{" "}
-                    {formatPrice(calculateExtraOptionsTotal())}円
+                    オプション合計: {formatPrice(calculateExtraOptionsTotal())}
+                    円
                   </p>
                 ) : null}
               </CardContent>

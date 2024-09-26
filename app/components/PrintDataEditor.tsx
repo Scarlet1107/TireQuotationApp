@@ -32,20 +32,15 @@ import { PrintData, ServiceFee, Wheel } from "@/utils/interface";
 import { Separator } from "@/components/ui/separator";
 import WheelInputCollapsible from "./WheelInputCollapsible";
 import { DEFAULT_WHEEL } from "@/config/constants";
+import { usePrintData } from "../printDataContext";
 
 interface PrintDataSheetProps {
-  printData: PrintData;
-  setPrintData: (data: PrintData) => void;
   generateQuotationNumber: () => string;
 }
 
-const PrintDataEditor = ({
-  printData,
-  setPrintData,
-  generateQuotationNumber,
-}: PrintDataSheetProps) => {
+const PrintDataEditor = ({ generateQuotationNumber }: PrintDataSheetProps) => {
+  const { printData, setPrintData } = usePrintData();
   const [wheel, setWheel] = useState<Wheel>(DEFAULT_WHEEL);
-
   const [manufacturer, setManufacturer] = useState<string>("");
   const [pattern, setPattern] = useState<string>("");
   const [tireSize, setTireSize] = useState<string>("");
@@ -132,10 +127,10 @@ const PrintDataEditor = ({
               <AlertDialogTrigger onClick={() => setEditData(index)} asChild>
                 <Card className="cursor-pointer hover:bg-gray-100">
                   <CardHeader>
-                    <div className="flex flex-col sm:justify-between sm:flex-row">
+                    <div className="flex flex-col sm:flex-row sm:justify-between">
                       <Button
                         variant="destructive"
-                        className="order-1 w-max md:order-2 place-self-end mb-4 md:mb-0"
+                        className="order-1 mb-4 w-max place-self-end md:order-2 md:mb-0"
                         onClick={(e) => deletePrintData(index, e)}
                       >
                         削除

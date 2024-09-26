@@ -20,12 +20,14 @@ import TireSearchForm from "./components/TireSearchForm";
 import TireSearchResultCards from "./components/TireSearchResultCards";
 import ManualTireInput from "./components/ManualTireInput";
 import Header from "./components/Header";
+import Link from "next/link";
+import { usePrintData } from "./printDataContext";
 
 const Main = () => {
   const { toast } = useToast();
 
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [printData, setPrintData] = useState<PrintData>(DEFAULT_PRINTDATA);
+  const { printData, setPrintData } = usePrintData();
 
   const componentRef = useRef(null);
   const isMounted = useRef(false);
@@ -99,10 +101,7 @@ const Main = () => {
     const filteredExtraOptions = printData.extraOptions.filter(
       (option) => option.option !== null && option.option !== "",
     );
-    setPrintData((prevData) => ({
-      ...prevData,
-      extraOptions: filteredExtraOptions,
-    }));
+    setPrintData({ ...printData, extraOptions: filteredExtraOptions });
 
     // すでに同じ見積もりを複数回保存しないようにする
     const printDataHistory = await getPrintDataHistory();
@@ -126,10 +125,7 @@ const Main = () => {
       <Header />
       <div className="mt-8 flex w-screen flex-col px-12 xl:flex-row">
         <div className="order-2 w-max xl:order-1">
-          <GlobalQuotationInputs
-            printData={printData}
-            setPrintData={setPrintData}
-          />
+          <GlobalQuotationInputs />
           <Separator className="hidden md:flex" />
           {/* デフォルトではタブを切り替えるたびにコンポーネントが再レンダリングされてしまうため、TabsContentのclassNameにて表示/非表示の切り替えを行っている。 */}
           <Tabs
@@ -149,15 +145,9 @@ const Main = () => {
               forceMount
               className="data-[state=inactive]:hidden"
             >
-              <TireSearchForm
-                printData={printData}
-                setPrintData={setPrintData}
-                setSearchResults={setSearchResults}
-              />
+              <TireSearchForm setSearchResults={setSearchResults} />
               <TireSearchResultCards
-                printData={printData}
                 searchResults={searchResults}
-                setPrintData={setPrintData}
                 generateQuotationNumber={generateQuotationNumber}
               />
             </TabsContent>
@@ -167,8 +157,6 @@ const Main = () => {
               className="data-[state=inactive]:hidden"
             >
               <ManualTireInput
-                printData={printData}
-                setPrintData={setPrintData}
                 generateQuotationNumber={generateQuotationNumber}
               />
             </TabsContent>
@@ -177,24 +165,22 @@ const Main = () => {
         <div className="order-1 flex w-full flex-col space-x-8 space-y-8 xl:order-2">
           <div className="mb-6 flex flex-row justify-start space-x-8 xl:mb-0 xl:justify-end">
             <PrintDataEditor
-              printData={printData}
-              setPrintData={setPrintData}
               generateQuotationNumber={generateQuotationNumber}
             />
-            <ResetButton
-              setPrintData={setPrintData}
-              printDataLength={printData.ids.length}
-            />
+            <ResetButton />
             <Button
               className="w-min transform bg-green-500 font-bold transition-all duration-100 hover:scale-95 hover:bg-green-600"
               onClick={() => handlePrintButtonClick()}
             >
               印刷
             </Button>
+            <Link href={"/print"}>
+              <Button>スマホ専用印刷ボタン</Button>
+            </Link>
           </div>
           <div className="hidden justify-center xl:flex">
             <div className="">
-              <PrintContent ref={componentRef} printData={printData} />
+              <PrintContent ref={componentRef}/>
             </div>
           </div>
         </div>
