@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
-import { DEFAULT_PRINTDATA } from "@/config/constants";
 import { PrintData, SearchResult } from "@/utils/interface";
 import {
   uploadPrintData,
@@ -123,7 +122,7 @@ const Main = () => {
   return (
     <main className="w-screen print:hidden">
       <Header />
-      <div className="mt-8 flex w-screen flex-col px-12 xl:flex-row">
+      <div className="mb-12 mt-8 flex w-screen flex-col px-4 md:px-8 xl:flex-row xl:px-12">
         <div className="order-2 w-max xl:order-1">
           <GlobalQuotationInputs />
           <Separator className="hidden md:flex" />
@@ -163,24 +162,24 @@ const Main = () => {
           </Tabs>
         </div>
         <div className="order-1 flex w-full flex-col space-x-8 space-y-8 xl:order-2">
-          <div className="mb-6 flex flex-row justify-start space-x-8 xl:mb-0 xl:justify-end">
+          <div className="mb-6 flex flex-row justify-start space-x-4 md:space-x-6 xl:mb-0 xl:justify-end xl:space-x-8">
             <PrintDataEditor
               generateQuotationNumber={generateQuotationNumber}
             />
             <ResetButton />
             <Button
-              className="w-min transform bg-green-500 font-bold transition-all duration-100 hover:scale-95 hover:bg-green-600"
+              className="hidden w-min transform bg-green-500 font-bold transition-all duration-100 hover:scale-95 hover:bg-green-600 xl:flex"
               onClick={() => handlePrintButtonClick()}
             >
               印刷
             </Button>
-            <Link href={"/print"}>
-              <Button>スマホ専用印刷ボタン</Button>
+            <Link className="flex xl:hidden" href={"/print"}>
+              <Button className="bg-green-500 hover:bg-green-600">スマホ専用印刷ボタン</Button>
             </Link>
           </div>
           <div className="hidden justify-center xl:flex">
             <div className="">
-              <PrintContent ref={componentRef}/>
+              <PrintContent ref={componentRef} />
             </div>
           </div>
         </div>
