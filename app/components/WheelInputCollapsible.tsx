@@ -60,37 +60,40 @@ const WheelInputCollapsible = ({
               placeholder="ホイールサイズ"
             />
           </div>
-          <div className="flex w-max flex-col justify-start space-y-2 sm:flex-row sm:space-y-0">
+          <div className="flex w-max flex-col justify-start space-x-0 space-y-2 sm:flex-row sm:space-x-4 sm:space-y-0">
             <div className="flex items-end">
-              <Input
-                name="price"
-                type="number"
-                ref={wheelPriceInputRef}
-                onClick={() => handleClick(wheelPriceInputRef)}
-                step={100}
-                onChange={(e) =>
-                  setWheel({ ...wheel, price: Number(e.target.value) })
-                }
-                value={wheel.price}
-                placeholder="金額"
-              />
-              <span className="text-xl">円</span>
+              <Label className="space-y-1">
+                <span>金額</span>
+                <Input
+                  name="price"
+                  type="number"
+                  ref={wheelPriceInputRef}
+                  onClick={() => handleClick(wheelPriceInputRef)}
+                  step={100}
+                  onChange={(e) =>
+                    setWheel({ ...wheel, price: Number(e.target.value) })
+                  }
+                  value={wheel.price}
+                  placeholder="金額"
+                />
+              </Label>
             </div>
-            <span className="mx-2 hidden text-xl sm:flex">✕</span>
             <div className="flex items-end">
-              <Input
-                name="quantity"
-                type="number"
-                ref={wheelQuantityInputRef}
-                onClick={() => handleClick(wheelQuantityInputRef)}
-                min={1}
-                onChange={(e) =>
-                  setWheel({ ...wheel, quantity: Number(e.target.value) })
-                }
-                value={wheel.quantity}
-                placeholder="数量"
-              />
-              <span className="text-xl">個</span>
+              <Label className="space-y-1">
+                <span>数量</span>
+                <Input
+                  name="quantity"
+                  type="number"
+                  ref={wheelQuantityInputRef}
+                  onClick={() => handleClick(wheelQuantityInputRef)}
+                  min={1}
+                  onChange={(e) =>
+                    setWheel({ ...wheel, quantity: Number(e.target.value) })
+                  }
+                  value={wheel.quantity}
+                  placeholder="数量"
+                />
+              </Label>
             </div>
           </div>
         </div>
