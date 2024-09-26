@@ -4,13 +4,13 @@ import PrintContent from "../printContent";
 import { usePrintData } from "../printDataContext";
 
 const Page = () => {
-  const { printData } = usePrintData();
 
+  const { printData } = usePrintData();
   const handlePrint = () => {
-    // const originalTitle = document.title;
-    // document.title = `${printData.customerName}様-${printData.quotationNumber}`;
+    const originalTitle = document.title;
+    document.title = `${printData.customerName}様-${printData.quotationNumber}`;
     window.print();
-    // document.title = originalTitle;
+    document.title = originalTitle;
   };
 
   return (

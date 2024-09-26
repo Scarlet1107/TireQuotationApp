@@ -19,8 +19,8 @@ import TireSearchForm from "./components/TireSearchForm";
 import TireSearchResultCards from "./components/TireSearchResultCards";
 import ManualTireInput from "./components/ManualTireInput";
 import Header from "./components/Header";
-import Link from "next/link";
 import { usePrintData } from "./printDataContext";
+import { useRouter } from 'next/navigation';
 
 const Main = () => {
   const { toast } = useToast();
@@ -30,6 +30,8 @@ const Main = () => {
 
   const componentRef = useRef(null);
   const isMounted = useRef(false);
+  const router = useRouter();
+
 
   // ページ読み込み時LocalStorageからデータを読み込む
   useEffect(() => {
@@ -72,37 +74,49 @@ const Main = () => {
     return quotationNumber;
   };
 
-  const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
-    documentTitle: printData.customerName + "様-" + printData.quotationNumber,
-  });
 
-  const handlePrintButtonClick = async () => {
+  const validateGlobalInputs = () => {
+    if(printData.staffName === "") {
+      toast({
+        title: "担当者を入力してください",
+      })
+      return false;
+    }
     if (printData.ids.length === 0) {
       toast({
         title: "タイヤを選択してください",
       });
-      return;
+      return false;
     }
     if (printData.customerName === "") {
       toast({
         title: "お客様名を入力してください",
       });
-      return;
+      return false;
     }
     if (printData.carModel === "") {
       toast({
         title: "車種を入力してください",
       });
-      return;
+      return false;
     }
+    filterExtraOptions();
+    return true;
+  };
 
-    // 空のオプションを取り除く
+  // 空のオプションを取り除く関数
+  const filterExtraOptions = () => {
     const filteredExtraOptions = printData.extraOptions.filter(
       (option) => option.option !== null && option.option !== "",
     );
-    setPrintData({ ...printData, extraOptions: filteredExtraOptions });
+    setPrintData({
+      ...printData,
+      extraOptions: filteredExtraOptions,
+    });
+  }
 
+  // 履歴に保存する関数
+  const savePrintDataToHistory = async () => {
     // すでに同じ見積もりを複数回保存しないようにする
     const printDataHistory = await getPrintDataHistory();
     if (printDataHistory[0].quotationNumber !== printData.quotationNumber) {
@@ -114,12 +128,35 @@ const Main = () => {
     } else {
       toast({
         title:
-          "すでに同じ見積もりが保存されていたため、履歴を保存しませんでした",
+        "すでに同じ見積もりが保存されていたため、履歴を保存しませんでした",
       });
     }
+  }
+
+
+  const handleMobilePrintButtonClick = () => {
+    const isValid = validateGlobalInputs();
+    if (isValid) {
+      savePrintDataToHistory();
+      router.push("/print");  // バリデーションが成功したときのみページ遷移
+    }
+  };
+
+
+  const handlePrintButtonClick = async () => {
+
+    // 必須情報が入力されているか確認
+    if(validateGlobalInputs() === false)
+      return;
+
+    savePrintDataToHistory();
     if (componentRef.current) handlePrint();
   };
 
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+    documentTitle: printData.customerName + "様-" + printData.quotationNumber,
+  });
   return (
     <main className="w-screen print:hidden">
       <Header />
@@ -174,24 +211,14 @@ const Main = () => {
             >
               印刷
             </Button>
-            {printData.ids.length === 0 ? (
-              <Button
-                className="bg-green-300 hover:bg-green-400"
-                onClick={() =>
-                  toast({
-                    title: "タイヤを追加してください",
-                  })
-                }
-              >
-                スマホ専用印刷ボタン
-              </Button>
-            ) : (
-              <Link className="flex xl:hidden" href={"/print"}>
-                <Button className="bg-green-500 hover:bg-green-600">
-                  スマホ専用印刷ボタン
-                </Button>
-              </Link>
-            )}
+            <Button
+              className={`flex xl:hidden ${
+                printData.ids.length === 0 ? 'bg-green-300 hover:bg-green-400' : 'bg-green-500 hover:bg-green-600'
+              }`}
+              onClick={() => handleMobilePrintButtonClick()}
+            >
+              スマホ専用印刷ボタン
+            </Button>
           </div>
           <div className="hidden justify-center xl:flex">
             <div className="">
