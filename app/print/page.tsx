@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import PrintContent from "../printContent";
-import { usePrintData } from "../printDataContext";
+// import { usePrintData } from "../printDataContext";
 
 const Page = () => {
 

@@ -213,7 +213,7 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
                 廃タイヤ処分
               </td>
               {printData.serviceFees.map((fee, index) => (
-                <td key={index} className="border border-gray-800 p-1">
+                <td key={index} className="border border-gray-800 p-1 font-semibold">
                   ¥{formatPrice(fee.tireDisposalFee)}
                 </td>
               ))}
@@ -266,7 +266,7 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
                 その他オプション
               </td>
               {printData.tires.map((_, index) => (
-                <td key={index} className="border border-gray-800 p-1">
+                <td key={index} className="border border-gray-800 p-1 font-semibold">
                   ¥{formatPrice(extraOptionsTotal)}
                 </td>
               ))}
