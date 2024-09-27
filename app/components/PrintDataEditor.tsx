@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -28,7 +27,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { PrintData, ServiceFee, Wheel } from "@/utils/interface";
+import { ServiceFee, Wheel } from "@/utils/interface";
 import { Separator } from "@/components/ui/separator";
 import WheelInputCollapsible from "./WheelInputCollapsible";
 import { DEFAULT_WHEEL } from "@/config/constants";
@@ -93,7 +92,7 @@ const PrintDataEditor = ({ generateQuotationNumber }: PrintDataSheetProps) => {
     e.stopPropagation(); // ダイアログが表示されるのを防ぐ
 
     if (printData.ids[index] === 0) {
-      if (!window.confirm("本当に削除しますか？")) {
+      if (!window.confirm("このタイヤは手動で追加したタイヤです。データベースに存在しません。本当に削除しますか？")) {
         return;
       }
     }

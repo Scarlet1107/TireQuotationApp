@@ -160,7 +160,7 @@ const Main = () => {
   return (
     <main className="w-screen print:hidden">
       <Header />
-      <div className="mb-12 mt-8 flex w-screen flex-col px-4 md:px-8 xl:flex-row xl:px-12">
+      <div className="mb-12 mt-8 flex w-screen flex-col px-4 md:px-8 xl:flex-row xl:px-12 justify-center">
         <div className="order-2 w-max xl:order-1">
           <GlobalQuotationInputs />
           <Separator className="hidden md:flex" />
@@ -204,7 +204,7 @@ const Main = () => {
             <PrintDataEditor
               generateQuotationNumber={generateQuotationNumber}
             />
-            <ResetButton />
+            <ResetButton setSearchResult = {setSearchResults} />
             <Button
               className="hidden w-min transform bg-green-500 font-bold transition-all duration-100 hover:scale-95 hover:bg-green-600 xl:flex"
               onClick={() => handlePrintButtonClick()}

@@ -9,6 +9,7 @@ export interface SearchResult {
   manufacturer: string;
   pattern: string;
   tireSize: string;
+  numberOfTires: number;
   tirePrice: number;
   priceRate: number;
   profit: number;

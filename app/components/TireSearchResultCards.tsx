@@ -7,7 +7,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { PrintData, SearchResult } from "@/utils/interface";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { SearchResult } from "@/utils/interface";
 import { toast } from "@/components/ui/use-toast";
 import { usePrintData } from "../printDataContext";
 
@@ -91,79 +97,103 @@ const TireSearchResultCards = ({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
         {searchResults.map((result, index) => (
           <div key={index}>
-            <Card
-              className={`transform cursor-pointer transition-all duration-100 hover:scale-105 ${
-                printData.ids.includes(result.id)
-                  ? "border-4 border-red-400 bg-gray-100"
-                  : ""
-              } select-none`} // ここで選択を無効化
-              onClick={() => toggleQuotationDataById(result.id)}
-            >
-              <CardHeader>
-                <CardTitle className="text-xl 2xl:text-2xl">メーカー: {result.manufacturer}</CardTitle>
-                <CardDescription>パターン: {result.pattern}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p>
-                  タイヤ: {formatPrice(result.tirePrice)} × {result.priceRate} ×{" "}
-                  {printData.numberOfTires} 円
-                </p>
-                {result.wheel.isIncluded ? (
-                  <p>
-                    ホイール:{" "}
-                    {formatPrice(result.wheel.price * result.wheel.quantity)}円
-                  </p>
-                ) : (
-                  ""
-                )}
-                <p>
-                  {" "}
-                  {result.serviceFee.laborFee !== 0 ||
-                  result.serviceFee.tireDisposalFee !== 0 ||
-                  result.serviceFee.removalFee !== 0 ||
-                  result.serviceFee.tireStorageFee !== 0 ? (
-                    <span>
-                      工賃:{" "}
-                      {formatPrice(
-                        (result.serviceFee.laborFee *
-                          (100 - result.discountRate.laborFee)) /
-                          100 +
-                          (result.serviceFee.removalFee *
-                            (100 - result.discountRate.removalFee)) /
-                            100 +
-                          result.serviceFee.tireDisposalFee +
-                          (result.serviceFee.tireStorageFee *
-                            (100 - result.discountRate.tireStorageFee)) /
-                            100,
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Card
+                    className={`w-full transform cursor-pointer transition-all duration-100 hover:scale-105 ${
+                      printData.ids.includes(result.id)
+                        ? "border-4 border-red-400 bg-gray-100"
+                        : ""
+                    } select-none`} // ここで選択を無効化
+                    onClick={() => toggleQuotationDataById(result.id)}
+                  >
+                    <CardHeader className="px-12">
+                      <CardTitle className="text-xl 2xl:text-2xl">
+                        {result.manufacturer}
+                      </CardTitle>
+                      <CardDescription className="">
+                        {result.pattern}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex justify-between">
+                        <span className="mr-4">タイヤ:</span>
+                        <span>
+                          {formatPrice(result.tirePrice)}×{result.priceRate}×
+                          {result.numberOfTires} 円
+                        </span>
+                      </div>
+                      {result.wheel.isIncluded && (
+                        <div className="flex justify-between">
+                          <span>ホイール: </span>
+                          <span>
+                            {formatPrice(
+                              result.wheel.price * result.wheel.quantity,
+                            )}
+                            円
+                          </span>
+                        </div>
                       )}
-                      円
+
+                      <div className="flex justify-between">
+                        <span>工賃:</span>
+                        <span>
+                          {formatPrice(
+                            (result.serviceFee.laborFee *
+                              (100 - result.discountRate.laborFee)) /
+                              100 +
+                              (result.serviceFee.removalFee *
+                                (100 - result.discountRate.removalFee)) /
+                                100 +
+                              result.serviceFee.tireDisposalFee +
+                              (result.serviceFee.tireStorageFee *
+                                (100 - result.discountRate.tireStorageFee)) /
+                                100,
+                          )}
+                          円
+                        </span>
+                      </div>
+
+                      {calculateExtraOptionsTotal() !== 0 && (
+                        <div className="flex justify-between">
+                          <span>オプション:</span>
+                          <span>
+                            {formatPrice(calculateExtraOptionsTotal())}円
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex justify-between">
+                        <span>小計:</span>
+                        <span>{formatPrice(result.totalPrice)}円</span>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex flex-col items-stretch">
+                      <div className="flex justify-between font-semibold">
+                        <span>合計(税込み):</span>
+                        <span> {formatPrice(result.totalPriceWithTax)}円</span>
+                      </div>
+                    </CardFooter>
+                  </Card>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div>
+                    <span>メーカー: </span>
+                    <span>{result.manufacturer}</span>
+                  </div>
+                  <div>
+                    <span>パターン: </span>
+                    <span>{result.pattern}</span>
+                  </div>
+                  <div className="mt-2">
+                    <span>タイヤ{result.numberOfTires}本の利益: </span>
+                    <span className="font-semibold">
+                      {formatPrice(result.profit)}円
                     </span>
-                  ) : (
-                    ""
-                  )}{" "}
-                </p>
-                {calculateExtraOptionsTotal() !== 0 ? (
-                  <p>
-                    オプション合計: {formatPrice(calculateExtraOptionsTotal())}
-                    円
-                  </p>
-                ) : null}
-              </CardContent>
-              <CardFooter>
-                <div className="flex flex-col">
-                  <p>
-                    合計（税抜）: <span>{formatPrice(result.totalPrice)}</span>
-                    円
-                  </p>
-                  <p className="font-bold">
-                    税込: {formatPrice(result.totalPriceWithTax)}円
-                  </p>
-                  <p className="mt-2">
-                    タイヤ利益(税抜) : {formatPrice(result.profit)}円
-                  </p>
-                </div>
-              </CardFooter>
-            </Card>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         ))}
       </div>

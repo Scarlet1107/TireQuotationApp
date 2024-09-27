@@ -158,7 +158,9 @@ const TireSearchForm = ({ setSearchResults }: TireSearchFormProps) => {
         tire.pattern,
         tireSearchFilters.target,
       );
-      const sellingPrice = Math.ceil((tirePrice * Number(priceRate)) / 10) * 10;
+      // タイヤ一本当たりの「A表の価格」*「お客さんのタイプごとの掛け率」
+      const sellingPrice = Math.ceil(tirePrice * priceRate);
+
       const profit = Math.ceil(
         (sellingPrice - tirePrice * searchMarkupRate(tire.pattern, "cost")) *
           printData.numberOfTires,
@@ -178,15 +180,15 @@ const TireSearchForm = ({ setSearchResults }: TireSearchFormProps) => {
       const totalPriceWithTax = Math.floor(totalPrice * TAX_RATE);
 
       return {
-        id: tire.id, //使ってる
+        id: tire.id,
         manufacturer: tire.manufacturer,
         pattern: tire.pattern,
         tireSize: tireSearchFilters.tireSize,
         tirePrice: tirePrice,
-        // numberOfTires: printData.numberOfTires, //いらない
         priceRate: priceRate,
         profit: profit,
         wheel: wheel,
+        numberOfTires: printData.numberOfTires,
         serviceFee: {
           rank: tire.laborCostRank,
           laborFee: serviceFee.laborFee,
@@ -196,7 +198,6 @@ const TireSearchForm = ({ setSearchResults }: TireSearchFormProps) => {
         },
         totalPrice: totalPrice,
         totalPriceWithTax: totalPriceWithTax,
-        // extraOptions: printData.extraOptions, // いらない
         discountRate: printData.discountRate,
       };
     });
@@ -204,7 +205,7 @@ const TireSearchForm = ({ setSearchResults }: TireSearchFormProps) => {
     setSearchResults(newResults);
   };
 
-  // タイヤのパターンとお客さんのターゲットによって価格を検索する。割合で返す
+  // タイヤのパターンとお客さんのターゲットによって価格を検索する。％ではなく割合で返すため注意
   const searchMarkupRate = (pattern: string, target: string): number => {
     const rate = priceRates.find((item) => {
       return pattern === item.pattern;
