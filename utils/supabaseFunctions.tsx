@@ -68,7 +68,7 @@ export const uploadPrintData = async (printData: PrintData) => {
 
 export const getPrintDataHistory = async () => {
   const { data, error } = await supabase
-    .from("print_logs")
+    .from("printLogs")
     .select("*")
     .order("id", { ascending: false }) // 最新のデータを取得
     .limit(MAX_PRINT_LOG_HISTORY); // 履歴の取得最大数
@@ -107,7 +107,7 @@ export const ExistDB = async (name: string): Promise<boolean> => {
 
 export const deletePrint_log = async (id: number) => {
   const { data, error } = await supabase
-    .from("print_logs")
+    .from("printLogs")
     .delete()
     .eq("id", id);
   if (error) {
