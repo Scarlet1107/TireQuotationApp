@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toaster";
 import { Separator } from "@/components/ui/separator";
-import PrintContent from "./printContent";
+import PrintContent from "./components/printContent";
 import PrintDataEditor from "./components/PrintDataEditor";
 import ResetButton from "./components/ResetButton";
 import GlobalQuotationInputs from "./components/GlobalQuotationInputs";
@@ -206,13 +206,13 @@ const Main = () => {
             />
             <ResetButton setSearchResult = {setSearchResults} />
             <Button
-              className="hidden w-min transform bg-green-500 font-bold transition-all duration-100 hover:scale-95 hover:bg-green-600 xl:flex"
+              className="hidden w-min transform bg-green-500 font-bold transition-all duration-100 hover:scale-95 hover:bg-green-600 lg:flex"
               onClick={() => handlePrintButtonClick()}
             >
               印刷
             </Button>
             <Button
-              className={`flex xl:hidden ${
+              className={`flex lg:hidden ${
                 printData.ids.length === 0 ? 'bg-green-300 hover:bg-green-400' : 'bg-green-500 hover:bg-green-600'
               }`}
               onClick={() => handleMobilePrintButtonClick()}

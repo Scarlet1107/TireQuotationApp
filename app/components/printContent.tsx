@@ -3,7 +3,7 @@ import React from "react";
 import { ServiceFee, DiscountRate } from "@/utils/interface";
 import { TAX_RATE } from "@/config/constants";
 import Image from "next/image";
-import { usePrintData } from "./printDataContext";
+import { usePrintData } from "../printDataContext";
 
 const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
   PrintContent.displayName = "PrintContent";
