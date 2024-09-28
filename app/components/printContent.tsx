@@ -359,7 +359,7 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
       )}
 
       <div className="flex justify-end text-xs">
-        <Image src="/TakeuchiPartLogo.jpg" alt="ロゴ" width={300} height={90} />
+        <Image src="/TakeuchiPartLogo.jpg" alt="ロゴ" width={300} height={88} />
       </div>
     </div>
   );
