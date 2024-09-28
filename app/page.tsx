@@ -20,7 +20,8 @@ import TireSearchResultCards from "./components/TireSearchResultCards";
 import ManualTireInput from "./components/ManualTireInput";
 import Header from "./components/Header";
 import { usePrintData } from "./printDataContext";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
+import { isMobile } from "react-device-detect"; // スマホからのアクセスかどうかを判定するためのライブラリ
 
 const Main = () => {
   const { toast } = useToast();
@@ -31,7 +32,6 @@ const Main = () => {
   const componentRef = useRef(null);
   const isMounted = useRef(false);
   const router = useRouter();
-
 
   // ページ読み込み時LocalStorageからデータを読み込む
   useEffect(() => {
@@ -74,12 +74,11 @@ const Main = () => {
     return quotationNumber;
   };
 
-
   const validateGlobalInputs = () => {
-    if(printData.staffName === "") {
+    if (printData.staffName === "") {
       toast({
         title: "担当者を入力してください",
-      })
+      });
       return false;
     }
     if (printData.ids.length === 0) {
@@ -113,7 +112,7 @@ const Main = () => {
       ...printData,
       extraOptions: filteredExtraOptions,
     });
-  }
+  };
 
   // 履歴に保存する関数
   const savePrintDataToHistory = async () => {
@@ -128,26 +127,22 @@ const Main = () => {
     } else {
       toast({
         title:
-        "すでに同じ見積もりが保存されていたため、履歴を保存しませんでした",
+          "すでに同じ見積もりが保存されていたため、履歴を保存しませんでした",
       });
     }
-  }
-
+  };
 
   const handleMobilePrintButtonClick = () => {
     const isValid = validateGlobalInputs();
     if (isValid) {
       savePrintDataToHistory();
-      router.push("/print");  // バリデーションが成功したときのみページ遷移
+      router.push("/print"); // バリデーションが成功したときのみページ遷移
     }
   };
 
-
   const handlePrintButtonClick = async () => {
-
     // 必須情報が入力されているか確認
-    if(validateGlobalInputs() === false)
-      return;
+    if (validateGlobalInputs() === false) return;
 
     savePrintDataToHistory();
     if (componentRef.current) handlePrint();
@@ -160,7 +155,7 @@ const Main = () => {
   return (
     <main className="w-screen print:hidden">
       <Header />
-      <div className="mb-12 mt-8 flex w-screen flex-col px-4 md:px-8 xl:flex-row xl:px-12 justify-center">
+      <div className="mb-12 mt-8 flex w-screen flex-col justify-center px-4 md:px-8 xl:flex-row xl:px-12">
         <div className="order-2 w-max xl:order-1">
           <GlobalQuotationInputs />
           <Separator className="hidden md:flex" />
@@ -204,21 +199,27 @@ const Main = () => {
             <PrintDataEditor
               generateQuotationNumber={generateQuotationNumber}
             />
-            <ResetButton setSearchResult = {setSearchResults} />
-            <Button
-              className="hidden w-min transform bg-green-500 font-bold transition-all duration-100 hover:scale-95 hover:bg-green-600 lg:flex"
-              onClick={() => handlePrintButtonClick()}
-            >
-              印刷
-            </Button>
-            <Button
-              className={`flex lg:hidden ${
-                printData.ids.length === 0 ? 'bg-green-300 hover:bg-green-400' : 'bg-green-500 hover:bg-green-600'
-              }`}
-              onClick={() => handleMobilePrintButtonClick()}
-            >
-              スマホ専用印刷ボタン
-            </Button>
+            <ResetButton setSearchResult={setSearchResults} />
+            {/* モバイルとPCで印刷のロジックを変えている。「印刷」の文字を統一しないとサーバーサイドのレンダリングとクライアントサイドのレンダリング結果に違いが出てエラーになるので注意 */}
+            {isMobile ? (
+              <Button
+                className={`flex ${
+                  printData.ids.length === 0
+                    ? "bg-green-300 hover:bg-green-400"
+                    : "bg-green-500 hover:bg-green-600"
+                }`}
+                onClick={() => handleMobilePrintButtonClick()}
+              >
+                印刷
+              </Button>
+            ) : (
+              <Button
+                className="w-min transform bg-green-500 font-bold transition-all duration-100 hover:scale-95 hover:bg-green-600"
+                onClick={() => handlePrintButtonClick()}
+              >
+                印刷
+              </Button>
+            )}
           </div>
           <div className="hidden justify-center xl:flex">
             <div className="">
