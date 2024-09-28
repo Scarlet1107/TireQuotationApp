@@ -48,6 +48,7 @@ export const DEFAULT_WHEEL = <Wheel>{
 };
 
 export const DEFAULT_PRINTDATA = <PrintData>{
+  id: 0,
   ids: [],
   tires: [],
   staffName: "",

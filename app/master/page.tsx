@@ -9,6 +9,7 @@ import AlertButton from "./AlertButton";
 import UploadButton from "./UploadButton";
 import ExportButton from "./ExportButton";
 import DataExist from "./DataExist";
+import HandlePrintLog from "./HandlerPrintLog";
 import {
   Card,
   CardContent,
@@ -133,6 +134,15 @@ const Page = () => {
                 </AlertButton>
                 <ExportButton>CustomerTypePriceRate</ExportButton>
               </CardContent>
+            </Card>
+
+            <Card className="m-4">
+              <CardHeader>
+                <CardTitle>Print_logs</CardTitle>
+                <CardDescription>履歴テーブル</CardDescription>
+              </CardHeader>
+              <HandlePrintLog />
+              <CardContent></CardContent>
             </Card>
           </div>
         </div>

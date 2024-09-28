@@ -34,11 +34,7 @@ const DataExist: React.FC<Props> = ({
   }, [trigger]);
   if (isLoading) return <div>テーブルの存在を確認中...</div>;
   if (error) return <div>エラー：{error}</div>;
-  return (
-    <div>
-      {exist ? ` ${tableName}は存在します` : `${tableName}は存在しません`}
-    </div>
-  );
+  return <div>{exist ? ` ${tableName}は存在します` : `${tableName}(空)`}</div>;
 };
 
 export default DataExist;

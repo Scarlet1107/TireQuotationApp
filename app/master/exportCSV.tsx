@@ -33,7 +33,23 @@ export const exportCSV = async (tableName: string) => {
         "cost",
       ];
     } else {
-      header = [];
+      header = [
+        "id",
+        "ids",
+        "tires",
+        "wheels",
+        "serviceFees",
+        "customerName",
+        "staffName",
+        "carModel",
+        "expiryDate",
+        "quotationNumber",
+        "numberOfTires",
+        "checkBox",
+        "discountRate",
+        "extraOption",
+        "createdAt",
+      ];
     }
 
     // データをCSV形式に変換

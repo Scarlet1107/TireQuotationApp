@@ -104,3 +104,15 @@ export const ExistDB = async (name: string): Promise<boolean> => {
   }
   return false;
 };
+
+export const deletePrint_log = async (id: number) => {
+  const { data, error } = await supabase
+    .from("print_logs")
+    .delete()
+    .eq("id", id);
+  if (error) {
+    console.error(error);
+  } else {
+    console.log("log data deleted:", data);
+  }
+};
