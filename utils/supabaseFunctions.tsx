@@ -40,7 +40,7 @@ export const searchTireByID = async (id: number) => {
 
 // Print History
 export const uploadPrintData = async (printData: PrintData) => {
-  const { data, error } = await supabase.from("print_logs").insert([
+  const { data, error } = await supabase.from("printLogs").insert([
     {
       ids: printData.ids,
       tires: printData.tires,
@@ -59,7 +59,7 @@ export const uploadPrintData = async (printData: PrintData) => {
   ]);
 
   if (error) {
-    console.error("Error uploading print data to print_logs: ", error);
+    console.error("Error uploading print data to printLogs: ", error);
     throw new Error("Failed to upload print data.");
   }
 
@@ -74,7 +74,7 @@ export const getPrintDataHistory = async () => {
     .limit(MAX_PRINT_LOG_HISTORY); // 履歴の取得最大数
 
   if (error) {
-    console.error("Error fetching print data history from print_logs: ", error);
+    console.error("Error fetching print data history from printLogs: ", error);
     throw new Error("Failed to fetch print data history.");
   }
 
@@ -115,4 +115,22 @@ export const deletePrint_log = async (id: number) => {
   } else {
     console.log("log data deleted:", data);
   }
+};
+
+export const getPrintLogsId = async () => {
+  const { data, error } = await supabase
+    .from("printLogs")
+    .select("id")
+    .order("id", { ascending: false }); // 最新のデータを取得
+
+  if (error) {
+    console.error(error);
+  }
+
+  const ids: number[] = data ? data.map((item) => item.id) : [];
+
+  console.log("fetch ids : " + ids);
+  console.log("ids[0] : " + ids[0]);
+
+  return ids;
 };

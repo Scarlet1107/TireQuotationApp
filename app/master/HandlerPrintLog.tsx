@@ -6,6 +6,7 @@ import { exportCSV } from "./exportCSV";
 import {
   getPrintDataHistory,
   deletePrint_log,
+  getPrintLogsId,
 } from "@/utils/supabaseFunctions";
 
 import {
@@ -23,13 +24,15 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 
 const HandlePrintLog = () => {
-  const [printHistory, setPrintHistory] = useState<PrintData[]>([]);
+  const [printLogsIDs, setPrintLogsIDs] = useState<number[]>([]);
   const [number, setNumber] = useState<number>(200);
   const { toast } = useToast();
 
   const fetchPrintLog = async () => {
-    const res = await getPrintDataHistory();
-    setPrintHistory(res as PrintData[]);
+    const res = await getPrintLogsId();
+    setPrintLogsIDs(res);
+
+    console.log("res = " + res);
 
     const dataLength = res.length;
     if (dataLength <= number) {
@@ -40,8 +43,8 @@ const HandlePrintLog = () => {
       });
     } else {
       for (let i = number; i < dataLength; i++) {
-        console.log(" printHistory : " + printHistory[i].id);
-        deletePrint_log(printHistory[i].id);
+        console.log(" printLogsIDs : " + printLogsIDs[i]);
+        deletePrint_log(printLogsIDs[i]);
       }
     }
   };

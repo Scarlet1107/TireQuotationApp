@@ -138,7 +138,7 @@ const Page = () => {
 
             <Card className="m-4">
               <CardHeader>
-                <CardTitle>Print_logs</CardTitle>
+                <CardTitle>printLogs</CardTitle>
                 <CardDescription>履歴テーブル</CardDescription>
               </CardHeader>
               <HandlePrintLog />
