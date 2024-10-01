@@ -36,6 +36,7 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
     return total;
   };
 
+
   const calculateExtraOptionsTotal = () => {
     return printData.extraOptions.reduce(
       (total, option) => total + option.price * option.quantity,
