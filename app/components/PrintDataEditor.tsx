@@ -92,7 +92,11 @@ const PrintDataEditor = ({ generateQuotationNumber }: PrintDataSheetProps) => {
     e.stopPropagation(); // ダイアログが表示されるのを防ぐ
 
     if (printData.ids[index] === 0) {
-      if (!window.confirm("このタイヤは手動で追加したタイヤです。データベースに存在しません。本当に削除しますか？")) {
+      if (
+        !window.confirm(
+          "このタイヤは手動で追加したタイヤです。データベースに存在しません。本当に削除しますか？",
+        )
+      ) {
         return;
       }
     }
@@ -114,7 +118,24 @@ const PrintDataEditor = ({ generateQuotationNumber }: PrintDataSheetProps) => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button disabled={printData.tires.length === 0}>編集</Button>
+        <Button id="editButton" disabled={printData.tires.length === 0} className="relative">
+          編集
+          {printData.ids.length >= 0 && (
+            <span
+              className={`absolute -right-3 -top-3 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-gray-800 text-center font-bold text-black ${
+                printData.ids.length === 1
+                  ? "bg-gray-200"
+                  : printData.ids.length === 2
+                    ? "bg-gray-300"
+                    : printData.ids.length === 3
+                      ? "bg-gray-400"
+                      : "bg-white"
+              }`}
+            >
+              {printData.ids.length}
+            </span>
+          )}
+        </Button>
       </SheetTrigger>
       <SheetContent className="max-h-[180vh] w-full max-w-xs overflow-y-auto sm:max-w-lg">
         <SheetHeader>
