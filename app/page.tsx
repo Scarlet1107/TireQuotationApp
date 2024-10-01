@@ -122,7 +122,7 @@ const Main = () => {
       try {
         await uploadPrintData(printData);
       } catch (error) {
-        console.error("Failed to save print data to print_logs:", error);
+        console.error("Failed to save print data to printLogs:", error);
       }
     } else {
       toast({

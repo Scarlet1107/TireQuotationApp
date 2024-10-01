@@ -1,7 +1,13 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { deletePrint_log, getPrintLogsId } from "@/utils/supabaseFunctions";
+import { useState, useEffect } from "react";
+import { PrintData } from "@/utils/interface";
+import { exportCSV } from "./exportCSV";
+import {
+  getPrintDataHistory,
+  deletePrint_log,
+  getPrintLogsId,
+} from "@/utils/supabaseFunctions";
 
 import {
   AlertDialog,
@@ -18,13 +24,17 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 
 const HandlePrintLog = () => {
+  const [printLogsIDs, setPrintLogsIDs] = useState<number[]>([]);
   const [number, setNumber] = useState<number>(200);
   const { toast } = useToast();
 
   const fetchPrintLog = async () => {
-    const printLogsIds = await getPrintLogsId();
+    const res = await getPrintLogsId();
+    setPrintLogsIDs(res);
 
-    const dataLength = printLogsIds.length;
+    console.log("res = " + res);
+
+    const dataLength = res.length;
     if (dataLength <= number) {
       toast({
         variant: "destructive",
@@ -32,8 +42,11 @@ const HandlePrintLog = () => {
         description: `保存されているlogの数が${number}以下です`,
       });
     } else {
+
+      console.log("length : " )
       for (let i = number; i < dataLength; i++) {
-        deletePrint_log(printLogsIds[i]);
+        console.log(" printLogsIDs : " + printLogsIDs[i]);
+        deletePrint_log(printLogsIDs[i]);
       }
     }
   };
