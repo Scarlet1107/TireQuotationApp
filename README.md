@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# タイヤ見積もりアプリ
 
-## Getting Started
+## 概要
 
-First, run the development server:
+このアプリは、タイヤの見積もりを簡単に作成できるウェブアプリケーションです。ユーザーはタイヤサイズと数量を入力することで、データベースから該当するタイヤの名前と価格のリストを取得し、見積もりを表示することができます。また、年に一度、csvファイルをアップロードしてデータベースを更新する機能も備えています。
+
+## 主な機能
+
+1. **タイヤ見積もり機能**
+
+   - ユーザーはタイヤサイズと数量を入力することで、該当するタイヤの見積もりを瞬時に取得できます。
+   - 各タイヤに対応するホイールも合わせて見積もりに追加されます。
+   - 見積もりには、顧客情報やスタッフ名、車両情報、見積もり有効期限なども含まれます。
+   - 詳細はinterfaceのprintDataを見てください。
+
+2. **印刷機能**
+
+   - 作成した見積もりはPDF形式で簡単にプリントアウトできます。
+
+3. **データベース更新機能(/master)**
+   - 管理者はcsvファイルをアップロードすることで、Supabaseデータベースのタイヤ情報を更新できます。
+   - 年に一度、タイヤ情報を最新のものに保つために使用されます。
+
+## 使用技術
+
+- **フロントエンド**: Next.js, TypeScript, React, Tailwind CSS
+- **バックエンド**: Next.js
+- **データベース**: Supabase (PostgreSQLベース)
+- **バージョン管理**: Github
+- **その他**: ホスティングにはAWS Amplifyを使用しています。これはGithubのレポジトリのmainブランチに紐づいているため、mainブランチにpushすると自動で再デプロイされます。またNext jsはバージョン１４のappルーターを使用しています。app直下のレポジトリ名がそのままルーティングになります。
+
+## インストール方法
+
+1. **Node.jsのインストール**
+   このアプリケーションをローカルで動作させるには、Node.jsが必要です。
+   Node.jsがインストールされていない場合、[Node.js公式サイト](https://nodejs.org/)からインストールしてください。
+
+   ```bash
+   node -v
+   ```
+
+2. **リポジトリをクローンします**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+   git clone git@github.com:TAKEUCHI-PARTS/QUOTATION-SYSTEM.git
+   cd QUOTATION-SYSTEM
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. **必要なパッケージのインストール**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+開発に必要なパッケージをインストールします。初回に一度だけ実行すればそれ以降は必要ありません。
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+   npm i
+```
 
-## Learn More
+4. **開発環境の立ち上げ**
 
-To learn more about Next.js, take a look at the following resources:
+以下のコマンドでローカルサーバーを立ち上げます。ローカルサーバーはデフォルトでlocalhost:3000に設定されています。
+```bash
+   npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+※立ち上げには１分ほど時間がかかる場合があります
