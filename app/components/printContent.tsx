@@ -36,7 +36,6 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
     return total;
   };
 
-
   const calculateExtraOptionsTotal = () => {
     return printData.extraOptions.reduce(
       (total, option) => total + option.price * option.quantity,
@@ -85,13 +84,9 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
       ref={ref}
       className="printable-component m-8 font-sans text-sm print:text-xs print:leading-tight"
     >
-      <h1 className="mb-4 text-center text-2xl font-bold print:text-xl">
-        御見積書
+      <h1 className="mb-4 text-center text-4xl font-bold print:text-xl">
+        タイヤ見積書
       </h1>
-
-      <p className="mb-4 text-center text-xl print:text-lg">
-        お見積りいただきありがとうございます。以下の内容でお見積りを作成いたしました。
-      </p>
 
       <div className="mb-4">
         <div className="flex justify-between">
@@ -214,7 +209,10 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
                 廃タイヤ処分
               </td>
               {printData.serviceFees.map((fee, index) => (
-                <td key={index} className="border border-gray-800 p-1 font-semibold">
+                <td
+                  key={index}
+                  className="border border-gray-800 p-1 font-semibold"
+                >
                   ¥{formatPrice(fee.tireDisposalFee)}
                 </td>
               ))}
@@ -267,7 +265,10 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
                 その他オプション
               </td>
               {printData.tires.map((_, index) => (
-                <td key={index} className="border border-gray-800 p-1 font-semibold">
+                <td
+                  key={index}
+                  className="border border-gray-800 p-1 font-semibold"
+                >
                   ¥{formatPrice(extraOptionsTotal)}
                 </td>
               ))}
