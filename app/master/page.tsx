@@ -142,7 +142,11 @@ const Page = () => {
                 <CardDescription>履歴テーブル</CardDescription>
               </CardHeader>
               <HandlePrintLog />
-              <CardContent></CardContent>
+              <CardContent>
+                <p>ここではPrintLogsの履歴を削除します</p>
+                <p>上の指定した値の数logを残して履歴を削除します</p>
+                <p>＜例＞70を入力　：　70個残して履歴を削除</p>
+              </CardContent>
             </Card>
           </div>
         </div>
