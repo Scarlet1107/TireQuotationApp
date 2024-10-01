@@ -94,8 +94,7 @@ export const deleteAllData = async (name: string) => {
 };
 
 export const ExistDB = async (name: string): Promise<boolean> => {
-  const { data, error } = await supabase.from(name).select("*").limit(1);
-  console.log(data);
+  const { data } = await supabase.from(name).select("*").limit(1);
   if (data?.length == 0) {
     return false;
   }
@@ -106,14 +105,11 @@ export const ExistDB = async (name: string): Promise<boolean> => {
 };
 
 export const deletePrint_log = async (id: number) => {
-  const { data, error } = await supabase
-    .from("printLogs")
-    .delete()
-    .eq("id", id);
+  const { error } = await supabase.from("printLogs").delete().eq("id", id);
   if (error) {
     console.error(error);
   } else {
-    console.log("log data deleted:", data);
+    console.log("print logs are successfully deleted:");
   }
 };
 
@@ -128,9 +124,6 @@ export const getPrintLogsId = async () => {
   }
 
   const ids: number[] = data ? data.map((item) => item.id) : [];
-
-  console.log("fetch ids : " + ids);
-  console.log("ids[0] : " + ids[0]);
 
   return ids;
 };
