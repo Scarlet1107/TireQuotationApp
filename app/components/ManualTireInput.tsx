@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import React, { useRef, useState } from "react";
 import WheelInputCollapsible from "./WheelInputCollapsible";
-import { PrintData, ServiceFee, Wheel } from "@/utils/interface";
+import { ServiceFee, Wheel } from "@/utils/interface";
 import { DEFAULT_WHEEL } from "@/config/constants";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";

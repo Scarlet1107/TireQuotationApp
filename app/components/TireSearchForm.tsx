@@ -13,7 +13,6 @@ import {
   TAX_RATE,
 } from "@/config/constants";
 import {
-  PrintData,
   SearchResult,
   SelectData,
   ServiceFee,
