@@ -32,6 +32,7 @@ const Main = () => {
   const componentRef = useRef(null);
   const isMounted = useRef(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [printReady, setPrintReady] = useState(false); // PCで印刷ボタンを押した際に、空の追加オプションを取り除くためのフラグ
   const router = useRouter();
 
   // ページ読み込み時LocalStorageからデータを読み込む
@@ -72,7 +73,8 @@ const Main = () => {
     const day = String(now.getDate()).padStart(2, "0");
     const hours = String(now.getHours()).padStart(2, "0");
     const minutes = String(now.getMinutes()).padStart(2, "0");
-    const quotationNumber = `${year}${month}${day}${hours}${minutes}`;
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    const quotationNumber = `${year}${month}${day}${hours}${minutes}${seconds}`;
     return quotationNumber;
   };
 
@@ -118,12 +120,15 @@ const Main = () => {
 
   // 履歴に保存する関数
   const savePrintDataToHistory = async () => {
-    // すでに同じ見積もりを複数回保存しないようにする
+    // すでに同じ見積もりがある場合回保存しないようにする
     const printDataHistory = await getPrintDataHistory();
-    if (
-      printDataHistory[0].quotationNumber !== printData.quotationNumber ||
-      printDataHistory.length === 0
-    ) {
+
+    // 履歴に同じ見積もり番号があるか確認
+    const isDuplicate = printDataHistory.some(
+      (history) => history.quotationNumber === printData.quotationNumber,
+    );
+
+    if (!isDuplicate) {
       try {
         await uploadPrintData(printData);
       } catch (error) {
@@ -150,8 +155,16 @@ const Main = () => {
     if (validateGlobalInputs() === false) return;
 
     savePrintDataToHistory();
-    if (componentRef.current) handlePrint();
+    setPrintReady(true); // 状態の更新が終わったら印刷フラグを立てる
   };
+
+  useEffect(() => {
+    if (printReady) {
+      if (componentRef.current) handlePrint();
+      setPrintReady(false); // 一度印刷が終わったらフラグをリセット
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [printReady]);
 
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
