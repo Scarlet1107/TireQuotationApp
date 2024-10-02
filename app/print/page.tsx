@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-import PrintContent from "@/app/components/PrintContent";
+import PrintContent from "@/app/components/printContent";
 import { usePrintData } from "../printDataContext";
 
 // スマホで印刷ボタンを押した際に印刷ダイアログを表示するためのページ

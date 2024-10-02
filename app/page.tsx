@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toaster";
 import { Separator } from "@/components/ui/separator";
-import PrintContent from "@/app/components/PrintContent";
+import PrintContent from "@/app/components/printContent";
 import PrintDataEditor from "./components/PrintDataEditor";
 import ResetButton from "./components/ResetButton";
 import GlobalQuotationInputs from "./components/GlobalQuotationInputs";
@@ -21,7 +21,7 @@ import ManualTireInput from "./components/ManualTireInput";
 import Header from "./components/Header";
 import { usePrintData } from "./printDataContext";
 import { useRouter } from "next/navigation";
-import { isMobile } from "react-device-detect"; // スマホからのアクセスかどうかを判定するためのライブラリ
+import { isMobile as detectMobile } from "react-device-detect"; // スマホからのアクセスかどうかを判定するためのライブラリ
 
 const Main = () => {
   const { toast } = useToast();
@@ -31,6 +31,7 @@ const Main = () => {
 
   const componentRef = useRef(null);
   const isMounted = useRef(false);
+  const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
 
   // ページ読み込み時LocalStorageからデータを読み込む
@@ -42,6 +43,7 @@ const Main = () => {
       }
       isMounted.current = true;
     }
+    setIsMobile(detectMobile);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -118,7 +120,10 @@ const Main = () => {
   const savePrintDataToHistory = async () => {
     // すでに同じ見積もりを複数回保存しないようにする
     const printDataHistory = await getPrintDataHistory();
-    if ((printDataHistory[0].quotationNumber !== printData.quotationNumber) || printDataHistory.length === 0) {
+    if (
+      printDataHistory[0].quotationNumber !== printData.quotationNumber ||
+      printDataHistory.length === 0
+    ) {
       try {
         await uploadPrintData(printData);
       } catch (error) {
@@ -205,12 +210,12 @@ const Main = () => {
               <Button
                 className={`flex ${
                   printData.ids.length === 0
-                    ? "bg-green-300 hover:bg-green-400"
+                    ? "bg-green-300 hover:bg-green-300"
                     : "bg-green-500 hover:bg-green-600"
                 }`}
                 onClick={() => handleMobilePrintButtonClick()}
               >
-                印刷
+                スマホ用印刷ボタン
               </Button>
             ) : (
               <Button
