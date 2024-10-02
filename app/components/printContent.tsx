@@ -80,51 +80,49 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
   };
 
   return (
-    <div
-      ref={ref}
-      className="printable-component m-8 font-sans text-sm print:text-xs print:leading-tight"
-    >
-      <h1 className="mb-4 text-center text-4xl font-bold print:text-xl">
-        タイヤ見積書
-      </h1>
+    <div ref={ref} className="m-8 font-sans print:leading-tight">
+      <h1 className="mb-8 text-center text-4xl font-bold">タイヤ見積書</h1>
 
       <div className="mb-4">
-        <div className="flex justify-between">
-          <p>
-            お客様名:{" "}
-            <span className="font-semibold">{printData.customerName}</span>
-          </p>
-          <p>
-            発行日:{" "}
-            <span className="font-semibold">
-              {new Date().toLocaleDateString("ja-JP", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
-          </p>
-        </div>
-        <div className="flex justify-between">
-          <p>
-            車種: <span className="font-semibold">{printData.carModel}</span>
-          </p>
-          <p>
-            有効期限:{" "}
-            <span className="font-semibold">
-              {new Date(printData.expiryDate).toLocaleDateString("ja-JP", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
-          </p>
-        </div>
-        <div className="flex justify-between">
-          <p>見積番号: {printData.quotationNumber}</p>
-          <p>
-            担当者: <span className="font-semibold">{printData.staffName}</span>
-          </p>
+        <div className="grid grid-cols-2">
+          <div className="flex flex-col space-y-2">
+            <p className="text-left text-2xl">
+              お客様名:{" "}
+              <span className="text-2xl font-semibold">
+                {printData.customerName}
+              </span>
+            </p>
+            <p className="text-left text-2xl">
+              車種: <span className="font-semibold">{printData.carModel}</span>
+            </p>
+          </div>
+          <div className="flex flex-col items-end">
+            <p>
+              発行日:{" "}
+              <span className="font-semibold">
+                {new Date().toLocaleDateString("ja-JP", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </p>
+            <p>
+              有効期限:{" "}
+              <span className="font-semibold">
+                {new Date(printData.expiryDate).toLocaleDateString("ja-JP", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </p>
+            <p>見積番号: {printData.quotationNumber}</p>
+            <p>
+              担当者:{" "}
+              <span className="font-semibold">{printData.staffName}</span>
+            </p>
+          </div>
         </div>
       </div>
 
