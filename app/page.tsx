@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toaster";
 import { Separator } from "@/components/ui/separator";
-import PrintContent from "./components/printContent";
+import PrintContent from "@/app/components/PrintContent";
 import PrintDataEditor from "./components/PrintDataEditor";
 import ResetButton from "./components/ResetButton";
 import GlobalQuotationInputs from "./components/GlobalQuotationInputs";
@@ -118,7 +118,7 @@ const Main = () => {
   const savePrintDataToHistory = async () => {
     // すでに同じ見積もりを複数回保存しないようにする
     const printDataHistory = await getPrintDataHistory();
-    if (printDataHistory[0].quotationNumber !== printData.quotationNumber) {
+    if ((printDataHistory[0].quotationNumber !== printData.quotationNumber) || printDataHistory.length === 0) {
       try {
         await uploadPrintData(printData);
       } catch (error) {

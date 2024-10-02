@@ -82,17 +82,17 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
   return (
     <div
       ref={ref}
-      className="printable-component m-8 font-sans text-sm print:text-xs print:leading-tight"
+      className="m-8 font-sans print:leading-tight"
     >
-      <h1 className="mb-4 text-center text-4xl font-bold print:text-xl">
+      <h1 className="mb-4 text-center text-4xl font-bold">
         タイヤ見積書
       </h1>
 
       <div className="mb-4">
         <div className="flex justify-between">
-          <p>
+          <p className="text-4xl">
             お客様名:{" "}
-            <span className="font-semibold">{printData.customerName}</span>
+            <span className="font-semibold text-4xl">{printData.customerName}</span>
           </p>
           <p>
             発行日:{" "}
@@ -106,7 +106,7 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
           </p>
         </div>
         <div className="flex justify-between">
-          <p>
+          <p className="text-4xl">
             車種: <span className="font-semibold">{printData.carModel}</span>
           </p>
           <p>
