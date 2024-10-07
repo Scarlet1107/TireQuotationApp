@@ -1,7 +1,10 @@
 "use client";
 import React from "react";
 import { ServiceFee, DiscountRate } from "@/utils/interface";
-import { TAX_RATE } from "@/config/constants";
+import {
+  QUALIFIED_INVOICE_ISSUER_REGISTRATION_NUMBER,
+  TAX_RATE,
+} from "@/config/constants";
 import Image from "next/image";
 import { usePrintData } from "../printDataContext";
 
@@ -50,30 +53,58 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
     else return wheel.price * wheel.quantity;
   });
 
-  const renderDiscountedPrice = (price: number, discountRate: number) => {
+  // 割引率が100%, 0%, それ以外の場合で表示を変える関数。tireStorageFee(タイヤ預かり料)は
+  const renderDiscountedPrice = (
+    price: number,
+    discountRate: number,
+    feeType: "laborFee" | "tireDisposalFee" | "tireStorageFee", // removalFeeは割引率に依存しないので、ここには含めない
+  ) => {
+    // tireStorageFeeならタイヤの本数を掛けない
+    const multipliedFee =
+      feeType === "tireStorageFee" ? price : price * printData.numberOfTires;
+
     if (discountRate === 100) {
       return (
         <div>
           <span className="mr-2 line-through decoration-double decoration-2">
-            ¥{formatPrice(price)}
+            {feeType !== "tireStorageFee" && (
+              <>
+                {formatPrice(price)} × {printData.numberOfTires}本<br />¥
+              </>
+            )}
+            {formatPrice(multipliedFee)}
           </span>
           <span>→</span>
           <span className="ml-2 font-semibold">無料！</span>
         </div>
       );
-    } else {
-      const discountedPrice = applyDiscount(price, discountRate);
+    } else if (discountRate > 0) {
+      const discountedPrice = applyDiscount(multipliedFee, discountRate);
       return (
         <div>
-          {discountRate > 0 && (
-            <span className="mr-2 line-through decoration-double decoration-2">
-              ¥{formatPrice(price)}
-            </span>
-          )}
+          <span className="mr-2 line-through decoration-double decoration-2">
+            {feeType !== "tireStorageFee" && (
+              <>
+                {formatPrice(price)} × {printData.numberOfTires}本<br />¥
+              </>
+            )}
+            {formatPrice(multipliedFee)}
+          </span>
           <span className="font-semibold">¥{formatPrice(discountedPrice)}</span>
-          {discountRate > 0 && (
-            <span className="ml-2 text-xs">({discountRate}%割引)</span>
-          )}
+          <span className="ml-2 text-xs">({discountRate}%割引)</span>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <span>
+            {feeType !== "tireStorageFee" && (
+              <>
+                {formatPrice(price)} × {printData.numberOfTires}本<br />
+              </>
+            )}
+          </span>
+          <span className="font-semibold">¥{formatPrice(multipliedFee)}</span>
         </div>
       );
     }
@@ -181,6 +212,7 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
                   {renderDiscountedPrice(
                     fee.laborFee,
                     printData.discountRate.laborFee,
+                    "laborFee",
                   )}
                 </td>
               ))}
@@ -196,6 +228,7 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
                   {renderDiscountedPrice(
                     fee.removalFee,
                     printData.discountRate.removalFee,
+                    "tireDisposalFee",
                   )}
                 </td>
               ))}
@@ -211,7 +244,9 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
                   key={index}
                   className="border border-gray-800 p-1 font-semibold"
                 >
-                  ¥{formatPrice(fee.tireDisposalFee)}
+                  {formatPrice(fee.tireDisposalFee)} × {printData.numberOfTires}
+                  本<br />¥
+                  {formatPrice(fee.tireDisposalFee * printData.numberOfTires)}
                 </td>
               ))}
             </tr>
@@ -226,6 +261,7 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
                   {renderDiscountedPrice(
                     fee.tireStorageFee,
                     printData.discountRate.tireStorageFee,
+                    "tireStorageFee",
                   )}
                 </td>
               ))}
@@ -358,8 +394,9 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
         </div>
       )}
 
-      <div className="flex justify-end text-xs">
+      <div className="flex flex-col items-end">
         <Image src="/TakeuchiPartLogo.jpg" alt="ロゴ" width={300} height={88} />
+        <span className="">{QUALIFIED_INVOICE_ISSUER_REGISTRATION_NUMBER}</span>
       </div>
     </div>
   );
