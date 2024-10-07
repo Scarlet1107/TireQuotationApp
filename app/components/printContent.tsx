@@ -20,6 +20,7 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
     return price * (1 - discountRate / 100);
   };
 
+  // 見積もりの合計金額を計算する関数（税抜き）
   const calculateTotalPrice = (
     tire: any,
     fee: ServiceFee,
@@ -28,14 +29,21 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
     let total =
       Math.ceil((tire.tirePrice * tire.priceRate) / 10) *
       10 *
-      printData.numberOfTires;
+      printData.numberOfTires; //タイヤの価格
     if (printData.checkBoxState.laborFee)
-      total += applyDiscount(fee.laborFee, discountRate.laborFee);
+      total += applyDiscount(
+        fee.laborFee * printData.numberOfTires,
+        discountRate.laborFee,
+      );
     if (printData.checkBoxState.removalFee)
-      total += applyDiscount(fee.removalFee, discountRate.removalFee);
+      total += applyDiscount(
+        fee.removalFee * printData.numberOfTires,
+        discountRate.removalFee,
+      );
     if (printData.checkBoxState.tireStorageFee)
       total += applyDiscount(fee.tireStorageFee, discountRate.tireStorageFee);
-    if (printData.checkBoxState.tireDisposalFee) total += fee.tireDisposalFee;
+    if (printData.checkBoxState.tireDisposalFee)
+      total += fee.tireDisposalFee * printData.numberOfTires;
     return total;
   };
 
@@ -308,6 +316,28 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
               ))}
             </tr>
           )}
+          <tr>
+            <td className="border border-gray-800 p-1 font-semibold">
+              消費税（10%）
+            </td>
+            {printData.tires.map((tire, index) => (
+              <td key={index} className="border border-gray-800 p-1">
+                <div className="font-semibold">
+                  ¥
+                  {formatPrice(
+                    (calculateTotalPrice(
+                      tire,
+                      printData.serviceFees[index],
+                      printData.discountRate,
+                    ) +
+                      extraOptionsTotal +
+                      wheelTotals[index]) *
+                      (TAX_RATE - 1.0),
+                  )}
+                </div>
+              </td>
+            ))}
+          </tr>
           <tr className="bg-gray-200">
             <td className="border border-gray-800 p-1 font-semibold">
               合計金額（税込）
@@ -325,23 +355,6 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
                     wheelTotals[index]) *
                     TAX_RATE,
                 )}
-                <span className="mx-2">
-                  (内税
-                  <span className="mx-1">
-                    ¥
-                    {formatPrice(
-                      (calculateTotalPrice(
-                        tire,
-                        printData.serviceFees[index],
-                        printData.discountRate,
-                      ) +
-                        extraOptionsTotal +
-                        wheelTotals[index]) *
-                        (TAX_RATE - 1.0),
-                    )}
-                    )
-                  </span>
-                </span>
               </td>
             ))}
           </tr>
