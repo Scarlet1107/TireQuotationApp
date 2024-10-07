@@ -318,7 +318,7 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
           )}
           <tr>
             <td className="border border-gray-800 p-1 font-semibold">
-              消費税（10%）
+              消費税（{Math.round(TAX_RATE * 100 - 100)}%）
             </td>
             {printData.tires.map((tire, index) => (
               <td key={index} className="border border-gray-800 p-1">
