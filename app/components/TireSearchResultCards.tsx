@@ -120,8 +120,14 @@ const TireSearchResultCards = ({
                       <div className="flex justify-between">
                         <span className="mr-4">タイヤ:</span>
                         <span>
-                          {formatPrice(result.tirePrice)}×{result.priceRate}×
-                          {result.numberOfTires} 円
+                          {formatPrice(
+                            Math.ceil(
+                              (result.tirePrice * result.priceRate) / 10,
+                            ) *
+                              10 *
+                              result.numberOfTires,
+                          )}
+                          円
                         </span>
                       </div>
                       {result.wheel.isIncluded && (
@@ -138,21 +144,7 @@ const TireSearchResultCards = ({
 
                       <div className="flex justify-between">
                         <span>工賃:</span>
-                        <span>
-                          {formatPrice(
-                            (result.serviceFee.laborFee *
-                              (100 - result.discountRate.laborFee)) /
-                              100 +
-                              (result.serviceFee.removalFee *
-                                (100 - result.discountRate.removalFee)) /
-                                100 +
-                              result.serviceFee.tireDisposalFee +
-                              (result.serviceFee.tireStorageFee *
-                                (100 - result.discountRate.tireStorageFee)) /
-                                100,
-                          )}
-                          円
-                        </span>
+                        <span>{formatPrice(result.totalServiceFee)}円</span>
                       </div>
 
                       {calculateExtraOptionsTotal() !== 0 && (
@@ -184,6 +176,18 @@ const TireSearchResultCards = ({
                   <div>
                     <span>パターン: </span>
                     <span>{result.pattern}</span>
+                  </div>
+                  <div>
+                    <span>タイヤ:</span>
+                    <br />
+                    {formatPrice(result.tirePrice)} × {result.priceRate} ×{" "}
+                    {printData.numberOfTires} =
+                    {formatPrice(
+                      Math.ceil((result.tirePrice * result.priceRate) / 10) *
+                        10 *
+                        result.numberOfTires,
+                    )}
+                    円
                   </div>
                   <div className="mt-2">
                     <span>タイヤ{result.numberOfTires}本の利益: </span>
