@@ -39,6 +39,10 @@ const ManualComponent = () => {
               <li>
                 csvファイルを保存する際は、データ形式をcsv UTF-8に指定して保存
               </li>
+              <li>
+                idのみ行は作らない
+                idのみしか入力されていない行があるとエラーになる
+              </li>
             </ul>
           </CardContent>
         </Card>
