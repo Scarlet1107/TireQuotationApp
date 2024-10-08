@@ -12,12 +12,7 @@ import {
   DEFAULT_WHEEL,
   TAX_RATE,
 } from "@/config/constants";
-import {
-  SearchResult,
-  SelectData,
-  ServiceFee,
-  Wheel,
-} from "@/utils/interface";
+import { SearchResult, SelectData, ServiceFee, Wheel } from "@/utils/interface";
 import {
   getAllmanufacturer,
   getAllTireSizes,
@@ -158,7 +153,7 @@ const TireSearchForm = ({ setSearchResults }: TireSearchFormProps) => {
         tireSearchFilters.target,
       );
       // タイヤ一本当たりの「A表の価格」*「お客さんのタイプごとの掛け率」
-      const sellingPrice = Math.ceil(tirePrice * priceRate);
+      const sellingPrice = Math.ceil((tirePrice * priceRate) / 10) * 10;
 
       const profit = Math.ceil(
         (sellingPrice - tirePrice * searchMarkupRate(tire.pattern, "cost")) *
@@ -195,6 +190,7 @@ const TireSearchForm = ({ setSearchResults }: TireSearchFormProps) => {
           tireStorageFee: serviceFee.tireStorageFee,
           tireDisposalFee: serviceFee.tireDisposalFee,
         },
+        totalServiceFee: totalServiceFee,
         totalPrice: totalPrice,
         totalPriceWithTax: totalPriceWithTax,
         discountRate: printData.discountRate,
@@ -220,14 +216,20 @@ const TireSearchForm = ({ setSearchResults }: TireSearchFormProps) => {
     return rate[target] / 100;
   };
 
+  // 作業工賃・脱着工賃・タイヤ預かり・廃タイヤ処分の合計を求める
   const calculateTotalServiceFee = (serviceFee: any) => {
     let total = 0;
     if (printData.checkBoxState.laborFee)
       total +=
-        (serviceFee.laborFee * (100 - printData.discountRate.laborFee)) / 100;
+        (serviceFee.laborFee *
+          printData.numberOfTires *
+          (100 - printData.discountRate.laborFee)) /
+        100;
     if (printData.checkBoxState.removalFee)
       total +=
-        (serviceFee.removalFee * (100 - printData.discountRate.removalFee)) /
+        (serviceFee.removalFee *
+          printData.numberOfTires *
+          (100 - printData.discountRate.removalFee)) /
         100;
     if (printData.checkBoxState.tireStorageFee)
       total +=
@@ -235,12 +237,10 @@ const TireSearchForm = ({ setSearchResults }: TireSearchFormProps) => {
           (100 - printData.discountRate.tireStorageFee)) /
         100;
     if (printData.checkBoxState.tireDisposalFee)
-      total += serviceFee.tireDisposalFee;
+      total += serviceFee.tireDisposalFee * printData.numberOfTires;
     return total;
   };
 
-  // ここ冗長な書き方になってるので後々リファクタリングする
-  // 名前がひどい
   const calculateLaborCost = (rank: string) => {
     let totalCost = {
       laborFee: 0,
