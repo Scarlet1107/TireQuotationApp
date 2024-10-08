@@ -44,10 +44,12 @@ const UploadButton: React.FC<UploadButtonProps> = ({
     try {
       Papa.parse(fileInputRef.current.files[0], {
         header: true,
+        skipEmptyLines: true,
         complete: async function (results: { data: any; errors: any }) {
           const { data, errors } = results;
           if (errors.length) {
             console.error(errors);
+            console.log("this is check point");
             setUploading(false);
             return;
           }
