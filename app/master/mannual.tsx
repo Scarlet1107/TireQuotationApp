@@ -32,6 +32,23 @@ const ManualComponent = () => {
 
         <Card className="mb-4">
           <CardHeader>
+            <h2 className="text-2xl font-bold">注意点</h2>
+          </CardHeader>
+          <CardContent>
+            <ul className="list-inside list-disc">
+              <li>
+                csvファイルを保存する際は、データ形式をcsv UTF-8に指定して保存
+              </li>
+              <li>
+                idのみ行は作らない
+                idのみしか入力されていない行があるとエラーになる
+              </li>
+            </ul>
+          </CardContent>
+        </Card>
+
+        <Card className="mb-4">
+          <CardHeader>
             <h2 className="text-2xl font-bold">tirePrice表</h2>
           </CardHeader>
           <CardContent>

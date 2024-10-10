@@ -10,8 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toaster";
-import { Separator } from "@/components/ui/separator";
-import PrintContent from "./components/printContent";
+import PrintContent from "@/app/components/printContent";
 import PrintDataEditor from "./components/PrintDataEditor";
 import ResetButton from "./components/ResetButton";
 import GlobalQuotationInputs from "./components/GlobalQuotationInputs";
@@ -21,7 +20,7 @@ import ManualTireInput from "./components/ManualTireInput";
 import Header from "./components/Header";
 import { usePrintData } from "./printDataContext";
 import { useRouter } from "next/navigation";
-import { isMobile } from "react-device-detect"; // スマホからのアクセスかどうかを判定するためのライブラリ
+import { isMobile as detectMobile } from "react-device-detect"; // スマホからのアクセスかどうかを判定するためのライブラリ
 
 const Main = () => {
   const { toast } = useToast();
@@ -31,6 +30,8 @@ const Main = () => {
 
   const componentRef = useRef(null);
   const isMounted = useRef(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [printReady, setPrintReady] = useState(false); // PCで印刷ボタンを押した際に、空の追加オプションを取り除くためのフラグ
   const router = useRouter();
 
   // ページ読み込み時LocalStorageからデータを読み込む
@@ -42,6 +43,7 @@ const Main = () => {
       }
       isMounted.current = true;
     }
+    setIsMobile(detectMobile);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -70,7 +72,8 @@ const Main = () => {
     const day = String(now.getDate()).padStart(2, "0");
     const hours = String(now.getHours()).padStart(2, "0");
     const minutes = String(now.getMinutes()).padStart(2, "0");
-    const quotationNumber = `${year}${month}${day}${hours}${minutes}`;
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    const quotationNumber = `${year}${month}${day}${hours}${minutes}${seconds}`;
     return quotationNumber;
   };
 
@@ -116,9 +119,15 @@ const Main = () => {
 
   // 履歴に保存する関数
   const savePrintDataToHistory = async () => {
-    // すでに同じ見積もりを複数回保存しないようにする
+    // すでに同じ見積もりがある場合回保存しないようにする
     const printDataHistory = await getPrintDataHistory();
-    if (printDataHistory[0].quotationNumber !== printData.quotationNumber) {
+
+    // 履歴に同じ見積もり番号があるか確認
+    const isDuplicate = printDataHistory.some(
+      (history) => history.quotationNumber === printData.quotationNumber,
+    );
+
+    if (!isDuplicate) {
       try {
         await uploadPrintData(printData);
       } catch (error) {
@@ -145,8 +154,16 @@ const Main = () => {
     if (validateGlobalInputs() === false) return;
 
     savePrintDataToHistory();
-    if (componentRef.current) handlePrint();
+    setPrintReady(true); // 状態の更新が終わったら印刷フラグを立てる
   };
+
+  useEffect(() => {
+    if (printReady) {
+      if (componentRef.current) handlePrint();
+      setPrintReady(false); // 一度印刷が終わったらフラグをリセット
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [printReady]);
 
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
@@ -158,7 +175,6 @@ const Main = () => {
       <div className="mb-12 mt-8 flex w-screen flex-col justify-center px-4 md:px-8 xl:flex-row xl:px-12">
         <div className="order-2 w-max xl:order-1">
           <GlobalQuotationInputs />
-          <Separator className="hidden md:flex" />
           {/* デフォルトではタブを切り替えるたびにコンポーネントが再レンダリングされてしまうため、TabsContentのclassNameにて表示/非表示の切り替えを行っている。 */}
           <Tabs
             defaultValue="search-tires"
@@ -205,12 +221,12 @@ const Main = () => {
               <Button
                 className={`flex ${
                   printData.ids.length === 0
-                    ? "bg-green-300 hover:bg-green-400"
+                    ? "bg-green-300 hover:bg-green-300"
                     : "bg-green-500 hover:bg-green-600"
                 }`}
                 onClick={() => handleMobilePrintButtonClick()}
               >
-                印刷
+                スマホ用印刷ボタン
               </Button>
             ) : (
               <Button

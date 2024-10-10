@@ -1,7 +1,10 @@
 "use client";
 import React from "react";
 import { ServiceFee, DiscountRate } from "@/utils/interface";
-import { TAX_RATE } from "@/config/constants";
+import {
+  QUALIFIED_INVOICE_ISSUER_REGISTRATION_NUMBER,
+  TAX_RATE,
+} from "@/config/constants";
 import Image from "next/image";
 import { usePrintData } from "../printDataContext";
 
@@ -17,6 +20,7 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
     return price * (1 - discountRate / 100);
   };
 
+  // 見積もりの合計金額を計算する関数（税抜き）
   const calculateTotalPrice = (
     tire: any,
     fee: ServiceFee,
@@ -25,14 +29,21 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
     let total =
       Math.ceil((tire.tirePrice * tire.priceRate) / 10) *
       10 *
-      printData.numberOfTires;
+      printData.numberOfTires; //タイヤの価格
     if (printData.checkBoxState.laborFee)
-      total += applyDiscount(fee.laborFee, discountRate.laborFee);
+      total += applyDiscount(
+        fee.laborFee * printData.numberOfTires,
+        discountRate.laborFee,
+      );
     if (printData.checkBoxState.removalFee)
-      total += applyDiscount(fee.removalFee, discountRate.removalFee);
+      total += applyDiscount(
+        fee.removalFee * printData.numberOfTires,
+        discountRate.removalFee,
+      );
     if (printData.checkBoxState.tireStorageFee)
       total += applyDiscount(fee.tireStorageFee, discountRate.tireStorageFee);
-    if (printData.checkBoxState.tireDisposalFee) total += fee.tireDisposalFee;
+    if (printData.checkBoxState.tireDisposalFee)
+      total += fee.tireDisposalFee * printData.numberOfTires;
     return total;
   };
 
@@ -50,81 +61,107 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
     else return wheel.price * wheel.quantity;
   });
 
-  const renderDiscountedPrice = (price: number, discountRate: number) => {
+  // 割引率が100%, 0%, それ以外の場合で表示を変える関数。tireStorageFee(タイヤ預かり料)は
+  const renderDiscountedPrice = (
+    price: number,
+    discountRate: number,
+    feeType: "laborFee" | "tireDisposalFee" | "tireStorageFee", // removalFeeは割引率に依存しないので、ここには含めない
+  ) => {
+    // tireStorageFeeならタイヤの本数を掛けない
+    const multipliedFee =
+      feeType === "tireStorageFee" ? price : price * printData.numberOfTires;
+
     if (discountRate === 100) {
       return (
         <div>
           <span className="mr-2 line-through decoration-double decoration-2">
-            ¥{formatPrice(price)}
+            {feeType !== "tireStorageFee" && (
+              <>
+                {formatPrice(price)} × {printData.numberOfTires}本<br />¥
+              </>
+            )}
+            {formatPrice(multipliedFee)}
           </span>
           <span>→</span>
           <span className="ml-2 font-semibold">無料！</span>
         </div>
       );
-    } else {
-      const discountedPrice = applyDiscount(price, discountRate);
+    } else if (discountRate > 0) {
+      const discountedPrice = applyDiscount(multipliedFee, discountRate);
       return (
         <div>
-          {discountRate > 0 && (
-            <span className="mr-2 line-through decoration-double decoration-2">
-              ¥{formatPrice(price)}
-            </span>
-          )}
+          <span className="mr-2 line-through decoration-double decoration-2">
+            {feeType !== "tireStorageFee" && (
+              <>
+                {formatPrice(price)} × {printData.numberOfTires}本<br />¥
+              </>
+            )}
+            {formatPrice(multipliedFee)}
+          </span>
           <span className="font-semibold">¥{formatPrice(discountedPrice)}</span>
-          {discountRate > 0 && (
-            <span className="ml-2 text-xs">({discountRate}%割引)</span>
-          )}
+          <span className="ml-2 text-xs">({discountRate}%割引)</span>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <span>
+            {feeType !== "tireStorageFee" && (
+              <>
+                {formatPrice(price)} × {printData.numberOfTires}本<br />
+              </>
+            )}
+          </span>
+          <span className="font-semibold">¥{formatPrice(multipliedFee)}</span>
         </div>
       );
     }
   };
 
   return (
-    <div
-      ref={ref}
-      className="printable-component m-8 font-sans text-sm print:text-xs print:leading-tight"
-    >
-      <h1 className="mb-4 text-center text-4xl font-bold print:text-xl">
-        タイヤ見積書
-      </h1>
+    <div ref={ref} className="m-8 font-sans print:leading-tight">
+      <h1 className="mb-8 text-center text-4xl font-bold">タイヤ見積書</h1>
 
       <div className="mb-4">
-        <div className="flex justify-between">
-          <p>
-            お客様名:{" "}
-            <span className="font-semibold">{printData.customerName}</span>
-          </p>
-          <p>
-            発行日:{" "}
-            <span className="font-semibold">
-              {new Date().toLocaleDateString("ja-JP", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
-          </p>
-        </div>
-        <div className="flex justify-between">
-          <p>
-            車種: <span className="font-semibold">{printData.carModel}</span>
-          </p>
-          <p>
-            有効期限:{" "}
-            <span className="font-semibold">
-              {new Date(printData.expiryDate).toLocaleDateString("ja-JP", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
-          </p>
-        </div>
-        <div className="flex justify-between">
-          <p>見積番号: {printData.quotationNumber}</p>
-          <p>
-            担当者: <span className="font-semibold">{printData.staffName}</span>
-          </p>
+        <div className="grid grid-cols-2">
+          <div className="flex flex-col space-y-2">
+            <p className="text-left text-2xl">
+              お客様名:{" "}
+              <span className="text-2xl font-semibold">
+                {printData.customerName}
+              </span>
+            </p>
+            <p className="text-left text-2xl">
+              車種: <span className="font-semibold">{printData.carModel}</span>
+            </p>
+          </div>
+          <div className="flex flex-col items-end">
+            <p>
+              発行日:{" "}
+              <span className="font-semibold">
+                {new Date().toLocaleDateString("ja-JP", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </p>
+            <p>
+              有効期限:{" "}
+              <span className="font-semibold">
+                {new Date(printData.expiryDate).toLocaleDateString("ja-JP", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </p>
+            <p>見積番号: {printData.quotationNumber}</p>
+            <p>
+              担当者:{" "}
+              <span className="font-semibold">{printData.staffName}</span>
+            </p>
+          </div>
         </div>
       </div>
 
@@ -183,6 +220,7 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
                   {renderDiscountedPrice(
                     fee.laborFee,
                     printData.discountRate.laborFee,
+                    "laborFee",
                   )}
                 </td>
               ))}
@@ -198,6 +236,7 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
                   {renderDiscountedPrice(
                     fee.removalFee,
                     printData.discountRate.removalFee,
+                    "tireDisposalFee",
                   )}
                 </td>
               ))}
@@ -213,7 +252,9 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
                   key={index}
                   className="border border-gray-800 p-1 font-semibold"
                 >
-                  ¥{formatPrice(fee.tireDisposalFee)}
+                  {formatPrice(fee.tireDisposalFee)} × {printData.numberOfTires}
+                  本<br />¥
+                  {formatPrice(fee.tireDisposalFee * printData.numberOfTires)}
                 </td>
               ))}
             </tr>
@@ -228,6 +269,7 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
                   {renderDiscountedPrice(
                     fee.tireStorageFee,
                     printData.discountRate.tireStorageFee,
+                    "tireStorageFee",
                   )}
                 </td>
               ))}
@@ -274,6 +316,28 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
               ))}
             </tr>
           )}
+          <tr>
+            <td className="border border-gray-800 p-1 font-semibold">
+              消費税（{Math.round(TAX_RATE * 100 - 100)}%）
+            </td>
+            {printData.tires.map((tire, index) => (
+              <td key={index} className="border border-gray-800 p-1">
+                <div className="font-semibold">
+                  ¥
+                  {formatPrice(
+                    (calculateTotalPrice(
+                      tire,
+                      printData.serviceFees[index],
+                      printData.discountRate,
+                    ) +
+                      extraOptionsTotal +
+                      wheelTotals[index]) *
+                      (TAX_RATE - 1.0),
+                  )}
+                </div>
+              </td>
+            ))}
+          </tr>
           <tr className="bg-gray-200">
             <td className="border border-gray-800 p-1 font-semibold">
               合計金額（税込）
@@ -291,23 +355,6 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
                     wheelTotals[index]) *
                     TAX_RATE,
                 )}
-                <span className="mx-2">
-                  (内税
-                  <span className="mx-1">
-                    ¥
-                    {formatPrice(
-                      (calculateTotalPrice(
-                        tire,
-                        printData.serviceFees[index],
-                        printData.discountRate,
-                      ) +
-                        extraOptionsTotal +
-                        wheelTotals[index]) *
-                        (TAX_RATE - 1.0),
-                    )}
-                    )
-                  </span>
-                </span>
               </td>
             ))}
           </tr>
@@ -360,8 +407,9 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
         </div>
       )}
 
-      <div className="flex justify-end text-xs">
-        <Image src="/TakeuchiPartLogo.jpg" alt="ロゴ" width={300} height={88} />
+      <div className="flex flex-col items-end">
+        <Image src="/QuotationLogo.jpg" alt="ロゴ" width={300} height={88} />
+        <span className="">{QUALIFIED_INVOICE_ISSUER_REGISTRATION_NUMBER}</span>
       </div>
     </div>
   );
