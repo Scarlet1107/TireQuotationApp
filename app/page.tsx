@@ -10,7 +10,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toaster";
-import { Separator } from "@/components/ui/separator";
 import PrintContent from "@/app/components/printContent";
 import PrintDataEditor from "./components/PrintDataEditor";
 import ResetButton from "./components/ResetButton";
@@ -176,7 +175,6 @@ const Main = () => {
       <div className="mb-12 mt-8 flex w-screen flex-col justify-center px-4 md:px-8 xl:flex-row xl:px-12">
         <div className="order-2 w-max xl:order-1">
           <GlobalQuotationInputs />
-          <Separator className="hidden md:flex" />
           {/* デフォルトではタブを切り替えるたびにコンポーネントが再レンダリングされてしまうため、TabsContentのclassNameにて表示/非表示の切り替えを行っている。 */}
           <Tabs
             defaultValue="search-tires"
