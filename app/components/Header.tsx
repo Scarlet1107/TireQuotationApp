@@ -3,7 +3,7 @@ import React from "react";
 
 const Header = () => {
   return (
-    <header className="flex flex-col items-center space-x-8 space-y-4 bg-gray-100 p-4 shadow-md md:flex-row md:space-y-0">
+    <header className="flex flex-col items-center space-y-4 bg-gray-100 p-4 shadow-md md:flex-row md:space-x-8 md:space-y-0">
       <Image
         src="/TakeuchiPartLogo.jpg"
         alt="ロゴ"
