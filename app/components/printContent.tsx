@@ -408,7 +408,7 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
       )}
 
       <div className="flex flex-col items-end">
-        <Image src="/TakeuchiPartLogo.jpg" alt="ロゴ" width={300} height={88} />
+        <Image src="/QuotationLogo.jpg" alt="ロゴ" width={300} height={88} />
         <span className="">{QUALIFIED_INVOICE_ISSUER_REGISTRATION_NUMBER}</span>
       </div>
     </div>
