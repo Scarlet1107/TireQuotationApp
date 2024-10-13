@@ -128,7 +128,9 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
             <p className="space-x-2 text-left text-2xl">
               <span>お客様名:</span>
               <span className="font-semibold">{printData.customerName}</span>
-              <span className="font-semibold">様</span>
+              {printData.customerName && (
+                <span className="font-semibold">様</span>
+              )}
             </p>
             <p className="text-left text-2xl">
               車種: <span className="font-semibold">{printData.carModel}</span>
