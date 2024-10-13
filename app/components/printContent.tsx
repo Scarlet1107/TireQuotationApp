@@ -125,11 +125,12 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
       <div className="mb-4">
         <div className="grid grid-cols-2">
           <div className="flex flex-col space-y-2">
-            <p className="text-left text-2xl">
-              お客様名:{" "}
-              <span className="text-2xl font-semibold">
-                {printData.customerName}
-              </span>
+            <p className="space-x-2 text-left text-2xl">
+              <span>お客様名:</span>
+              <span className="font-semibold">{printData.customerName}</span>
+              {printData.customerName && (
+                <span className="font-semibold">様</span>
+              )}
             </p>
             <p className="text-left text-2xl">
               車種: <span className="font-semibold">{printData.carModel}</span>
