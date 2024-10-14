@@ -57,54 +57,62 @@ const PrintHistorySheet = ({ setPrintData }: PrintHistorySheetProps) => {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
   };
   return (
-<Sheet>
-  <SheetTrigger asChild>
-    <Button className="w-min transform bg-blue-500 text-white hover:bg-blue-600">
-      履歴を表示
-    </Button>
-  </SheetTrigger>
-  <SheetContent side={"left"} className="overflow-y-auto md:overflow-hidden">
-    <SheetHeader>
-      <div className="flex items-center justify-center space-x-4">
-        <Button onClick={prevPage} disabled={currentPage === 1}>
-          前へ
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button className="w-min transform bg-blue-500 text-white hover:bg-blue-600">
+          履歴を表示
         </Button>
-        <span>
-          ページ {currentPage} / {totalPages}
-        </span>
-        <Button onClick={nextPage} disabled={currentPage === totalPages}>
-          次へ
-        </Button>
-      </div>
-      <SheetTitle>履歴を管理</SheetTitle>
-    </SheetHeader>
-    <SheetDescription asChild>
-      <SheetClose>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>見積り番号</TableHead>
-              <TableHead>お客様</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {getCurrentPageData().map((history, index) => (
-              <TableRow key={index} onClick={() => setPrintData(history)}>
-                <TableCell className="text-left font-medium">
-                  {history.quotationNumber}
-                </TableCell>
-                <TableCell className="text-left">
-                  {history.customerName}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </SheetClose>
-    </SheetDescription>
-  </SheetContent>
-</Sheet>
-
+      </SheetTrigger>
+      <SheetContent
+        side={"left"}
+        className="overflow-y-auto md:overflow-hidden"
+      >
+        <SheetHeader>
+          <div className="flex items-center justify-center space-x-4">
+            <Button onClick={prevPage} disabled={currentPage === 1}>
+              前へ
+            </Button>
+            <span>
+              ページ {currentPage} / {totalPages}
+            </span>
+            <Button onClick={nextPage} disabled={currentPage === totalPages}>
+              次へ
+            </Button>
+          </div>
+          <SheetTitle>履歴を管理</SheetTitle>
+        </SheetHeader>
+        <SheetDescription asChild>
+          <SheetClose>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>見積り番号</TableHead>
+                  <TableHead>お客様</TableHead>
+                  <TableHead className="hidden 2xl:table-cell">
+                    担当者
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {getCurrentPageData().map((history, index) => (
+                  <TableRow key={index} onClick={() => setPrintData(history)}>
+                    <TableCell className="text-left font-medium">
+                      {history.quotationNumber}
+                    </TableCell>
+                    <TableCell className="text-left">
+                      {history.customerName}
+                    </TableCell>
+                    <TableCell className="hidden 2xl:table-cell">
+                      {history.staffName}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </SheetClose>
+        </SheetDescription>
+      </SheetContent>
+    </Sheet>
   );
 };
 
