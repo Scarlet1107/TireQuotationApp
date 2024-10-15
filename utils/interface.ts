@@ -49,6 +49,7 @@ export interface PrintData {
 
   wheels: Wheel[];
   extraOptions: ExtraOption[];
+  memo: string;
 }
 
 export interface ExtraOption {

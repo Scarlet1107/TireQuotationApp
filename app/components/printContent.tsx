@@ -408,9 +408,21 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
         </div>
       )}
 
-      <div className="flex flex-col items-end">
-        <Image src="/QuotationLogo.jpg" alt="ロゴ" width={300} height={88} />
-        <span className="">{QUALIFIED_INVOICE_ISSUER_REGISTRATION_NUMBER}</span>
+      <div className="grid grid-cols-2">
+        {printData.memo && (
+          <div className="col-start-1 flex flex-col flex-wrap">
+            <span className="font-semibold">商談メモ</span>
+            <span className="w-full flex-wrap whitespace-pre-wrap break-words rounded border-2 border-gray-300 p-2">
+              {printData.memo}
+            </span>
+          </div>
+        )}
+        <div className="col-start-2 flex flex-col items-end">
+          <Image src="/QuotationLogo.jpg" alt="ロゴ" width={300} height={88} />
+          <span className="">
+            {QUALIFIED_INVOICE_ISSUER_REGISTRATION_NUMBER}
+          </span>
+        </div>
       </div>
     </div>
   );

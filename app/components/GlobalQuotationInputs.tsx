@@ -8,6 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { CheckboxState, ExtraOption, PrintData } from "@/utils/interface";
@@ -390,6 +391,20 @@ const GlobalQuotationInputs = () => {
               </div>
             </div>
           ))}
+        </div>
+        <div className="mt-2">
+          <Label htmlFor="memo">商談メモ</Label>
+          <Textarea
+            id="memo"
+            className="mt-1"
+            value={printData.memo}
+            onChange={(e) =>
+              setPrintData({
+                ...printData,
+                memo: e.target.value,
+              })
+            }
+          />
         </div>
       </div>
     </div>
