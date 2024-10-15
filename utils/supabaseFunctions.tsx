@@ -55,14 +55,15 @@ export const uploadPrintData = async (printData: PrintData) => {
       discountRate: printData.discountRate,
       wheels: printData.wheels,
       extraOptions: printData.extraOptions,
+      memo: printData.memo,
     },
   ]);
 
   if (error) {
     console.error("Error uploading print data to printLogs: ", error);
     throw new Error("Failed to upload print data.");
-  } else{
-    console.log("Success to upload print history")
+  } else {
+    console.log("Success to upload print history");
   }
 
   return data;
