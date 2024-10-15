@@ -9,7 +9,7 @@ import {
 
 export const TAX_RATE = 1.1; // 消費税率。2024年8月時点で10%
 export const DEFAULT_EXPIRY_DATE = 14 * 24 * 60 * 60 * 1000; // 見積もりの有効期限。デフォルトは14日
-export const MAX_EXTRAOPTIONS = 10; // 追加オプションの最大数
+export const MAX_EXTRAOPTIONS = 5; // 追加オプションの最大数
 export const QUALIFIED_INVOICE_ISSUER_REGISTRATION_NUMBER = "T5380001017587"; //インボイスの適格請求書発行事業者登録番号
 
 export const DEFAULT_TIRE_SEARCH_FILTERS = {
@@ -62,6 +62,7 @@ export const DEFAULT_PRINTDATA = <PrintData>{
   wheels: [],
   discountRate: DEFAULT_DISCOUNT_RATE,
   extraOptions: [],
+  memo: "",
 };
 
 // 履歴部分の1ページあたりの表示数。現在はスマホサイズに合わせて8に設定

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -118,7 +119,11 @@ const PrintDataEditor = ({ generateQuotationNumber }: PrintDataSheetProps) => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button id="editButton" disabled={printData.tires.length === 0} className="relative">
+        <Button
+          id="editButton"
+          disabled={printData.tires.length === 0}
+          className="relative"
+        >
           編集
           {printData.ids.length >= 0 && (
             <span
@@ -139,7 +144,9 @@ const PrintDataEditor = ({ generateQuotationNumber }: PrintDataSheetProps) => {
       </SheetTrigger>
       <SheetContent className="max-h-[180vh] w-full max-w-xs overflow-y-auto sm:max-w-lg">
         <SheetHeader>
-          <SheetTitle>見積内容の編集</SheetTitle>
+          <SheetTitle className="text-xl">見積内容の編集</SheetTitle>
+          {/* SheetDescriptionを設定しないと警告が出るため空で配置 */}
+          <SheetDescription></SheetDescription>
         </SheetHeader>
         <div className="mt-4 flex flex-col space-y-6">
           {printData.tires.map((tire, index) => (
