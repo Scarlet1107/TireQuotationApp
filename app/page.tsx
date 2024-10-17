@@ -59,6 +59,16 @@ const Main = () => {
     }
   }, [printData]);
 
+  // お客様名が変更されたときに見積もり番号を再生成
+  useEffect(() => {
+    setPrintData({
+      ...printData,
+      quotationNumber: generateQuotationNumber(),
+    });
+    console.log("useEffect was called");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [printData.customerName]);
+
   const savePrintData = (printData: PrintData) => {
     localStorage.setItem("printData", JSON.stringify(printData));
   };
