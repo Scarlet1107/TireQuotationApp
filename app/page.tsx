@@ -59,15 +59,15 @@ const Main = () => {
     }
   }, [printData]);
 
-  // お客様名が変更されたときに見積もり番号を再生成
-  useEffect(() => {
-    setPrintData({
-      ...printData,
-      quotationNumber: generateQuotationNumber(),
-    });
-    console.log("useEffect was called");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [printData.customerName]);
+  // // お客様名が変更されたときに見積もり番号を再生成
+  // useEffect(() => {
+  //   setPrintData({
+  //     ...printData,
+  //     quotationNumber: generateQuotationNumber(),
+  //   });
+  //   console.log("useEffect was called");
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [printData.customerName]);
 
   const savePrintData = (printData: PrintData) => {
     localStorage.setItem("printData", JSON.stringify(printData));
@@ -184,7 +184,9 @@ const Main = () => {
       <Header />
       <div className="mb-12 mt-8 flex w-screen flex-col justify-center px-4 md:px-8 xl:flex-row xl:px-12">
         <div className="order-2 w-max xl:order-1">
-          <GlobalQuotationInputs />
+          <GlobalQuotationInputs
+            generateQuotationNumber={generateQuotationNumber}
+          />
           {/* デフォルトではタブを切り替えるたびにコンポーネントが再レンダリングされてしまうため、TabsContentのclassNameにて表示/非表示の切り替えを行っている。 */}
           <Tabs
             defaultValue="search-tires"
