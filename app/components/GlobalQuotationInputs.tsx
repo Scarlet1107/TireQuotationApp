@@ -20,7 +20,13 @@ import { MAX_EXTRAOPTIONS } from "@/config/constants";
 import PrintHistorySheet from "./PrintHistorySheet";
 import { usePrintData } from "../printDataContext";
 
-const GlobalQuotationInputs = () => {
+interface GlobalQuotationInputsProps {
+  generateQuotationNumber: () => string;
+}
+
+const GlobalQuotationInputs = ({
+  generateQuotationNumber,
+}: GlobalQuotationInputsProps) => {
   // クリックしたとき数値入力欄を自動選択
   const { printData, setPrintData } = usePrintData();
   const tireQuantityInputRef = useRef<HTMLInputElement>(null);
@@ -159,6 +165,13 @@ const GlobalQuotationInputs = () => {
                   setPrintData({
                     ...printData,
                     customerName: e.target.value,
+                  })
+                }
+                // onChangeだと履歴からsetPrint関数を呼び出したときに上書きしてしまうのでKeyDownで対応
+                onKeyDown={() =>
+                  setPrintData({
+                    ...printData,
+                    quotationNumber: generateQuotationNumber(),
                   })
                 }
               />

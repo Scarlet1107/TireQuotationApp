@@ -285,10 +285,16 @@ const PrintContent = React.forwardRef<HTMLDivElement>((props, ref) => {
               {printData.tires.map((_, index) => {
                 return printData.wheels[index].isIncluded ? (
                   <td key={index} className="border border-gray-800 p-1">
-                    <p>
-                      {printData.wheels[index].name} (
-                      {printData.wheels[index].size})
-                    </p>
+                    <div className="space-x-2">
+                      <span>
+                        {printData.wheels[index].name} (
+                        {printData.wheels[index].size})
+                      </span>
+                      <span>
+                        {formatPrice(printData.wheels[index].price)} ×{" "}
+                        {printData.wheels[index].quantity}本
+                      </span>
+                    </div>
                     <div className="font-semibold">
                       ¥{formatPrice(wheelTotals[index])}
                     </div>
